@@ -10,7 +10,7 @@ export default function Home() {
       {/* BANNER */}
       <section className="relative">
         {/* Dark Overlay */}
-        <div className="absolute bg-black bg-opacity-40 w-full h-full top-0 flex items-center pl-8">
+        <div className="absolute bg-black bg-opacity-40 w-full h-full top-0 flex items-center pl-8 lg:pl-16">
           <div className="max-w-[1500px]">
             <h2 className="text-white text-4xl sm:text-6xl lg:text-7xl font-bold">
               FAMILY FEDERATION FOR WORLD PEACE AND UNIFICATION
