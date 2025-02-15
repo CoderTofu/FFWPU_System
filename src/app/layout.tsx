@@ -24,10 +24,10 @@ export default function RootLayout({
     <html lang="en">
       <link rel="icon" href="/icons/ffwpu_icon.svg" sizes="any" />
       <body className={`antialiased min-h-screen flex flex-col`}>
-        {isLogin ? <NavbarPrivate /> : <NavbarPublic />}
+        <NavbarPublic />
         <Preloader />
         <main className="flex-grow">{children}</main>
-        {isLogin ? <FooterPrivate /> : <FooterPublic />}
+        <FooterPublic />
       </body>
     </html>
   );

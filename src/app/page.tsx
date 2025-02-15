@@ -1,12 +1,8 @@
-import NavbarPublic from "@/components/NavbarPublic";
-import FooterPublic from "@/components/FooterPublic";
 import ChatbotWidget from "../components/ChatbotWidget";
 
 export default function Home() {
   return (
     <div className="relative">
-      <NavbarPublic />
-
       {/* BANNER */}
       <section className="relative">
         {/* Dark Overlay */}
