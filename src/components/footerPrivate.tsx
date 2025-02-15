@@ -1,3 +1,7 @@
 export default function FooterPrivate() {
-  return <div className="bg-red-500 text-white p-4">THIS IS FOOTER</div>;
+  return (
+    <div className="bg-[#01438F] text-white p-8 text-center">
+      Copyright © 2025, FFWPU. All Rights Reserved.
+    </div>
+  );
 }

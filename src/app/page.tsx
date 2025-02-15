@@ -1,3 +1,4 @@
+import { useState } from "react";
 import ChatbotWidget from "../components/ChatbotWidget";
 
 export default function Home() {
@@ -84,7 +85,7 @@ export default function Home() {
       </section>
 
       {/* Chat Bot */}
-      <section className="px-5 sm:p-0 my-16 flex justify-around flex-col sm:flex-row items-center">
+      <section className="min-h-[400px] px-5 sm:p-0 my-16 flex justify-around flex-col sm:flex-row items-center">
         <div className="">
           <h3 className="text-4xl  lg:text-6xl font-bold text-[#BE9231]">
             Got Any Questions?
