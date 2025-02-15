@@ -1,6 +1,6 @@
-import NavbarPublic from "@/components/navbarPublic";
-import FooterPublic from "@/components/footerPublic";
-import ChatbotWidget from "./../components/chatbotWidget";
+import NavbarPublic from "@/components/NavbarPublic";
+import FooterPublic from "@/components/FooterPublic";
+import ChatbotWidget from "../components/ChatbotWidget";
 
 export default function Home() {
   return (
@@ -106,7 +106,6 @@ export default function Home() {
         </div>
       </section>
       <ChatbotWidget />
-      <FooterPublic />
     </div>
   );
 }

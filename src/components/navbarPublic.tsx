@@ -20,7 +20,7 @@ export default function NavbarPublic() {
   }, [isSidebarOpen]);
 
   const navItems = [
-    { name: "Home", href: "/home", icon: Home },
+    { name: "Home", href: "/", icon: Home },
     { name: "About Us", href: "/about", icon: Info },
     { name: "Contacts", href: "/contacts", icon: Phone },
     { name: "Admin", href: "/login", icon: Shield },
@@ -30,7 +30,7 @@ export default function NavbarPublic() {
     <div className="bg-[#01438F] text-white p-4 px-[100px] min-h-[100px] flex justify-between items-center">
       {/* Logo */}
       <div className="flex gap-4 items-center">
-        <a href="/home">
+        <a href={"/"}>
           <img
             src="/icons/ffwpu_icon.svg"
             className="h-full w-auto"
@@ -90,7 +90,7 @@ export default function NavbarPublic() {
 
         <div className="mt-auto">
           <p className="text-sm text-gray-300">
-            © 2023 FFWPU. All rights reserved.
+            © 2025 FFWPU. All rights reserved.
           </p>
         </div>
       </div>

@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-
 export default function FooterPublic() {
   return (
     <div className="bg-[#01438F] text-white p-8 px-[100px] flex justify-center md:justify-between items-center">

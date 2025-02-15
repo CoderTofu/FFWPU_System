@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Preloader from "../components/preLoader";
-import type React from "react"; // Import React
+import { useState } from "react";
+import Preloader from "../components/Preloader";
+import FooterPublic from "@/components/FooterPublic";
+import NavbarPublic from "@/components/NavbarPublic";
+import FooterPrivate from "@/components/FooterPrivate";
+import NavbarPrivate from "@/components/NavbarPrivate";
+import { useRef } from "react";
 
 export const metadata: Metadata = {
   title: "FFWPU-System",
@@ -13,11 +18,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let isLogin = false; // Temporary value
+
   return (
     <html lang="en">
-      <body className={`antialiased`}>
+      <link rel="icon" href="/icons/ffwpu_icon.svg" sizes="any" />
+      <body className={`antialiased min-h-screen flex flex-col`}>
+        {isLogin ? <NavbarPrivate /> : <NavbarPublic />}
         <Preloader />
-        {children}
+        <main className="flex-grow">{children}</main>
+        {isLogin ? <FooterPrivate /> : <FooterPublic />}
       </body>
     </html>
   );
