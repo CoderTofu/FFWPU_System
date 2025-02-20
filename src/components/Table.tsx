@@ -8,7 +8,7 @@ return (
     <div className="overflow-x-auto">
     <table className="w-full border-collapse border border-gray-300">
         <thead>
-        <tr className="bg-[#01438F] text-[#FCC346]">
+        <tr className="bg-[#01438F] text-[#FCC346] cursor-pointer">
             {headers.map((header, index) => (
             <th key={index} className="px-4 py-2 text-center">
                 {header}
@@ -19,7 +19,7 @@ return (
         <tbody>
         {data.length > 0 ? (
             data.map((row, rowIndex) => (
-            <tr key={rowIndex} className="hover:bg-[#D9D9D9]">
+            <tr key={rowIndex} className="hover:bg-[#E7E6E6] cursor-pointer">
                 {headers.map((header, colIndex) => (
                 <td key={colIndex} className="px-4 py-2 text-center">
                     {row[header] ?? "-"}
