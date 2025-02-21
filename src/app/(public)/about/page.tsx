@@ -1,3 +1,5 @@
+import ChatbotWidget from "../../../components/chatbotWidget";
+
 export default function About() {
   return (
     <div className="relative">
@@ -25,7 +27,7 @@ export default function About() {
           </h2>
         </div>
 
-        <div className="text-2xl w-full mx-auto text-left sm:text-justify">
+        <div className="text-2xl max-w-[1168px] mx-auto text-justify leading-relaxed tracking-normal px-8 md:px-16">
           <p>
             The Family Federation is a global movement that, like its birthplace South Korea, has experienced remarkable growth.
             Sun Myung Moon, its founder, was called by Jesus Christ to his mission in 1935, during Korea’s harsh Japanese occupation.
@@ -59,9 +61,9 @@ export default function About() {
               className="rounded-lg w-full sm:w-[442px] h-auto"/>
             </div>
 
-          <div className="text-area">
-            <p className="mt-4 mb-4 text-center text-2xl sm:text-3xl font-semibold">Hak Ja Han Moon</p>
-          </div> 
+            <div className="text-area">
+              <p className="mt-4 mb-4 text-center text-2xl sm:text-3xl font-semibold">Hak Ja Han Moon</p>
+            </div> 
           </div>
         </div>
 
@@ -86,6 +88,9 @@ export default function About() {
           </p>
         </div>
       </section>
+
+      <ChatbotWidget />
+
     </div>
   );
 }

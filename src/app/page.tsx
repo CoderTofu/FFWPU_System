@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ChatbotWidget from "../components/ChatbotWidget";
+import ChatbotWidget from "../components/chatbotWidget";
 
 export default function Home() {
   return (
