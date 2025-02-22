@@ -1,4 +1,4 @@
-import ChatbotWidget from "../../../components/chatbotWidget";
+import ChatbotWidget from "@/components/chatbotWidget";
 
 export default function About() {
   return (
@@ -27,7 +27,7 @@ export default function About() {
           </h2>
         </div>
 
-        <div className="text-2xl max-w-[1168px] mx-auto text-justify leading-relaxed tracking-normal px-8 md:px-16">
+        <div className="text-[18px] ml-14 mr-14 text-left sm:text-justify leading-9">
           <p>
             The Family Federation is a global movement that, like its birthplace South Korea, has experienced remarkable growth.
             Sun Myung Moon, its founder, was called by Jesus Christ to his mission in 1935, during Korea’s harsh Japanese occupation.
@@ -51,7 +51,7 @@ export default function About() {
             </div>
             
             <div className="text-area">
-              <p className="mt-4 mb-4 text-center text-2xl sm:text-3xl font-semibold">Sun Myung Moon</p>
+              <p className="mt-4 mb-4 text-center text-[28.75px] sm:text-[28.75px] font-semibold">Sun Myung Moon</p>
             </div>
           </div>
 
@@ -62,7 +62,7 @@ export default function About() {
             </div>
 
             <div className="text-area">
-              <p className="mt-4 mb-4 text-center text-2xl sm:text-3xl font-semibold">Hak Ja Han Moon</p>
+              <p className="mt-4 mb-4 text-center text-[28.75px] sm:text-[28.75px] font-semibold">Hak Ja Han Moon</p>
             </div> 
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function About() {
           </h2>
         </div>
 
-        <div className="text-2xl mx-auto text-left sm:text-justify">
+        <div className="text-[18px] ml-14 mr-14 text-left sm:text-justify leading-9">
           <p>
             The Family Federation for World Peace and Unification strives to build a peaceful world, not a new religion. 
             Our vision is a global family where people of all faiths live in harmony, recognizing God as our Heavenly Parent.
