@@ -16,6 +16,11 @@ pnpm dev
 bun dev
 ```
 
+## Relevant Links
+
+- Feature Document: [Google Docs](https://docs.google.com/document/d/1f0t-Xctr4BFc-mCnA4dZaLp0oPKl8h0XmAuKnhIUL_E/edit?usp=sharing)
+- Figma Web Design: [Figma](https://www.figma.com/design/0RouhR7wALLTVZY8l9yjMy/CS-Elective---FFWPU?node-id=277-67&t=OPzIi6RkJDZNcLOT-1)
+
 ## Features
 
 1. Member Management
