@@ -10,5 +10,5 @@ export default function Member() {
     router.push("/member/add-member");
   }, [router]);
 
-  return null; // No need for an empty div
+  return null;
 }

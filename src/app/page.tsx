@@ -1,9 +1,8 @@
-import { useState } from "react";
 import ChatbotWidget from "../components/ChatbotWidget";
 
 export default function Home() {
   return (
-    <div className="relative">
+    <div className="relative" id="random_id">
       {/* BANNER */}
       <section className="relative">
         {/* Dark Overlay */}
