@@ -1,4 +1,4 @@
-import ChatbotWidget from "@/components/chatbotWidget";
+import ChatbotWidget from "@/components/ChatbotWidget";
 
 export default function About() {
   return (
