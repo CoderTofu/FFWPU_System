@@ -257,7 +257,10 @@ export function DeleteSubregionModal() {
             <Label htmlFor="region-select" className="text-right font-bold">
               Region
             </Label>
-            <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+            <Select
+              value={selectedRegion.toString()}
+              onValueChange={setSelectedRegion}
+            >
               <SelectTrigger
                 id="region-select"
                 className="col-span-3 border-2 border-black rounded-sm"
