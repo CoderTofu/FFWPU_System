@@ -1,10 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import NavbarPublic from "@/components/NavbarPublic";
-import NavbarPrivate from "@/components/NavbarPrivate";
-import FooterPublic from "@/components/FooterPublic";
-import FooterPrivate from "@/components/FooterPrivate";
+import NavbarPublic from "@/components/navbarPublic";
+import NavbarPrivate from "@/components/navbarPrivate";
+import FooterPublic from "@/components/footerPublic";
+import FooterPrivate from "@/components/footerPrivate";
 
 export default function LayoutWrapper({
   children,
