@@ -401,7 +401,6 @@ export function AddNewAdminModal() {
 
   const handleAddAdmin = () => {
     // Add logic to handle adding a new admin
-    const access_token = Cookies.get("access_token");
     axiosInstance
       .post(
         "/add-admin/",
@@ -410,7 +409,7 @@ export function AddNewAdminModal() {
           email: adminEmail,
           password: adminPassword,
         },
-        { headers: { Authorization: `Bearer ${access_token}` } }
+        { headers: { Authorization: `Bearer ${Cookies.get("access_token")}` } }
       )
       .then((response) => {
         if (response.status == 201) {
