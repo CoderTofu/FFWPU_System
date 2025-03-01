@@ -1,12 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, MouseEvent } from "react";
 import { Menu, X, ArrowRight, CircleUserRound } from "lucide-react"; // Added more icons
-
-export default function NavbarPublic() {
+import Cookies from "js-cookie";
+export default function NavbarPrivate() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   // Prevent scrolling when sidebar is open
   useEffect(() => {
     if (isSidebarOpen) {
@@ -27,6 +26,12 @@ export default function NavbarPublic() {
     { name: "Reporting", href: "/reporting" },
     { name: "CMS", href: "/cms" },
   ];
+
+  const logout = (e: MouseEvent) => {
+    Cookies.remove("access_token");
+    Cookies.remove("refresh_token");
+    window.location.href = "/";
+  };
 
   return (
     <div className="bg-[#01438F] border-b-4 border-[#FCC346] text-white p-4 px-[100px] min-h-[100px] flex justify-between items-center">
@@ -85,10 +90,11 @@ export default function NavbarPublic() {
         ))}
 
         <a
-          href={"/"}
+          // href={"/"}
+          onClick={logout}
           className="mt-auto transition-all duration-200 hover:scale-110 justify-center items-center flex "
         >
-          <ArrowRight className="w-12 h-12" />
+          <ArrowRight className="w-12 h-12 cursor-pointer" />
         </a>
       </div>
 
