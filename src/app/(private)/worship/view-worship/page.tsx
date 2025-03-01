@@ -1,6 +1,5 @@
 "use client"; // This makes the file a client component
 
-
 import Table from "@/components/Table";
 
 export default function Brent() {
@@ -19,9 +18,9 @@ export default function Brent() {
   };
 
   return (
-    <div className="p-[20px] sm:p-[50px] bg-[#D9D9D9] min-h-screen justify-center items-center ">
-      {/*Banner*/}
-      <div className=" bg-white p-4 shadow-[0px_4px_4px_rgba(0,0,0,0.25)]">
+    <div className="p-[20px] sm:p-[50px] bg-[#D9D9D9] min-h-screen justify-center items-center">
+      {/* Banner */}
+      <div className="bg-white p-4 shadow-[0px_4px_4px_rgba(0,0,0,0.25)]">
         <p className="mt-4 mb-4 text-center text-2xl sm:text-3xl font-semibold">
           WORSHIP EVENTS
         </p>
@@ -32,13 +31,9 @@ export default function Brent() {
         <p className="text-xl font-roboto font-normal whitespace-nowrap">
           First Sunday Event
         </p>
-        <div className="border-2 border-[#01438F] border-solid rounded-lg flex items-center justify-center bg-white mt-6 min-h-[300px] ">
+        <div className="border-2 border-[#01438F] border-solid rounded-lg flex items-center justify-center bg-white mt-6 min-h-[300px]">
           <label className="flex flex-col items-center cursor-pointer">
-            <input
-              type="file"
-              accept=".png,.jpg,.jpeg,.svg"
-              className="hidden"
-            />
+            <input type="file" accept=".png,.jpg,.jpeg,.svg" className="hidden" />
             <div className="flex flex-col items-center text-gray-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -62,25 +57,20 @@ export default function Brent() {
       </div>
 
       <section>
-        <div className="md:p-6 ">
+        <div className="md:p-6">
           <div className="flex flex-col md:flex-row">
-            
-            <div className="flex  flex-1 justify-center items-start gap-2">
-              <div className="rounded-lg mt-[20px] sm:mt-0 w-full ">
+            <div className="flex flex-1 justify-center items-start gap-2">
+              <div className="rounded-lg mt-[20px] sm:mt-0 w-full">
                 <div className="flex flex-wrap gap-4 justify-center">
                   {/* First table */}
-                  <div className="w-full rounded-lg  p-4 pb-0">
-                    <h2 className="text-lg font-semibold mb-2">
-                      Members Attended
-                    </h2>
+                  <div className="w-full rounded-lg p-4 pb-0">
+                    <h2 className="text-lg font-semibold mb-2">Members Attended</h2>
                     <Table data={data} columns={columnConfig} />
                   </div>
 
                   {/* Second table */}
                   <div className="w-full rounded-lg p-4">
-                    <h2 className="text-lg font-semibold mb-2">
-                      Guests Attended
-                    </h2>
+                    <h2 className="text-lg font-semibold mb-2">Guests Attended</h2>
                     <Table
                       data={data}
                       columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
@@ -89,34 +79,47 @@ export default function Brent() {
                 </div>
               </div>
             </div>
+
             <div className="flex flex-1 justify-start items-start flex-col">
-              <div className="flex justify-center items-center w-full text-xl font-semibold ">
+              <div className="flex justify-center items-center w-full text-xl font-semibold">
                 <p className="text-2xl m-8">DETAILS</p>
               </div>
-              <form className="flex flex-col gap-4 text-left ">
-                <div className="flex mb-1 ">
+              <form className="flex flex-col gap-4 text-left pl-8 w-full">
+                <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Worship ID:</label>
-                  <p className="ml-2 text-base">Placeholder</p>
+                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
+                    <p className="text-base">Placeholder</p>
+                  </div>
                 </div>
-                <div className="flex mb-1 ">
+                <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Date:</label>
-                  <p className="ml-2 text-base">Placeholder</p>
+                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
+                    <p className="text-base">Placeholder</p>
+                  </div>
                 </div>
-                <div className="flex mb-1 ">
+                <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Sub Region:</label>
-                  <p className="ml-2 text-base">Placeholder</p>
+                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
+                    <p className="text-base">Placeholder</p>
+                  </div>
                 </div>
-                <div className="flex mb-1 ">
+                <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Region:</label>
-                  <p className="ml-2 text-base">Placeholder</p>
+                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
+                    <p className="text-base">Placeholder</p>
+                  </div>
                 </div>
-                <div className="flex mb-1 ">
+                <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Church:</label>
-                  <p className="ml-2 text-base">Placeholder</p>
+                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
+                    <p className="text-base">Placeholder</p>
+                  </div>
                 </div>
-                <div className="flex mb-1 ">
+                <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Worship Type:</label>
-                  <p className="ml-2 text-base">Placeholder</p>
+                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
+                    <p className="text-base">Placeholder</p>
+                  </div>
                 </div>
               </form>
             </div>
