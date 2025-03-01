@@ -66,7 +66,7 @@ const Table: React.FC<TableProps> = ({ data, columns, rowDoubleClickPath, onRowS
     <div ref={tableRef} className="overflow-x-auto min-h-[300px] max-h-[450px] overflow-y-auto rounded-lg">
       <table className="min-w-full border-gray-300 bg-white rounded-lg">
         {/* Table Head */}
-        <thead className="bg-gray-200">
+        <thead className="bg-gray-200 sticky top-0">
           <tr className="bg-[#01438F] text-[#FCC346] cursor-pointer">
             {visibleHeaders.map((header) => (
               <th key={header} className="px-4 py-2 text-center top-0">
