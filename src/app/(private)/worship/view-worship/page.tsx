@@ -1,8 +1,8 @@
-"use client"; // This makes the file a client component
+"use client"; 
 
 import Table from "@/components/Table";
 
-export default function Brent() {
+export default function ViewWorship() {
   const data = [
     { ID: 6001, Name: "Orton, Johan H." },
     { ID: 6002, Name: "Reigns, Jeff T." },
