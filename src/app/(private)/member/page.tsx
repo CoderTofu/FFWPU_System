@@ -7,7 +7,7 @@ export default function Member() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/member/add-member");
+    router.push("/member/view-members");
   }, [router]);
 
   return null;

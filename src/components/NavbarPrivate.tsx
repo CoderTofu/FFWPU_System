@@ -29,7 +29,7 @@ export default function NavbarPublic() {
   ];
 
   return (
-    <div className="bg-[#01438F] text-white p-4 px-[100px] min-h-[100px] flex justify-between items-center">
+    <div className="bg-[#01438F] border-b-4 border-[#FCC346] text-white p-4 px-[100px] min-h-[100px] flex justify-between items-center">
       {/* Logo */}
       <div className="flex gap-4 items-center">
         <a href={"/"}>
@@ -75,7 +75,7 @@ export default function NavbarPublic() {
 
         {navItems.map((item, index) => (
           <a
-            key={item.name}
+            key={item.name + index}
             className="flex items-center hover:bg-blue-700 p-2 rounded-md transition-all duration-200 hover:translate-x-2 text-base"
             href={item.href}
             onClick={() => setIsSidebarOpen(false)}
