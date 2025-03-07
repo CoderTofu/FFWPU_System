@@ -131,7 +131,7 @@ export default function Donation() {
           openSortDropdown={openSortDropdown} // Pass sorting dropdown state
           openCurrencyDropdown={openCurrencyDropdown} // Pass currency dropdown state
           toggleSortDropdown={toggleSortDropdown} // Pass sorting dropdown toggle
-          setOpenCurrencyDropdown={setOpenCurrencyDropdown} // Pass currency dropdown toggle
+          toggleCurrencyDropdown={toggleCurrencyDropdown} // Pass currency dropdown toggle
           handleSort={handleSort}
           selectedCurrency={selectedCurrency}
           setSelectedCurrency={setSelectedCurrency}
