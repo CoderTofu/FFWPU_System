@@ -1,10 +1,16 @@
 "use client"
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { ImageIcon } from "lucide-react";
 
+interface HistoryEntry {
+  role: string;
+  organization: string;
+  country: string;
+  startDate: string;
+  endDate: string;
+}
+
 export default function AddMember() {
-  const [input, setInput] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     givenName: "",
@@ -13,12 +19,52 @@ export default function AddMember() {
     age: "",
     birthdate: "",
     gender: "",
+    region: "",
+    subRegion: "",
+    maritalStatus: "",
+    nation: "",
+    spouseName: "",
+    phone: "",
+    email: "",
+    address: "",
+    generation:"",
+    blessingStatus: "",
+    spiritualBirthday: "",
+    spiritualParent: "",
+    membershipCategory: "",
+    missionHistory: [{ role: "", organization: "", country: "", startDate: "", endDate: "" }]
   });
 
+  //Change in normal forms
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  //Change in Mission History
+  const handleHistoryChange = (index: number, field: keyof HistoryEntry, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      history: prev.missionHistory.map((entry, i) => (i === index ? { ...entry, [field]: value } : entry)),
+    }));
+  };
+
+  // Add another history entry
+  const addHistory = () => {
+    setFormData((prev) => ({
+      ...prev,
+      missionHistory: [...prev.missionHistory, { role: "", organization: "", country: "", startDate: "", endDate: "" }],
+    }));
+  };
+
+  // Remove a history entry
+  const removeHistory = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      missionHistory: prev.missionHistory.filter((_, i) => i !== index),
+    }));
+  };
+
+  //Handle Submit when Adding new Member
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Member Data:", formData);
@@ -34,7 +80,7 @@ export default function AddMember() {
     }
   };
 
-  return (<div className="p-4 bg-[#D9D9D9] min-h-screen justify-center items-center">
+  return (<div className="p-8 bg-[#D9D9D9] min-h-screen flex justify-center items-center">
     <form onSubmit={handleSubmit}>
     {/*Banner */}
     <div className=" bg-white p-4 shadow-[0px_4px_4px_rgba(0,0,0,0.25)]">
@@ -46,22 +92,23 @@ export default function AddMember() {
     {/*Personal Information Section*/}
     <section className="">
       
-      <p className="text-lg text-[#BE9231] font-[700]">PERSONAL INFORMATION</p>
+      <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">PERSONAL INFORMATION</p>
         {/* Div for Form and Picture */}
-        <div className="flex flex-row">
-          {/* Div for Form*/}
+        <div className="flex flex-row gap-2">
+        {/* Div for Form*/}
         <div className="flex flex-col">
-          {/* Div for First Row of Form*/}
-        <div className="flex flex-row gap-4">
+        {/* Div for First Row of Form*/}
+        <div className="flex flex-row gap-4 mt-2 mb-2">
           {/*Given Name*/}
           <div className="w-1/6">
-            <p>Given Name</p>
+            <label>Given Name</label>
             <div>
               <input 
               type="text"
               name="givenName"
               value={formData.givenName}
-              onChange={handleChange} 
+              onChange={handleChange}
+              required
               className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
             </div>
             <p className="text-[#E00000] text-xs italic">Given Name is Required</p>
@@ -69,30 +116,46 @@ export default function AddMember() {
 
           {/*Middle Name*/}
           <div className="w-1/6">
-            <p>Middle Name</p>
+            <label>Middle Name</label>
             <div>
-              <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-              className="border-[#01438F] border rounded-md w-full"/>
+              <input 
+              type="text"
+              name="middleName"
+              value={formData.middleName}
+              onChange={handleChange} 
+              required
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
             </div>
           </div>
 
           {/*Family Name*/}
           <div className="w-1/6">
-            <p>Family Name</p>
+            <label>Family Name</label>
             <div>
-              <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-              className="border-[#01438F] border rounded-md w-full"/>
+              <input 
+              type="text"
+              name="familyName"
+              value={formData.familyName}
+              onChange={handleChange}
+              required
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
             </div>
             <p className="text-[#E00000] text-xs">Family Name is Required</p>
           </div>
 
           {/*Gender*/}
           <div className="w-1/6">
-            <p>Gender</p>
+            <label>Gender</label>
             <div>
-              <select className="border-[#01438F] border rounded-md w-full">
-                <option>Male</option>
-                <option>Female</option>
+              <select 
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              required
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
               </select>
             </div>
           </div>
@@ -100,139 +163,200 @@ export default function AddMember() {
 
           {/*Date of Birth*/}
           <div className="w-1/6">
-            <p>Date of Birth</p>
+            <label>Date of Birth</label>
             <div>
-              <input type="date" value={input}onChange={(e)=>setInput(e.target.value)} 
-              className="border-[#01438F] border rounded-md w-full"/>
+              <input 
+              type="date"
+              name="birthdate"
+              value={formData.birthdate}
+              onChange={handleChange}
+              required
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
             </div>
           </div>
 
           {/*Age */}
           <div className="w-1/6">
-            <p>Age</p>
+            <label>Age</label>
             <div>
-              <input type="number" value={input}onChange={(e)=>setInput(e.target.value)} 
-              className="border-[#01438F] border rounded-md w-full"/>
+              <input 
+              type="number"
+              name="age"
+              value={formData.age}
+              onChange={handleChange}
+              min="0"
+              required
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
             </div>
           </div>
 
         </div>
 
-
-        <div className="flex flex-row gap-4">
+          {/* Div for Second Row of Form*/}
+        <div className="flex flex-row gap-4 mt-2 mb-2">
           {/*Region*/}
           <div className="w-1/5">
-            <p>Region</p>
+            <label>Region</label>
             <div>
-              <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-              className="border-[#01438F] border rounded-md w-full"/>
+              <input
+              type="text"
+              name="region"
+              value={formData.region}
+              onChange={handleChange} 
+              required
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
             </div>
           </div>
 
           {/*SubRegion*/}
           <div className="w-1/5">
-            <p>Sub Region</p>
+            <label>Sub Region</label>
             <div>
-              <select className="border-[#01438F] border rounded-md w-full">
-                <option>Subregion 1</option>
-                <option>Subregion 2</option>
+              <select 
+              name="subRegion"
+              value={formData.subRegion}
+              onChange={handleChange}
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"
+              required>
+                <option value="">Select Sub Region</option>
+                <option value="SR1">Sub Region 1</option>
+                <option value="SR2">Sub Region 2</option>
               </select>
             </div>
           </div>
 
           {/*Marital Status*/}
           <div className="w-1/5">
-            <p>Marital Status</p>
+            <label>Marital Status</label>
             <div>
-              <select className="border-[#01438F] border rounded-md w-full">
-                <option>Single</option>
-                <option>Married</option>
+              <select 
+              name="maritalStatus"
+              value={formData.maritalStatus}
+              onChange={handleChange}
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"
+              required>
+                <option value="">Select Marital Status</option>
+                <option value="SR1">Single</option>
+                <option value="SR2">Married</option>
               </select>
             </div>
           </div>
 
           {/*Nation*/}
           <div className="w-1/5">
-            <p>Nation</p>
+            <label>Nation</label>
             <div>
-              <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-              className="border-[#01438F] border rounded-md w-full"/>
+              <input 
+              type="text"
+              name="nation"
+              value={formData.nation}
+              onChange={handleChange}
+              required
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
             </div>
           </div>
 
           {/*Name of Spouse*/}
           <div className="w-1/5">
-            <p>Name of Spouse</p>
+            <label>Name of Spouse</label>
             <div>
-              <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-              className="border-[#01438F] border rounded-md w-full"/>
+              <input 
+              type="text"
+              name="spouseName"
+              value={formData.spouseName}
+              onChange={handleChange}
+              required 
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
             </div>
           </div>
 
         </div>
 
-        <div className="flex flex-row gap-4">
+          {/* Div for Third Row of Form*/}
+        <div className="flex flex-row gap-4 mt-2 mb-2">
           {/*Phone*/}
           <div className="w-1/5">
-            <p>Phone</p>
+            <label>Phone</label>
             <div>
-              <input type="text" value={input}onChange={(e)=>setInput(e.target.value)}
-              placeholder="0912-345-6789" 
-              className="border-[#01438F] border rounded-md w-full"/>
+              <input 
+              type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required 
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"
+              placeholder="0912-345-6789" />
             </div>
           </div>
 
           {/*Email*/}
           <div className="w-1/5">
-            <p>Email</p>
+            <label>Email</label>
             <div>
-              <input type="text" value={input}onChange={(e)=>setInput(e.target.value)}
-              placeholder="example@mail.com" 
-              className="border-[#01438F] border rounded-md w-full"/>
+              <input 
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required 
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"
+              placeholder="example@mail.com"/>
             </div>
             <p className="text-[#E00000] text-xs">Please Enter a Valid Email</p>
           </div>
 
           {/*Address*/}
           <div className="w-3/5">
-            <p>Address</p>
+            <label>Address</label>
             <div>
-              <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-              className="border-[#01438F] border rounded-md w-full"/>
+              <input 
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              required 
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
             </div>
           </div>
         </div>
-
-        
         </div>
+
           {/* Div for Picture*/}
-          <div className="flex flex-col items-center space-y-4">
-            <div className="w-32 h-32 border-2 border-dashed flex items-center justify-center rounded-lg overflow-hidden bg-gray-100">
+          <div className="flex flex-col items-center center space-y-4 w-1/6">
+            <div className="w-32 h-32 border-2 border-dashed flex items-center justify-center overflow-hidden bg-gray-100">
               {image ? (
                 <img src={image} alt="Uploaded preview" className="w-full h-full object-cover" />
               ) : (
-                <ImageIcon className="w-10 h-10 text-gray-400" />
+                <ImageIcon className="w-10 h-10 text-gray-800" />
               )}
             </div>
             <label className="bg-[#01438f] text-[#FCC346] font-[700] pl-6 pr-6 px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700">
               UPLOAD
               <input type="file" accept="image/jpeg, image/jpg, image/png" className="hidden" onChange={handleImageChange} />
             </label>
-            <p className="text-sm text-gray-500">Upload file (JPEG, JPG, PNG) - 1x1 size required.</p>
+            <div className="w-32">
+              <p className="text-xs italic ">Upload file (JPEG, JPG, PNG) - 1x1 size required.</p>
+            </div>
+            
           </div>   
       </div>
     </section>
 
     {/*Spiritual Information Section */}
-    <section className="flex flex-col">
-      <p className="text-lg text-[#BE9231] font-[700]">SPIRITUAL INFORMATION</p>
-      <div className="flex flex-row w-3/4 gap-4">
+    <section className="">
+      <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">SPIRITUAL INFORMATION</p>
+      <div className="flex flex-row w-10/12 gap-4">
         {/*Generation*/}
         <div className="w-1/5">
           <p>Generation</p>
           <div>
-            <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-            className="border-[#01438F] border rounded-md w-full"/>
+            <input 
+            type="text"
+            name="generation"
+            value={formData.generation}
+            onChange={handleChange}
+            required 
+            className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
           </div>
         </div>
 
@@ -240,8 +364,13 @@ export default function AddMember() {
         <div className="w-1/5">
           <p>Blessing Status</p>
           <div>
-            <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-            className="border-[#01438F] border rounded-md w-full"/>
+            <input 
+            type="text"
+            name="blessingStatus"
+            value={formData.blessingStatus}
+            onChange={handleChange}
+            required 
+            className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
           </div>
         </div>
 
@@ -249,8 +378,13 @@ export default function AddMember() {
         <div className="w-1/5">
           <p>Spiritual Birthday</p>
           <div>
-            <input type="date" value={input}onChange={(e)=>setInput(e.target.value)} 
-            className="border-[#01438F] border rounded-md w-full"/>
+            <input 
+            type="date"
+            name="spiritualBirthday"
+            value={formData.spiritualBirthday}
+            onChange={handleChange}
+            required
+            className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
           </div>
         </div>
 
@@ -258,8 +392,13 @@ export default function AddMember() {
         <div className="w-1/5">
           <p>Spiritual Parent</p>
           <div>
-            <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-            className="border-[#01438F] border rounded-md w-full"/>
+            <input 
+            type="text"
+            name="spiritualParent"
+            value={formData.spiritualParent}
+            onChange={handleChange}
+            required 
+            className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
           </div>
         </div>
 
@@ -267,23 +406,33 @@ export default function AddMember() {
         <div className="w-1/5">
           <p>Membership Category</p>
           <div>
-            <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-            className="border-[#01438F] border rounded-md w-full"/>
+            <input 
+            type="text"
+            name="membershipCategory"
+            value={formData.membershipCategory}
+            onChange={handleChange}
+            required 
+            className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
           </div>
         </div>
         </div>
     </section>
 
     {/*Mission History Section */}
-    <section className="flex flex-col">
-      <p className="text-lg text-[#BE9231] font-[700]">MISSION HISTORY</p>
-      <div className="flex flex-row gap-4 w-3/4">
+    <section className="">
+      <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">MISSION HISTORY</p>
+      {formData.missionHistory.map((entry, index) => (
+      <div key={index} className="flex flex-row w-11/12 gap-4 mt-2 mb-5">
         {/*Mission Title/Role*/}
         <div className="w-1/5">
           <p>Mission Title/Role</p>
           <div>
-            <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-            className="border-[#01438F] border rounded-md w-full"/>
+            <input 
+            type="text"
+            value={entry.role}
+            onChange={(e) => handleHistoryChange(index, "role", e.target.value)} 
+            className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"
+            required/>
           </div>
         </div>
 
@@ -291,8 +440,12 @@ export default function AddMember() {
         <div className="w-1/5">
           <p>Organization</p>
           <div>
-            <input type="text" value={input}onChange={(e)=>setInput(e.target.value)} 
-            className="border-[#01438F] border rounded-md w-full"/>
+            <input 
+            type="text" 
+            value={entry.organization} 
+            onChange={(e) => handleHistoryChange(index, "organization", e.target.value)}
+            required 
+            className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
           </div>
         </div>
 
@@ -300,9 +453,14 @@ export default function AddMember() {
         <div className="w-1/5">
         <p>Country</p>
         <div>
-          <select className="border-[#01438F] border rounded-md w-full">
-            <option>Philippines</option>
-            <option>U.S.A.</option>
+          <select 
+          value={entry.country} 
+          onChange={(e) => handleHistoryChange(index, "country", e.target.value)}
+          required
+          className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3">
+            <option value="">Select Country</option>
+            <option value="Philippines">Philippines</option>
+            <option value="U.S.A.">U.S.A.</option>
           </select>
         </div>
       </div>
@@ -311,8 +469,12 @@ export default function AddMember() {
         <div className="w-1/5">
           <p>Start Date</p>
           <div>
-            <input type="date" value={input}onChange={(e)=>setInput(e.target.value)} 
-            className="border-[#01438F] border rounded-md w-full"/>
+            <input 
+            type="date" 
+            value={entry.startDate} 
+            onChange={(e) => handleHistoryChange(index, "startDate", e.target.value)}
+            required
+            className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
           </div>
         </div>
 
@@ -320,21 +482,43 @@ export default function AddMember() {
         <div className="w-1/5">
           <p>End Date</p>
           <div>
-            <input type="date" value={input}onChange={(e)=>setInput(e.target.value)} 
-            className="border-[#01438F] border rounded-md w-full"/>
+            <input 
+            type="date" 
+            value={entry.endDate} 
+            onChange={(e) => handleHistoryChange(index, "endDate", e.target.value)} 
+            required
+            className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3"/>
           </div>
         </div>
+
+        {/*Div for Add/Delete Buttons */}
+        <div className="self-end">
+        {/* First entry always has Add button, others only have Delete */}
+        {index === 0 ? (
+            <button type="button" 
+            onClick={addHistory} 
+            className="bg-[#01438f] text-[#FCC346] font-[700] pl-8 pr-8 px-4 py-2  rounded-lg text-base hover:bg-blue-700 ">
+              Add
+            </button>
+          ) : (
+            <button type="button" 
+            onClick={() => removeHistory(index)} 
+            className="bg-[#01438f] text-[#FCC346] font-[700] pl-6 pr-6 px-4 py-2 rounded-lg text-base hover:bg-blue-700">
+              Delete
+            </button>
+          )}
+          </div>
         </div>
-
-        <div className="flex flex-row">
-
-        </div>
-
+      ))}
     </section>
 
-
-
-    <Button className="bg-[#01438f] text-[#FCC346] font-[700] pl-6 pr-6">ADD</Button>
+      <div className="w-full flex justify-center mt-32">
+        <button 
+          type="submit" 
+          className="bg-[#01438f] text-[#FCC346] font-[700] pl-6 pr-6 px-4 py-2 rounded-lg text-base hover:bg-blue-700 h-14">
+          ADD
+        </button>
+      </div>
 
     </form>
     
