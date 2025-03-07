@@ -26,19 +26,25 @@ export default function Donation() {
   const data: DataItem[] = [
     { "Donation ID": 1001, "Member ID": 5001, Name: "Gregorio, Princess Nicole L.", Date: "2024-02-01", Church: "Manila Cathedral", Amount: "PHP 100.50" },
     { "Donation ID": 1002, "Member ID": 5122, Name: "Bilan, Edrill F.", Date: "2024-02-02", Church: "San Agustin Church", Amount: "USD 250.00" },
-    { "Donation ID": 1003, "Member ID": 5563, Name: "Jagonoy, Jhon Mar F.", Date: "2024-08-02", Church: "Sto. Nino de Pandacan Parish Church", Amount: "WON 75.25" },
-    { "Donation ID": 1004, "Member ID": 5938, Name: "Balba, Johan Paolo B.", Date: "2010-03-06", Church: "St. Jude Parish Church", Amount: "YEN 90.00" },
+    { "Donation ID": 1003, "Member ID": 5563, Name: "Jagonoy, Jhon Mar F.", Date: "2024-08-02", Church: "Sto. Nino de Pandacan Parish Church", Amount: "KRW 75.25" },
+    { "Donation ID": 1004, "Member ID": 5938, Name: "Balba, Johan Paolo B.", Date: "2010-03-06", Church: "St. Jude Parish Church", Amount: "CNY 90.00" },
     { "Donation ID": 1005, "Member ID": 7009, Name: "Sanchez, Princess Aira", Date: "2015-07-12", Church: "San Fernando De Dilao Parish Church", Amount: "EUR 5.00" },
-    { "Donation ID": 1006, "Member ID": 1039, Name: "Lagumbay, Lantis Violet F.", Date: "2003-02-02", Church: "San Beda Church", Amount: "USD 1000.00" },
-    { "Donation ID": 1007, "Member ID": 1098, Name: "Fulgencio, Sonaj A.", Date: "2019-10-12", Church: "Quiapo Church", Amount: "PHP 1500.50" },
+    { "Donation ID": 1006, "Member ID": 1039, Name: "Lagumbay, Lantis Violet F.", Date: "2003-02-02", Church: "San Beda Church", Amount: "JPY 1000.00" },
+    { "Donation ID": 1007, "Member ID": 1098, Name: "Lopez, Roman Lirio R.", Date: "2011-09-07", Church: "Quiapo Church", Amount: "CNY 1500.50" },
+    { "Donation ID": 1008, "Member ID": 2000, Name: "Habla, Renzo", Date: "2025-01-17", Church: "St. Peter's Basilica", Amount: "PHP 1500.50" },
+    { "Donation ID": 1009, "Member ID": 3192, Name: "Igaya, Kryztine G.", Date: "2022-01-12", Church: "Manila Cathedral", Amount: "USD 1.50" },
+    { "Donation ID": 1010, "Member ID": 2087, Name: "Falziz, Ye-em A.", Date: "1998-10-28", Church: "San Sebastian Church", Amount: "KRW 20000.00" },
+    { "Donation ID": 1011, "Member ID": 1012, Name: "Jeon, Jungkook C.", Date: "2001-05-10", Church: "San Miguel Church", Amount: "CNY 1200.75" },
+    { "Donation ID": 1012, "Member ID": 6478, Name: "Torres, Lyka Jasmine L.", Date: "2008-08-10", Church: "Quiapo Church", Amount: "EUR 10.00" },
   ];
 
   const exchangeRates = {
     USD: 55,
     PHP: 1,
     EUR: 60,
-    WON: 0.042,
-    YEN: 0.37
+    KRW: 0.042,
+    CNY: 0.37,
+    JPY: 0.38
   };
 
   useEffect(() => {
