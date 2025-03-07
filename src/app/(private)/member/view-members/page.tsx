@@ -2,9 +2,12 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Search, ChevronDown, ChevronUp } from 'lucide-react';
 import Table from "@/components/Table";
+import Modal from "@/components/Modal"; // Assuming you have a Modal component
 
 export default function Member() {
+  const [searchQuery, setSearchQuery] = useState("");
   const data = [
     { ID: 645969, "Full Name": "Gregorio, Venus Aira L.", Gender: "M", Nation: "Philippines", Region: "Asia Pacific", "Marital Status": "Widowed", Age: 69 },
     { ID: 645970, "Full Name": "Sanchez, Princess Nicole A.", Gender: "F", Nation: "USA", Region: "North America", "Marital Status": "Single", Age: 40 },
@@ -21,6 +24,8 @@ export default function Member() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [selectedRow, setSelectedRow] = useState<{ ID: number } | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState<{ ID: number } | null>(null);
   const router = useRouter();
   const url = "/user";
 
@@ -51,8 +56,23 @@ export default function Member() {
   };
 
   const handleDeleteClick = () => {
-    // Handle delete click
+    if (selectedRow) {
+      setRowToDelete(selectedRow);
+      setIsOpen(true);
+    }
   };
+
+  const handleConfirm = () => {
+    console.log("Confirmed!", rowToDelete);
+    // Add your deletion logic here
+    setIsOpen(false);
+  };
+
+  const filteredData = data.filter((member) =>
+    Object.values(member).some((value) =>
+      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
 
   return (
     <div className="p-4 bg-[#D9D9D9] min-h-screen flex flex-col items-center">
@@ -62,18 +82,16 @@ export default function Member() {
       </div>
 
       {/* Search & Filters Section */}
-      <div className="w-full max-w-6xl flex flex-col md:flex-row items-start gap-4 p-4 mt-6">
+      <div className="w-full max-w-[1450px] flex flex-col md:flex-row items-start gap-4 p-4 mt-6">
         {/* Search Bar */}
-        <div className="relative flex-grow">
-          <img
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"
-            src="/icons/search_icon.png"
-            alt="Search Icon"
-          />
+        <div className="relative w-80">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: '#01438F' }} />
           <input
             className="w-full h-8 pl-10 pr-3 border border-[#01438F] rounded-md outline-none"
             type="text"
             placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
@@ -84,21 +102,33 @@ export default function Member() {
           {/* Dropdowns */}
           <div className="flex flex-wrap items-center gap-2" ref={dropdownRef}>
             {["Gender", "Age", "Marital Status", "Nation", "Region", "Membership Category", "Archived"].map((filter) => {
-              const buttonClassName = filter.includes(" ") 
-                ? "two-word-filter w-42 h-8 border border-[#01438F] rounded-md px-2 outline-none bg-white text-gray-600 flex justify-between items-center text-xs whitespace-nowrap"
-                : "one-word-filter w-24 h-8 border border-[#01438F] rounded-md px-2 outline-none bg-white text-gray-600 flex justify-between items-center text-xs whitespace-nowrap";
+              const buttonWidth = {
+                Gender: '80px',
+                Age: '70px',
+                "Marital Status": '120px',
+                Nation: '100px',
+                Region: '100px',
+                "Membership Category": '160px',
+                Archived: '90px'
+              }[filter];
 
               return (
                 <div key={filter} className="relative">
                   <button
                     onClick={() => toggleDropdown(filter)}
-                    className={buttonClassName}
-                    style={{ backgroundImage: "url('/icons/caret_down.png')", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", paddingRight: "20px" }}>
+                    className="border border-[#01438F] rounded-md px-2 outline-none bg-white text-gray-600 flex justify-between items-center text-xs whitespace-nowrap"
+                    style={{ width: buttonWidth, height: '32px' }}
+                  >
                     {filter}
+                    {openDropdown === filter ? (
+                      <ChevronUp className="ml-2 w-4 h-4" style={{ color: '#01438F' }} />
+                    ) : (
+                      <ChevronDown className="ml-2 w-4 h-4" style={{ color: '#01438F' }} />
+                    )}
                   </button>
 
                   {openDropdown === filter && (
-                    <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md z-10 text-xs">
+                    <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md z-10 text-xs max-h-40 overflow-y-auto">
                       {filter === "Gender" ? (
                         <>
                           <label className="flex items-center px-2 py-2 hover:bg-gray-200">
@@ -200,37 +230,52 @@ export default function Member() {
       </div>
 
       {/* Table Section */}
-      <div className="bg-white mt-5 w-full overflow-hidden rounded-lg">
-       <Table data={data} columns={columnConfig} rowDoubleClickPath="/user" onRowSelect={setSelectedRow}/> 
+      <div className="w-full max-w-[1450px] mt-1 overflow-hidden rounded-lg">
+        {filteredData.length > 0 ? (
+          <Table data={filteredData} columns={columnConfig} rowDoubleClickPath={url} onRowSelect={setSelectedRow} />
+        ) : (
+          <p className="text-left text-base mt-4" style={{ marginTop: '20px' }}>No result found.</p>
+        )}
       </div>
 
       {/* Button Section */}
-      <div className="flex items-center justify-center h-32 gap-4">
-        <button
-          onClick={handleAddClick}
-          className="w-32 px-4 py-2 rounded mb-4 m-4 justify-center bg-[#01438F] text-[#FCC346] hover:bg-blue-600 font-bold text-base"
-        >
-          ADD
-        </button>
-        <button
-          onClick={handleEditClick}
-          disabled={!selectedRow}
-          className={`w-32 px-4 py-2 rounded mb-4 m-4 justify-center ${
-            selectedRow ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600" : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          } font-bold text-base`}
-        >
-          EDIT
-        </button>
-        <button
-          onClick={handleDeleteClick}
-          disabled={!selectedRow}
-          className={`w-32 px-4 py-2 rounded mb-4 m-4 justify-center ${
-            selectedRow ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600" : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          } font-bold text-base`}
-        >
-          DELETE
-        </button>
-      </div>
+      {filteredData.length > 0 && (
+        <div className="flex items-center justify-center h-32 gap-4">
+          <button
+            onClick={handleAddClick}
+            className="w-20 h-10 flex items-center justify-center rounded mb-4 m-4 bg-[#01438F] text-[#FCC346] hover:bg-blue-600 font-bold text-base"
+          >
+            ADD
+          </button>
+          <button
+            onClick={handleEditClick}
+            disabled={!selectedRow}
+            className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
+              selectedRow ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600" : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            } font-bold text-base`}
+          >
+            EDIT
+          </button>
+          <button
+            onClick={handleDeleteClick}
+            disabled={!selectedRow}
+            className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
+              selectedRow ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600" : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            } font-bold text-base`}
+          >
+            DELETE
+          </button>
+        </div>
+      )}
+
+      {/* Modal */}
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onConfirm={handleConfirm}
+        confirmText="Yes"
+        cancelText="No"
+      />
     </div>
   );
 }
