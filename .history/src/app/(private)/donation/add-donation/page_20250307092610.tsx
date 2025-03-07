@@ -54,7 +54,7 @@ export default function AddDonation() {
             setIsOpen(true);
           }}>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[30%] flex-shrink-1 mb-4">
             <label className="text-[14px] mb-1">Member ID</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -63,7 +63,7 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[30%] flex-shrink-1 mb-4">
             <label className="text-[14px] mb-1">Date</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
@@ -72,7 +72,7 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[30%] flex-shrink-1 mb-4">
             <label className="text-[14px] mb-1">Church</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
@@ -81,7 +81,7 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[30%] flex-shrink-1 mb-4">
             <label className="text-[14px] mb-1">Amount</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"

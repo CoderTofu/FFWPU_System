@@ -9,7 +9,6 @@ export default function AddDonation() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
-  const dropdownButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleConfirm = () => {
     console.log("Confirmed!");
@@ -22,21 +21,15 @@ export default function AddDonation() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        openDropdown &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        (!dropdownButtonRef.current || !dropdownButtonRef.current.contains(event.target as Node)) // Check if target is not the dropdown button
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, [openDropdown]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  const handleCurrencySelect = (currency: string, event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handleCurrencySelect = (currency: string) => {
     setSelectedCurrency(currency);
     setOpenDropdown(null);
   };
@@ -44,7 +37,7 @@ export default function AddDonation() {
   return (
     <div>
       <div className="w-full mx-auto max-w-[1450px] flex flex-col md:flex-row justify-center items-center bg-white rounded-md shadow-md shadow-black/25 p-4 mt-8">
-        <p className="text-[28px] font-bold">ADD DONATION</p>
+        <p className="text-[28px] font-bold">DONATIONS</p>
       </div>
 
       <div className="flex flex-col items-center mt-[63px]">
@@ -52,9 +45,9 @@ export default function AddDonation() {
           onSubmit={(e) => {
             e.preventDefault();
             setIsOpen(true);
-          }}>
-
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          }}
+        >
+          <div className="flex flex-col w-[394px] max-w-full mb-4">
             <label className="text-[14px] mb-1">Member ID</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -63,7 +56,7 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-full mb-4">
             <label className="text-[14px] mb-1">Date</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
@@ -72,7 +65,7 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-full mb-4">
             <label className="text-[14px] mb-1">Church</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
@@ -81,7 +74,7 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-full mb-4">
             <label className="text-[14px] mb-1">Amount</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -90,16 +83,12 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col mb-4">
+          <div className="flex flex-col w-[394px] max-w-full mb-4">
             <label className="text-[14px] mb-1">Currency</label>
             <div ref={dropdownRef} className="relative">
               <button
-                ref={dropdownButtonRef}
                 onClick={() => toggleDropdown("Select")}
-                className="w-[394px] h-[36px] border border-[#01438F] rounded-md px-[12px] outline-none
-                 bg-white text-[16px] text-black flex justify-between items-center
-                 max-w-[100%] min-w-[50%] flex-shrink-1"
-                type="button" 
+                className="w-[120px] md:w-[140px] lg:w-[394px] h-[36px] border border-[#01438F] rounded-md px-[12px] outline-none bg-white text-[16px] text-gray-600 flex justify-between items-center"
               >
                 {selectedCurrency || "Select"}
                 <ChevronDown className="w-[16px] h-[16px] text-[#01438F]"/>
@@ -109,14 +98,16 @@ export default function AddDonation() {
                 <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md">
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("USD", event)}>
-                    <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "USD"} readOnly/> USD
+                    onClick={() => handleCurrencySelect("$ USD")}
+                  >
+                    <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "$ USD"} readOnly/> $ USD
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("PHP", event)}>
-                    <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "PHP"} readOnly/> PHP
+                    onClick={() => handleCurrencySelect("₱ PHP")}
+                  >
+                    <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "₱ PHP"} readOnly/> ₱ PHP
                   </div>
                 </div>
               )}

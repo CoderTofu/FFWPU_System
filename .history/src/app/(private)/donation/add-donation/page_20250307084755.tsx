@@ -44,7 +44,7 @@ export default function AddDonation() {
   return (
     <div>
       <div className="w-full mx-auto max-w-[1450px] flex flex-col md:flex-row justify-center items-center bg-white rounded-md shadow-md shadow-black/25 p-4 mt-8">
-        <p className="text-[28px] font-bold">ADD DONATION</p>
+        <p className="text-[28px] font-bold">DONATIONS</p>
       </div>
 
       <div className="flex flex-col items-center mt-[63px]">
@@ -54,7 +54,7 @@ export default function AddDonation() {
             setIsOpen(true);
           }}>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-full mb-4">
             <label className="text-[14px] mb-1">Member ID</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -63,7 +63,7 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-full mb-4">
             <label className="text-[14px] mb-1">Date</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
@@ -72,7 +72,7 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-full mb-4">
             <label className="text-[14px] mb-1">Church</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
@@ -81,7 +81,7 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-full mb-4">
             <label className="text-[14px] mb-1">Amount</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -90,15 +90,14 @@ export default function AddDonation() {
             />
           </div>
 
-          <div className="flex flex-col mb-4">
+          <div className="flex flex-col w-[394px] max-w-full mb-4">
             <label className="text-[14px] mb-1">Currency</label>
             <div ref={dropdownRef} className="relative">
               <button
                 ref={dropdownButtonRef}
                 onClick={() => toggleDropdown("Select")}
-                className="w-[394px] h-[36px] border border-[#01438F] rounded-md px-[12px] outline-none
-                 bg-white text-[16px] text-black flex justify-between items-center
-                 max-w-[100%] min-w-[50%] flex-shrink-1"
+                className="w-[120px] md:w-[140px] lg:w-[394px] h-[36px] border border-[#01438F] rounded-md px-[12px] outline-none
+                 bg-white text-[16px] text-black flex justify-between items-center"
                 type="button" 
               >
                 {selectedCurrency || "Select"}
@@ -109,13 +108,15 @@ export default function AddDonation() {
                 <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md">
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("USD", event)}>
+                    onClick={(event) => handleCurrencySelect("USD", event)}
+                  >
                     <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "USD"} readOnly/> USD
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("PHP", event)}>
+                    onClick={(event) => handleCurrencySelect("PHP", event)}
+                  >
                     <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "PHP"} readOnly/> PHP
                   </div>
                 </div>
