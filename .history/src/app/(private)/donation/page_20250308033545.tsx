@@ -18,8 +18,10 @@ interface DataItem {
 export default function Donation() {
   const [selectedRow, setSelectedRow] = useState<{ ID: number } | null>(null);
   const router = useRouter();
+  const [isExiting, setIsExiting] = useState(false);
   const [openSortDropdown, setOpenSortDropdown] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortedData, setSortedData] = useState<DataItem[]>([]);
   const [originalData, setOriginalData] = useState<DataItem[]>([]);
 
@@ -114,21 +116,23 @@ export default function Donation() {
         </div>
 
         <div className="font-bold text-[#FCC346] text-[20px] mt-[32px] mb-[180px] flex flex-wrap justify-center gap-[22px]">
-          <button onClick={() => router.push("/donation/add-donation")} className="w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25">
+          <button onClick={() => router.push("/donation/add-donation")}className="w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25">
             ADD
           </button>
 
           <button
-            onClick={() => { console.log(selectedRow); setSelectedRow(null); router.push("/donation/edit-donation")}  }
+            onClick={() => { console.log(selectedRow); setSelectedRow(null); handleEditClick() }}
             disabled={!selectedRow}
-            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}>
+            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}
+          >
             EDIT
           </button>
 
           <button
             onClick={() => setShowDeleteModal(true)}
             disabled={!selectedRow}
-            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}>
+            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}
+          >
             DELETE
           </button>
         </div>

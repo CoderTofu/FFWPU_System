@@ -103,13 +103,7 @@ export default function DonationModals({
                     type="radio"
                     name={filter}
                     className="mr-2"
-                    checked={selectedFilters[filter] === "Descending"}
-                    onChange={() => {
-                      setSelectedFilters({ ...selectedFilters, [filter]: "Descending" });
-                      handleSort(filterKeyMap[filter], "desc");
-                      toggleSortDropdown(null);
-                    }}
-                    />
+                    checked={selectedFilters[filter] === "Descending"}/>
                   Descending
                 </label>
               </div>

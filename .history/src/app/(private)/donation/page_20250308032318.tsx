@@ -18,8 +18,10 @@ interface DataItem {
 export default function Donation() {
   const [selectedRow, setSelectedRow] = useState<{ ID: number } | null>(null);
   const router = useRouter();
+  const [isExiting, setIsExiting] = useState(false);
   const [openSortDropdown, setOpenSortDropdown] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortedData, setSortedData] = useState<DataItem[]>([]);
   const [originalData, setOriginalData] = useState<DataItem[]>([]);
 
@@ -34,11 +36,11 @@ export default function Donation() {
   ];
 
   const exchangeRates = {
-    USD: 55,
-    PHP: 1,
-    EUR: 60,
-    WON: 0.042,
-    YEN: 0.37
+    USD: 1,
+    PHP: 55,
+    EUR: 0.92,
+    WON: 1320,
+    YEN: 150
   };
 
   useEffect(() => {
@@ -57,41 +59,77 @@ export default function Donation() {
     const numericValue = parseFloat(value);
 
     if (!exchangeRates[currency as keyof typeof exchangeRates]) {
-      console.warn(`Unknown currency: ${currency}`);
-      return NaN;
+        console.warn(`Unknown currency: ${currency}`);
+        return NaN; // Handle unknown currency gracefully
     }
 
     return numericValue * exchangeRates[currency as keyof typeof exchangeRates];
+};
+
+interface DataItem {
+    Amount: string; // e.g., "USD 100", "PHP 5000"
+    [key: string]: any; // Allow other properties
+}
+const handleSort = (key: keyof DataItem, order: "asc" | "desc") => {
+  setSortedData((prevData) => {
+      const sorted = [...prevData].sort((a, b) => {
+          if (key === "Amount") {
+              const aAmount = getAmountInPHP(a[key]);
+              const bAmount = getAmountInPHP(b[key]);
+
+              if (isNaN(aAmount) && isNaN(bAmount)) return 0; // Keep original order
+              if (isNaN(aAmount)) return 1; // Move NaN to the end
+              if (isNaN(bAmount)) return -1; // Move NaN to the end
+
+              return order === "asc" ? aAmount - bAmount : bAmount - aAmount;
+          }
+
+          // Sorting for string values
+          if (typeof a[key] === "string" && typeof b[key] === "string") {
+              return order === "asc"
+                  ? (a[key] as string).localeCompare(b[key] as string)
+                  : (b[key] as string).localeCompare(a[key] as string);
+          }
+
+          // Sorting for number values
+          if (typeof a[key] === "number" && typeof b[key] === "number") {
+              return order === "asc"
+                  ? (a[key] as number) - (b[key] as number)
+                  : (b[key] as number) - (a[key] as number);
+          }
+
+          return 0; // Default to no change if types are different or not handled.
+      });
+
+      return sorted; // Update the state
+  });
+};
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    if (!term) {
+      setSortedData(originalData);
+      return;
+    }
+
+    const filteredData = originalData.filter((item) =>
+      item.Name.toLowerCase().includes(term.toLowerCase())
+    );
+    setSortedData(filteredData);
   };
 
-  const handleSort = (key: keyof DataItem, order: "asc" | "desc") => {
-    setSortedData((prevData) => {
-      const sorted = [...prevData].sort((a, b) => {
-        if (key === "Amount") {
-          const aAmount = getAmountInPHP(a[key]);
-          const bAmount = getAmountInPHP(b[key]);
+  const handleAddClick = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      router.push('/donation/add-donation');
+    }, 400);
+  };
 
-          if (isNaN(aAmount) && isNaN(bAmount)) return 0;
-          if (isNaN(aAmount)) return 1;
-          if (isNaN(bAmount)) return -1;
-
-          return order === "asc" ? aAmount - bAmount : bAmount - aAmount;
-        }
-
-        if (typeof a[key] === "string" && typeof b[key] === "string") {
-          return order === "asc"
-            ? (a[key] as string).localeCompare(b[key] as string)
-            : (b[key] as string).localeCompare(a[key] as string);
-        }
-
-        if (typeof a[key] === "number" && typeof b[key] === "number") {
-          return order === "asc" ? a[key] - b[key] : b[key] - a[key];
-        }
-
-        return 0;
-      });
-      return sorted;
-    });
+  const handleEditClick = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      router.push('/donation/edit-donation');
+    }, 400);
   };
 
   return (
@@ -114,21 +152,23 @@ export default function Donation() {
         </div>
 
         <div className="font-bold text-[#FCC346] text-[20px] mt-[32px] mb-[180px] flex flex-wrap justify-center gap-[22px]">
-          <button onClick={() => router.push("/donation/add-donation")} className="w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25">
+          <button onClick={handleAddClick} className="w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25">
             ADD
           </button>
 
           <button
-            onClick={() => { console.log(selectedRow); setSelectedRow(null); router.push("/donation/edit-donation")}  }
+            onClick={() => { console.log(selectedRow); setSelectedRow(null); handleEditClick() }}
             disabled={!selectedRow}
-            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}>
+            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}
+          >
             EDIT
           </button>
 
           <button
             onClick={() => setShowDeleteModal(true)}
             disabled={!selectedRow}
-            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}>
+            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}
+          >
             DELETE
           </button>
         </div>

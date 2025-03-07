@@ -18,15 +18,14 @@ interface FilterDropdownProps {
 }
 
 const exchangeRates = {
-  USD: 55,
-  PHP: 1,
-  EUR: 60,
-  WON: 0.042,
-  YEN: 0.37
+  USD: 1,
+  PHP: 55, // Example: 1 USD = 55 PHP
 };
 
 export default function DonationModals({
-  handleSort, openSortDropdown,toggleSortDropdown,
+  handleSort,
+  openSortDropdown,
+  toggleSortDropdown,
 }: FilterDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: "Ascending" | "Descending" }>({});
@@ -35,20 +34,11 @@ export default function DonationModals({
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         toggleSortDropdown(null);
-  
-        setSelectedFilters((prevFilters) => {
-          const updatedFilters = { ...prevFilters };
-          if (openSortDropdown) {
-            delete updatedFilters[openSortDropdown];
-          }
-          return updatedFilters;
-        });
       }
     };
-  
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [toggleSortDropdown, openSortDropdown]);
+  }, [toggleSortDropdown]);
 
   const filterKeyMap: { [key: string]: keyof DataItem } = {
     "Member ID": "Member ID",
@@ -75,8 +65,8 @@ export default function DonationModals({
           <div key={filter} className="relative">
             <button
               onClick={() => toggleSortDropdown(openSortDropdown === filter ? null : filter)}
-              className="w-[120px] md:w-[140px] lg:w-[160px] h-10 border border-[#01438F] rounded-md px-3 outline-none
-              bg-white text-gray-600 flex justify-between items-center">
+              className="w-[120px] md:w-[140px] lg:w-[160px] h-10 border border-[#01438F] rounded-md px-3 outline-none bg-white text-gray-600 flex justify-between items-center"
+            >
               {filter}
               <ChevronDown className="w-4 h-4 text-[#01438F]" />
             </button>
@@ -94,10 +84,9 @@ export default function DonationModals({
                       handleSort(filterKeyMap[filter], "asc");
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Ascending
                 </label>
-
                 <label className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm">
                   <input
                     type="radio"
@@ -109,7 +98,7 @@ export default function DonationModals({
                       handleSort(filterKeyMap[filter], "desc");
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Descending
                 </label>
               </div>

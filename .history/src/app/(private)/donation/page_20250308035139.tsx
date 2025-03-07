@@ -41,11 +41,6 @@ export default function Donation() {
     YEN: 0.37
   };
 
-  useEffect(() => {
-    setOriginalData(data);
-    setSortedData(data);
-  }, []);
-
   const column = {
     lg: ["Donation ID", "Member ID", "Name", "Date", "Church", "Amount"],
     md: ["Donation ID", "Name", "Date", "Amount"],

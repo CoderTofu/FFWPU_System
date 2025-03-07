@@ -18,8 +18,10 @@ interface DataItem {
 export default function Donation() {
   const [selectedRow, setSelectedRow] = useState<{ ID: number } | null>(null);
   const router = useRouter();
+  const [isExiting, setIsExiting] = useState(false);
   const [openSortDropdown, setOpenSortDropdown] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortedData, setSortedData] = useState<DataItem[]>([]);
   const [originalData, setOriginalData] = useState<DataItem[]>([]);
 
@@ -121,14 +123,16 @@ export default function Donation() {
           <button
             onClick={() => { console.log(selectedRow); setSelectedRow(null); router.push("/donation/edit-donation")}  }
             disabled={!selectedRow}
-            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}>
+            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}
+          >
             EDIT
           </button>
 
           <button
             onClick={() => setShowDeleteModal(true)}
             disabled={!selectedRow}
-            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}>
+            className={`${selectedRow ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25" : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"}`}
+          >
             DELETE
           </button>
         </div>

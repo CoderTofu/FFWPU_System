@@ -18,43 +18,40 @@ interface FilterDropdownProps {
 }
 
 const exchangeRates = {
-  USD: 55,
-  PHP: 1,
-  EUR: 60,
-  WON: 0.042,
-  YEN: 0.37
+  USD: 1,
+  PHP: 55, // Example: 1 USD = 55 PHP
 };
 
+// donation-modals.tsx
+
 export default function DonationModals({
-  handleSort, openSortDropdown,toggleSortDropdown,
+  handleSort,
+  openSortDropdown,
+  toggleSortDropdown,
 }: FilterDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: "Ascending" | "Descending" }>({});
+  const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: string }>({});
+  const [currency, setCurrency] = useState<string>("USD");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         toggleSortDropdown(null);
-  
-        setSelectedFilters((prevFilters) => {
-          const updatedFilters = { ...prevFilters };
-          if (openSortDropdown) {
-            delete updatedFilters[openSortDropdown];
-          }
-          return updatedFilters;
-        });
       }
     };
-  
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [toggleSortDropdown, openSortDropdown]);
+  }, [toggleSortDropdown]);
 
   const filterKeyMap: { [key: string]: keyof DataItem } = {
     "Member ID": "Member ID",
     Date: "Date",
     Church: "Church",
     Amount: "Amount",
+  };
+
+  const handleCurrencyChange = (selectedCurrency: string) => {
+    setCurrency(selectedCurrency);
   };
 
   return (
@@ -75,8 +72,8 @@ export default function DonationModals({
           <div key={filter} className="relative">
             <button
               onClick={() => toggleSortDropdown(openSortDropdown === filter ? null : filter)}
-              className="w-[120px] md:w-[140px] lg:w-[160px] h-10 border border-[#01438F] rounded-md px-3 outline-none
-              bg-white text-gray-600 flex justify-between items-center">
+              className="w-[120px] md:w-[140px] lg:w-[160px] h-10 border border-[#01438F] rounded-md px-3 outline-none bg-white text-gray-600 flex justify-between items-center"
+            >
               {filter}
               <ChevronDown className="w-4 h-4 text-[#01438F]" />
             </button>
@@ -94,10 +91,9 @@ export default function DonationModals({
                       handleSort(filterKeyMap[filter], "asc");
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Ascending
                 </label>
-
                 <label className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm">
                   <input
                     type="radio"
@@ -109,14 +105,51 @@ export default function DonationModals({
                       handleSort(filterKeyMap[filter], "desc");
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Descending
                 </label>
               </div>
             )}
           </div>
         ))}
+
+        {/* Currency Selector should be handled as its own dropdown outside of the main filter section */}
+        <div className="relative">
+          <button
+            onClick={() => toggleSortDropdown(openSortDropdown === "Currency" ? null : "Currency")}
+            className="w-[120px] md:w-[140px] lg:w-[160px] h-10 border border-[#01438F] rounded-md px-3 outline-none bg-white text-gray-600 flex justify-between items-center"
+          >
+            {currency}
+            <ChevronDown className="w-4 h-4 text-[#01438F]" />
+          </button>
+
+          {openSortDropdown === "Currency" && (
+            <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md z-10">
+              <label className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm">
+                <input
+                  type="radio"
+                  name="currency"
+                  className="mr-2"
+                  checked={currency === "USD"}
+                  onChange={() => handleCurrencyChange("USD")}
+                />
+                USD
+              </label>
+              <label className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm">
+                <input
+                  type="radio"
+                  name="currency"
+                  className="mr-2"
+                  checked={currency === "PHP"}
+                  onChange={() => handleCurrencyChange("PHP")}
+                />
+                PHP
+              </label>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
+

@@ -57,6 +57,13 @@ export default function DonationModals({
     Amount: "Amount",
   };
 
+  // To convert Amounts into a comparable numeric value
+  const getAmountInPHP = (amount: string) => {
+    const currency = amount.split(" ")[0]; // Extract currency from the string
+    const value = parseFloat(amount.split(" ")[1]); // Extract the amount or value
+    return value * exchangeRates[currency as keyof typeof exchangeRates]; // Convert to currency equivalent
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-4">
       <div className="relative min-w-[250px] sm:w-[275px] md:w-[300px] lg:w-[325px]">
@@ -91,13 +98,17 @@ export default function DonationModals({
                     checked={selectedFilters[filter] === "Ascending"}
                     onChange={() => {
                       setSelectedFilters({ ...selectedFilters, [filter]: "Ascending" });
-                      handleSort(filterKeyMap[filter], "asc");
+                      if (filter === "Amount") {
+                        handleSort(filterKeyMap[filter], "asc");
+                      } else {
+                        handleSort(filterKeyMap[filter], "asc");
+                      }
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Ascending
                 </label>
-
+                
                 <label className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm">
                   <input
                     type="radio"
@@ -106,10 +117,14 @@ export default function DonationModals({
                     checked={selectedFilters[filter] === "Descending"}
                     onChange={() => {
                       setSelectedFilters({ ...selectedFilters, [filter]: "Descending" });
-                      handleSort(filterKeyMap[filter], "desc");
+                      if (filter === "Amount") {
+                        handleSort(filterKeyMap[filter], "desc");
+                      } else {
+                        handleSort(filterKeyMap[filter], "desc");
+                      }
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Descending
                 </label>
               </div>

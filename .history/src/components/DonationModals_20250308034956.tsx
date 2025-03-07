@@ -91,10 +91,14 @@ export default function DonationModals({
                     checked={selectedFilters[filter] === "Ascending"}
                     onChange={() => {
                       setSelectedFilters({ ...selectedFilters, [filter]: "Ascending" });
-                      handleSort(filterKeyMap[filter], "asc");
+                      if (filter === "Amount") {
+                        handleSort(filterKeyMap[filter], "asc");
+                      } else {
+                        handleSort(filterKeyMap[filter], "asc");
+                      }
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Ascending
                 </label>
 
@@ -106,10 +110,14 @@ export default function DonationModals({
                     checked={selectedFilters[filter] === "Descending"}
                     onChange={() => {
                       setSelectedFilters({ ...selectedFilters, [filter]: "Descending" });
-                      handleSort(filterKeyMap[filter], "desc");
+                      if (filter === "Amount") {
+                        handleSort(filterKeyMap[filter], "desc");
+                      } else {
+                        handleSort(filterKeyMap[filter], "desc");
+                      }
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Descending
                 </label>
               </div>

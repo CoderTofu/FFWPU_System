@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import Table from "@/components/Table";
@@ -21,7 +21,6 @@ export default function Donation() {
   const [openSortDropdown, setOpenSortDropdown] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [sortedData, setSortedData] = useState<DataItem[]>([]);
-  const [originalData, setOriginalData] = useState<DataItem[]>([]);
 
   const data: DataItem[] = [
     { "Donation ID": 1001, "Member ID": 5001, Name: "Gregorio, Princess Nicole L.", Date: "2024-02-01", Church: "Manila Cathedral", Amount: "PHP 100.50" },
@@ -40,11 +39,6 @@ export default function Donation() {
     WON: 0.042,
     YEN: 0.37
   };
-
-  useEffect(() => {
-    setOriginalData(data);
-    setSortedData(data);
-  }, []);
 
   const column = {
     lg: ["Donation ID", "Member ID", "Name", "Date", "Church", "Amount"],
