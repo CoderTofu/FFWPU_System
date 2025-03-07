@@ -108,37 +108,37 @@ export default function AddDonation() {
                 <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md">
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("$ USD", event)}>
+                    onClick={(event) => handleCurrencySelect("USD", event)}>
                     <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "$ USD"} readOnly/> $ USD
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("₱ PHP", event)}>
+                    onClick={(event) => handleCurrencySelect("PHP", event)}>
                     <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "₱ PHP"} readOnly/> ₱ PHP
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("€ EUR", event)}>
+                    onClick={(event) => handleCurrencySelect("EUR", event)}>
                     <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "€ EUR"} readOnly/> € EUR
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("¥ JPY", event)}>
+                    onClick={(event) => handleCurrencySelect("JPY", event)}>
                     <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "¥ JPY"} readOnly/> ¥ JPY
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("₩ KRW", event)}>
+                    onClick={(event) => handleCurrencySelect("KRW", event)}>
                     <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "₩ KRW"} readOnly/> ₩ KRW
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("¥ CNY", event)}>
+                    onClick={(event) => handleCurrencySelect("EUR", event)}>
                     <input type="radio" name="currency" className="mr-2" checked={selectedCurrency === "¥ CNY"} readOnly/> ¥ CNY
                   </div>
                 </div>
