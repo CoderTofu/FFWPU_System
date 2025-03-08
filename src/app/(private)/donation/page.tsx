@@ -84,6 +84,15 @@ export default function Donation() {
       Church: "Quiapo Church",
       Amount: "PHP 1500.50",
     },
+
+    {
+      "Donation ID": 1020,
+      "Member ID": 1100,
+      Name: "Fulgencio, Juan Paolo.",
+      Date: "2011-10-01",
+      Church: "Paco Church",
+      Amount: "KRW 1200.50",
+    },
   ];
 
   const exchangeRates = {
