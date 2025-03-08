@@ -2,21 +2,61 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal"; // Assuming you have a Modal component
 
 export default function Member() {
   const [searchQuery, setSearchQuery] = useState("");
   const data = [
-    { ID: 645969, "Full Name": "Gregorio, Venus Aira L.", Gender: "M", Nation: "Philippines", Region: "Asia Pacific", "Marital Status": "Widowed", Age: 69 },
-    { ID: 645970, "Full Name": "Sanchez, Princess Nicole A.", Gender: "F", Nation: "USA", Region: "North America", "Marital Status": "Single", Age: 40 },
-    { ID: 645969, "Full Name": "Gregorio, Venus Aira L.", Gender: "M", Nation: "Philippines", Region: "Asia Pacific", "Marital Status": "Widowed", Age: 69 },
-    { ID: 645970, "Full Name": "Sanchez, Princess Nicole A.", Gender: "F", Nation: "USA", Region: "North America", "Marital Status": "Single", Age: 40 },
+    {
+      ID: 645969,
+      "Full Name": "Gregorio, Venus Aira L.",
+      Gender: "M",
+      Nation: "Philippines",
+      Region: "Asia Pacific",
+      "Marital Status": "Widowed",
+      Age: 69,
+    },
+    {
+      ID: 645970,
+      "Full Name": "Sanchez, Princess Nicole A.",
+      Gender: "F",
+      Nation: "USA",
+      Region: "North America",
+      "Marital Status": "Single",
+      Age: 40,
+    },
+    {
+      ID: 645969,
+      "Full Name": "Gregorio, Venus Aira L.",
+      Gender: "M",
+      Nation: "Philippines",
+      Region: "Asia Pacific",
+      "Marital Status": "Widowed",
+      Age: 69,
+    },
+    {
+      ID: 645970,
+      "Full Name": "Sanchez, Princess Nicole A.",
+      Gender: "F",
+      Nation: "USA",
+      Region: "North America",
+      "Marital Status": "Single",
+      Age: 40,
+    },
   ];
 
   const columnConfig = {
-    lg: ["ID", "Full Name", "Gender", "Nation", "Region", "Marital Status", "Age"],
+    lg: [
+      "ID",
+      "Full Name",
+      "Gender",
+      "Nation",
+      "Region",
+      "Marital Status",
+      "Age",
+    ],
     md: ["ID", "Full Name", "Gender", "Age"],
     sm: ["ID", "Full Name"],
   };
@@ -37,7 +77,10 @@ export default function Member() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpenDropdown(null);
       }
     };
@@ -85,7 +128,10 @@ export default function Member() {
       <div className="w-full max-w-[1450px] flex flex-col md:flex-row items-start gap-4 p-4 mt-6">
         {/* Search Bar */}
         <div className="relative w-80">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: '#01438F' }} />
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"
+            style={{ color: "#01438F" }}
+          />
           <input
             className="w-full h-8 pl-10 pr-3 border border-[#01438F] rounded-md outline-none"
             type="text"
@@ -101,15 +147,23 @@ export default function Member() {
 
           {/* Dropdowns */}
           <div className="flex flex-wrap items-center gap-2" ref={dropdownRef}>
-            {["Gender", "Age", "Marital Status", "Nation", "Region", "Membership Category", "Archived"].map((filter) => {
+            {[
+              "Gender",
+              "Age",
+              "Marital Status",
+              "Nation",
+              "Region",
+              "Membership Category",
+              "Archived",
+            ].map((filter) => {
               const buttonWidth = {
-                Gender: '80px',
-                Age: '70px',
-                "Marital Status": '120px',
-                Nation: '100px',
-                Region: '100px',
-                "Membership Category": '160px',
-                Archived: '90px'
+                Gender: "80px",
+                Age: "70px",
+                "Marital Status": "120px",
+                Nation: "100px",
+                Region: "100px",
+                "Membership Category": "160px",
+                Archived: "90px",
               }[filter];
 
               return (
@@ -117,13 +171,19 @@ export default function Member() {
                   <button
                     onClick={() => toggleDropdown(filter)}
                     className="border border-[#01438F] rounded-md px-2 outline-none bg-white text-gray-600 flex justify-between items-center text-xs whitespace-nowrap"
-                    style={{ width: buttonWidth, height: '32px' }}
+                    style={{ width: buttonWidth, height: "32px" }}
                   >
                     {filter}
                     {openDropdown === filter ? (
-                      <ChevronUp className="ml-2 w-4 h-4" style={{ color: '#01438F' }} />
+                      <ChevronUp
+                        className="ml-2 w-4 h-4"
+                        style={{ color: "#01438F" }}
+                      />
                     ) : (
-                      <ChevronDown className="ml-2 w-4 h-4" style={{ color: '#01438F' }} />
+                      <ChevronDown
+                        className="ml-2 w-4 h-4"
+                        style={{ color: "#01438F" }}
+                      />
                     )}
                   </button>
 
@@ -174,7 +234,8 @@ export default function Member() {
                             <input type="checkbox" className="mr-2" /> USA
                           </label>
                           <label className="flex items-center px-2 py-2 hover:bg-gray-200">
-                            <input type="checkbox" className="mr-2" /> Philippines
+                            <input type="checkbox" className="mr-2" />{" "}
+                            Philippines
                           </label>
                           <label className="flex items-center px-2 py-2 hover:bg-gray-200">
                             <input type="checkbox" className="mr-2" /> Others
@@ -183,10 +244,12 @@ export default function Member() {
                       ) : filter === "Region" ? (
                         <>
                           <label className="flex items-center px-2 py-2 hover:bg-gray-200">
-                            <input type="checkbox" className="mr-2" /> North America
+                            <input type="checkbox" className="mr-2" /> North
+                            America
                           </label>
                           <label className="flex items-center px-2 py-2 hover:bg-gray-200">
-                            <input type="checkbox" className="mr-2" /> Asia Pacific
+                            <input type="checkbox" className="mr-2" /> Asia
+                            Pacific
                           </label>
                           <label className="flex items-center px-2 py-2 hover:bg-gray-200">
                             <input type="checkbox" className="mr-2" /> Europe
@@ -213,10 +276,20 @@ export default function Member() {
                       ) : (
                         <>
                           <label className="flex items-center px-2 py-2 hover:bg-gray-200">
-                            <input type="checkbox" name={filter} className="mr-2" /> Ascending
+                            <input
+                              type="checkbox"
+                              name={filter}
+                              className="mr-2"
+                            />{" "}
+                            Ascending
                           </label>
                           <label className="flex items-center px-2 py-2 hover:bg-gray-200">
-                            <input type="checkbox" name={filter} className="mr-2" /> Descending
+                            <input
+                              type="checkbox"
+                              name={filter}
+                              className="mr-2"
+                            />{" "}
+                            Descending
                           </label>
                         </>
                       )}
@@ -232,9 +305,16 @@ export default function Member() {
       {/* Table Section */}
       <div className="w-full max-w-[1450px] mt-1 overflow-hidden rounded-lg">
         {filteredData.length > 0 ? (
-          <Table data={filteredData} columns={columnConfig} rowDoubleClickPath={url} onRowSelect={setSelectedRow} />
+          <Table
+            data={filteredData}
+            columns={columnConfig}
+            rowDoubleClickPath={url}
+            onRowSelect={setSelectedRow}
+          />
         ) : (
-          <p className="text-left text-base mt-4" style={{ marginTop: '20px' }}>No result found.</p>
+          <p className="text-left text-base mt-4" style={{ marginTop: "20px" }}>
+            No result found.
+          </p>
         )}
       </div>
 
@@ -251,7 +331,9 @@ export default function Member() {
             onClick={handleEditClick}
             disabled={!selectedRow}
             className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
-              selectedRow ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600" : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              selectedRow
+                ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
             } font-bold text-base`}
           >
             EDIT
@@ -260,7 +342,9 @@ export default function Member() {
             onClick={handleDeleteClick}
             disabled={!selectedRow}
             className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
-              selectedRow ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600" : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              selectedRow
+                ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
             } font-bold text-base`}
           >
             DELETE
