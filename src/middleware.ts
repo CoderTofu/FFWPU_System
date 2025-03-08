@@ -20,5 +20,6 @@ export const config = {
     "/login",
     "/cms/:path*",
     "/worship/:path*",
+    "/reporting/:path*",
   ],
 };

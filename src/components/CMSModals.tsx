@@ -418,7 +418,7 @@ export function AddNewAdminModal() {
       })
       .catch((err) => {
         if (err.response) {
-          console.log(err.response.data.error);
+          alert(err.response.data.error);
         } else {
           alert(err.status);
         }
