@@ -22,8 +22,7 @@ const exchangeRates = {
   PHP: 1,
   EUR: 60,
   WON: 0.042,
-  CNY: 0.37,
-  JPY: 0.38
+  YEN: 0.37
 };
 
 export default function DonationModals({
@@ -46,7 +45,7 @@ export default function DonationModals({
         });
       }
     };
-    
+  
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [toggleSortDropdown, openSortDropdown]);
@@ -92,10 +91,14 @@ export default function DonationModals({
                     checked={selectedFilters[filter] === "Ascending"}
                     onChange={() => {
                       setSelectedFilters({ ...selectedFilters, [filter]: "Ascending" });
-                      handleSort(filterKeyMap[filter], "asc");
+                      if (filter === "Amount") {
+                        handleSort(filterKeyMap[filter], "asc");
+                      } else {
+                        handleSort(filterKeyMap[filter], "asc");
+                      }
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Ascending
                 </label>
 
@@ -107,10 +110,14 @@ export default function DonationModals({
                     checked={selectedFilters[filter] === "Descending"}
                     onChange={() => {
                       setSelectedFilters({ ...selectedFilters, [filter]: "Descending" });
-                      handleSort(filterKeyMap[filter], "desc");
+                      if (filter === "Amount") {
+                        handleSort(filterKeyMap[filter], "desc");
+                      } else {
+                        handleSort(filterKeyMap[filter], "desc");
+                      }
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Descending
                 </label>
               </div>

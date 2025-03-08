@@ -22,8 +22,7 @@ const exchangeRates = {
   PHP: 1,
   EUR: 60,
   WON: 0.042,
-  CNY: 0.37,
-  JPY: 0.38
+  YEN: 0.37
 };
 
 export default function DonationModals({
@@ -46,7 +45,7 @@ export default function DonationModals({
         });
       }
     };
-    
+  
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [toggleSortDropdown, openSortDropdown]);

@@ -18,16 +18,14 @@ interface FilterDropdownProps {
 }
 
 const exchangeRates = {
-  USD: 55,
-  PHP: 1,
-  EUR: 60,
-  WON: 0.042,
-  CNY: 0.37,
-  JPY: 0.38
+  USD: 1,
+  PHP: 55, // Example: 1 USD = 55 PHP
 };
 
 export default function DonationModals({
-  handleSort, openSortDropdown,toggleSortDropdown,
+  handleSort,
+  openSortDropdown,
+  toggleSortDropdown,
 }: FilterDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: "Ascending" | "Descending" }>({});
@@ -37,16 +35,17 @@ export default function DonationModals({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         toggleSortDropdown(null);
   
+        // Reset only the filter that was open
         setSelectedFilters((prevFilters) => {
           const updatedFilters = { ...prevFilters };
           if (openSortDropdown) {
-            delete updatedFilters[openSortDropdown];
+            delete updatedFilters[openSortDropdown]; // Remove the selected choice of the open dropdown
           }
           return updatedFilters;
         });
       }
     };
-    
+  
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [toggleSortDropdown, openSortDropdown]);
@@ -56,6 +55,13 @@ export default function DonationModals({
     Date: "Date",
     Church: "Church",
     Amount: "Amount",
+  };
+
+  // Function to convert Amounts into a comparable numeric value
+  const getAmountInPHP = (amount: string) => {
+    const currency = amount.split(" ")[0]; // Extract currency (USD or PHP)
+    const value = parseFloat(amount.split(" ")[1]); // Extract the number
+    return value * exchangeRates[currency as keyof typeof exchangeRates]; // Convert to PHP equivalent
   };
 
   return (
@@ -76,8 +82,8 @@ export default function DonationModals({
           <div key={filter} className="relative">
             <button
               onClick={() => toggleSortDropdown(openSortDropdown === filter ? null : filter)}
-              className="w-[120px] md:w-[140px] lg:w-[160px] h-10 border border-[#01438F] rounded-md px-3 outline-none
-              bg-white text-gray-600 flex justify-between items-center">
+              className="w-[120px] md:w-[140px] lg:w-[160px] h-10 border border-[#01438F] rounded-md px-3 outline-none bg-white text-gray-600 flex justify-between items-center"
+            >
               {filter}
               <ChevronDown className="w-4 h-4 text-[#01438F]" />
             </button>
@@ -92,13 +98,16 @@ export default function DonationModals({
                     checked={selectedFilters[filter] === "Ascending"}
                     onChange={() => {
                       setSelectedFilters({ ...selectedFilters, [filter]: "Ascending" });
-                      handleSort(filterKeyMap[filter], "asc");
+                      if (filter === "Amount") {
+                        handleSort(filterKeyMap[filter], "asc");
+                      } else {
+                        handleSort(filterKeyMap[filter], "asc");
+                      }
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Ascending
                 </label>
-
                 <label className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm">
                   <input
                     type="radio"
@@ -107,10 +116,14 @@ export default function DonationModals({
                     checked={selectedFilters[filter] === "Descending"}
                     onChange={() => {
                       setSelectedFilters({ ...selectedFilters, [filter]: "Descending" });
-                      handleSort(filterKeyMap[filter], "desc");
+                      if (filter === "Amount") {
+                        handleSort(filterKeyMap[filter], "desc");
+                      } else {
+                        handleSort(filterKeyMap[filter], "desc");
+                      }
                       toggleSortDropdown(null);
                     }}
-                    />
+                  />
                   Descending
                 </label>
               </div>
