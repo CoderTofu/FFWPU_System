@@ -21,5 +21,6 @@ export const config = {
     "/cms/:path*",
     "/worship/:path*",
     "/reporting/:path*",
+    "/event/:path*",
   ],
 };
