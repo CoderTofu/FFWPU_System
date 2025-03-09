@@ -8,7 +8,9 @@ import { Search, ChevronDown } from "lucide-react";
 
 export default function ViewBlessing() {
   const router = useRouter();
-  const [selectedRow, setSelectedRow] = useState<{ "Blessing ID": number } | null>(null);
+  const [selectedRow, setSelectedRow] = useState<{
+    "Blessing ID": number;
+  } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState("");
@@ -21,17 +23,46 @@ export default function ViewBlessing() {
   };
 
   const [blessing, setBlessing] = useState([
-    { "Blessing ID": 102010, Date: "02/19/2021", "Name of Blessing": "Blessing 1", Year: 2021 },
-    { "Blessing ID": 124495, Date: "02/21/2025", "Name of Blessing": "First Sunday Event", Year: 2025 },
-    { "Blessing ID": 321345, Date: "02/26/2025", "Name of Blessing": "Blessing 3", Year: 2025 },
-    { "Blessing ID": 124495, Date: "02/21/2025", "Name of Blessing": "Blessing 4", Year: 2019 },
+    {
+      "Blessing ID": 102010,
+      Date: "02/19/2021",
+      "Name of Blessing": "Blessing 1",
+      Year: 2021,
+    },
+    {
+      "Blessing ID": 124495,
+      Date: "02/21/2025",
+      "Name of Blessing": "First Sunday Event",
+      Year: 2025,
+    },
+    {
+      "Blessing ID": 321345,
+      Date: "02/26/2025",
+      "Name of Blessing": "Blessing 3",
+      Year: 2025,
+    },
+    {
+      "Blessing ID": 124495,
+      Date: "02/21/2025",
+      "Name of Blessing": "Blessing 4",
+      Year: 2019,
+    },
   ]);
 
-  const availableYears = ["All Years", ...Array.from(new Set(blessing.map(item => item.Year.toString())))];
+  // DATA ID
+  const dataId = "Blessing ID";
+
+  const availableYears = [
+    "All Years",
+    ...Array.from(new Set(blessing.map((item) => item.Year.toString()))),
+  ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpenDropdown(null);
       }
     };
@@ -41,34 +72,43 @@ export default function ViewBlessing() {
 
   const filteredData = blessing.filter(
     (item) =>
-      Object.values(item).join(" ").toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (selectedYear && selectedYear !== "All Years" ? item.Year.toString() === selectedYear : true)
+      Object.values(item)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) &&
+      (selectedYear && selectedYear !== "All Years"
+        ? item.Year.toString() === selectedYear
+        : true)
   );
 
   const handleEditClick = () => {
     if (selectedRow) {
-      router.push(`/blessing/${selectedRow["Blessing ID"]}/edit`);
+      router.push(`/blessings/edit-blessing/${selectedRow[dataId]}`);
     }
   };
 
   const [isOpen, setIsOpen] = useState(false);
   const handleConfirm = () => {
     if (selectedRow) {
-      setBlessing(blessing.filter((item) => item["Blessing ID"] !== selectedRow["Blessing ID"]));
+      setBlessing(
+        blessing.filter(
+          (item) => item["Blessing ID"] !== selectedRow["Blessing ID"]
+        )
+      );
     }
     console.log("Data deleted successfully!");
     setIsOpen(false);
   };
 
   return (
-    <div>
+    <div className="px-0 md:px-[150px] mt-8">
       {/* Header */}
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-4 flex justify-center items-center mt-8">
-        <h1 className="text-2xl font-bold uppercase">BLESSINGS INFORMATION</h1>
+      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
+        <p className="text-3xl font-bold uppercase">BLESSINGS INFORMATION</p>
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-wrap items-center gap-4 mt-4 justify-between max-w-6xl mx-auto">
+      <div className="flex flex-wrap items-center gap-4 mt-4 justify-between ">
         {/* Search */}
         <div className="relative w-full sm:max-w-xs">
           <input
@@ -84,7 +124,9 @@ export default function ViewBlessing() {
         {/* Filter Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => setOpenDropdown(openDropdown === "Year" ? null : "Year")}
+            onClick={() =>
+              setOpenDropdown(openDropdown === "Year" ? null : "Year")
+            }
             className="w-30 md:w-36 lg:w-40 h-7 border border-[#01438F] rounded-md px-3 outline-none bg-white text-sm text-gray-500 flex justify-between items-center"
           >
             Year
@@ -113,33 +155,57 @@ export default function ViewBlessing() {
       </div>
 
       {/* Table */}
-      <div className="max-w-6xl mx-auto overflow-hidden rounded-lg bg-white mt-6">
-        <Table data={filteredData} columns={columns} rowDoubleClickPath="/blessing" onRowSelect={setSelectedRow} />
+      <div className="overflow-hidden rounded-lg bg-white mt-6">
+        <Table
+          data={filteredData}
+          columns={columns}
+          rowDoubleClickPath="/blessings"
+          idName={dataId}
+          onRowSelect={setSelectedRow}
+        />
       </div>
 
       {/* Buttons */}
       <div className="flex justify-center items-center m-7 gap-5">
-        <button className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold" onClick={() => router.push("/blessing/add")}>
+        <button
+          className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+          onClick={() => router.push("/blessings/add-blessing")}
+        >
           ADD
         </button>
         <button
           onClick={handleEditClick}
           disabled={!selectedRow}
-          className={`px-6 py-2 rounded ${selectedRow ? "bg-[#01438F] text-[#FCC346] font-bold" : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"}`}
+          className={`px-6 py-2 rounded ${
+            selectedRow
+              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
+          }`}
         >
           EDIT
         </button>
         <button
           onClick={() => setIsOpen(true)}
           disabled={!selectedRow}
-          className={`px-4 py-2 rounded ${selectedRow ? "bg-[#01438F] text-[#FCC346] font-bold" : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"}`}
+          className={`px-4 py-2 rounded ${
+            selectedRow
+              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
+          }`}
         >
           DELETE
         </button>
       </div>
 
       {/* Modal */}
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} onConfirm={handleConfirm} message="Are you sure you want to delete the data?" confirmText="Yes" cancelText="No" />
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onConfirm={handleConfirm}
+        message="Are you sure you want to delete the data?"
+        confirmText="Yes"
+        cancelText="No"
+      />
     </div>
   );
 }

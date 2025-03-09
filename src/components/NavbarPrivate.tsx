@@ -19,9 +19,9 @@ export default function NavbarPrivate() {
   }, [isSidebarOpen]);
 
   const navItems = [
-    { name: "Member Information", href: "/member" },
-    { name: "Worship Eventa", href: "/event" },
-    { name: "Blessings Management", href: "/blessing" },
+    { name: "Members", href: "/member" },
+    { name: "Events", href: "/event" },
+    { name: "Blessings", href: "/blessings" },
     { name: "Donations", href: "/donation" },
     { name: "Reporting", href: "/reporting" },
     { name: "CMS", href: "/cms" },
