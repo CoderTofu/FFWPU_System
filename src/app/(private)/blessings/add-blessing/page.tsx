@@ -5,11 +5,8 @@ import { Calendar, PlusCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
-import { useRouter } from "next/navigation";
 
 export default function AddBlessing() {
-  const router = useRouter();
-
   const [members, setMembers] = useState([
     { "Member ID": "M001", Name: "Binose" },
     { "Member ID": "M002", Name: "Lans" },
@@ -28,8 +25,10 @@ export default function AddBlessing() {
     { Name: "Hiro" },
   ]);
 
-  const [selectedMember, setSelectedMember] = useState(null);
-  const [selectedGuest, setSelectedGuest] = useState(null);
+  const [selectedMember, setSelectedMember] = useState<{
+    "Member ID": number;
+  } | null>(null);
+  const [selectedGuest, setSelectedGuest] = useState<string[]>([]);
 
   const [showModal, setShowModal] = useState(false);
   const [date, setDate] = useState("");
@@ -42,31 +41,14 @@ export default function AddBlessing() {
     setIsRegistrationModalOpen(true);
   };
 
-  const handleConfirm = () => {
-    console.log("Saving...");
-    setShowModal(false);
-    router.push("/blessings");
-  };
-
   const handleSubmit = (formData: Record<string, string>) => {
-    if (registrationType === "member") {
-      setMembers([
-        ...members,
-        // Kung ano name associated with the ID
-        { "Member ID": formData.memberId, Name: "Placeholder" },
-      ]);
-    } else if (registrationType === "guest") {
-      setGuests([...guests, { Name: formData.fullName }]);
-    }
+    console.log("Form Data Submitted:", formData);
   };
 
   const handleGuestDelete = () => {
-    setGuests(guests.filter((guest) => guest !== selectedGuest));
     console.log("Deleting Guest: " + selectedGuest);
   };
-
   const handleMemberDelete = () => {
-    setMembers(members.filter((member) => member !== selectedMember));
     console.log("Deleting Member: " + selectedMember);
   };
 
@@ -91,17 +73,15 @@ export default function AddBlessing() {
               />
             </div>
           </h2>
-          <div className="max-h-[250px] overflow-y-auto">
-            <Table
-              data={members}
-              columns={{
-                lg: ["Member ID", "Name"],
-                md: ["Member ID", "Name"],
-                sm: ["Name"],
-              }}
-              onRowSelect={setSelectedMember}
-            />
-          </div>
+          <Table
+            data={members}
+            columns={{
+              lg: ["Member ID", "Name"],
+              md: ["Member ID", "Name"],
+              sm: ["Name"],
+            }}
+            onRowSelect={setSelectedMember}
+          />
           <button
             onClick={handleMemberDelete}
             disabled={!selectedMember}
@@ -124,13 +104,11 @@ export default function AddBlessing() {
               />
             </div>
           </h2>
-          <div className="max-h-[250px] overflow-y-auto">
-            <Table
-              data={guests}
-              columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
-              onRowSelect={setSelectedGuest}
-            />
-          </div>
+          <Table
+            data={guests}
+            columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+            onRowSelect={setSelectedGuest}
+          />
           <button
             onClick={handleGuestDelete}
             disabled={!selectedGuest}
@@ -196,8 +174,11 @@ export default function AddBlessing() {
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
-          onConfirm={handleConfirm}
-          message="Are you sure you want to add the blessing?"
+          onConfirm={() => {
+            console.log("Saving...");
+            setShowModal(false);
+          }}
+          message="Are you sure you want to add the data?"
           confirmText="Add"
           cancelText="Cancel"
         />

@@ -1,32 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { Calendar, PlusCircle } from "lucide-react";
 import Table from "@/components/Table";
-import { useParams } from "next/navigation";
+import Modal from "@/components/Modal";
+import RegistrationModal from "@/components/RegistrationModal";
 
-export default function ViewBlessing() {
-  const params = useParams();
+export default function AddBlessing() {
+  const [members, setMembers] = useState([]);
 
-  // This is the blessing ID from the URL
-  console.log(params.blessingID);
-
-  const [members, setMembers] = useState([
-    { "Member ID": "M001", Name: "Binose" },
-    { "Member ID": "M002", Name: "Lans" },
-    { "Member ID": "M001", Name: "Ye Em" },
-    { "Member ID": "M002", Name: "Cess" },
-    { "Member ID": "M001", Name: "Dril" },
-    { "Member ID": "M002", Name: "Pao" },
-  ]);
-
-  const [guests, setGuests] = useState([
-    { Name: "Blake" },
-    { Name: "Sloane" },
-    { Name: "Nisamon" },
-    { Name: "Chekwa" },
-    { Name: "Chiki" },
-    { Name: "Hiro" },
-  ]);
+  const [guests, setGuests] = useState([]);
 
   return (
     <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7 mb-10">
@@ -41,25 +24,21 @@ export default function ViewBlessing() {
           <h2 className="text-lg font-semibold mb-3 flex justify-between">
             Members Blessed
           </h2>
-          <div className="max-h-[250px] overflow-y-auto">
-            <Table
-              data={members}
-              columns={{
-                lg: ["Member ID", "Name"],
-                md: ["Member ID", "Name"],
-                sm: ["Name"],
-              }}
-            />
-          </div>
+          <Table
+            data={members}
+            columns={{
+              lg: ["Member ID", "Name"],
+              md: ["Member ID", "Name"],
+              sm: ["Name"],
+            }}
+          />
           <h2 className="text-lg font-semibold mt-4 mb-3 flex justify-between">
             Guests Blessed
           </h2>
-          <div className="max-h-[250px] overflow-y-auto">
-            <Table
-              data={guests}
-              columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
-            />
-          </div>
+          <Table
+            data={guests}
+            columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+          />
         </div>
 
         {/* Blessing Event Details */}
