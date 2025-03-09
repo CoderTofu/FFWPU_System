@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Preloader from "@/components/preLoader";
+import Preloader from "@/components/Preloader";
 import LayoutWrapper from "@/components/LayoutWrapper";
 
 export const metadata: Metadata = {

@@ -20,7 +20,7 @@ export default function NavbarPrivate() {
 
   const navItems = [
     { name: "Member Information", href: "/member" },
-    { name: "Worship Event", href: "/worship" },
+    { name: "Worship Eventa", href: "/event" },
     { name: "Blessings Management", href: "/blessing" },
     { name: "Donations", href: "/donation" },
     { name: "Reporting", href: "/reporting" },

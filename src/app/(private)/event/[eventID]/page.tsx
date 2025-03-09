@@ -1,8 +1,14 @@
-"use client"; 
+"use client";
 
 import Table from "@/components/Table";
 
-export default function ViewWorship() {
+export default function ViewWorship({
+  params,
+}: {
+  params: {
+    eventID: string;
+  };
+}) {
   const data = [
     { ID: 6001, Name: "Orton, Johan H." },
     { ID: 6002, Name: "Reigns, Jeff T." },
@@ -33,7 +39,11 @@ export default function ViewWorship() {
         </p>
         <div className="border-2 border-[#01438F] border-solid rounded-lg flex items-center justify-center bg-white mt-6 min-h-[300px]">
           <label className="flex flex-col items-center cursor-pointer">
-            <input type="file" accept=".png,.jpg,.jpeg,.svg" className="hidden" />
+            <input
+              type="file"
+              accept=".png,.jpg,.jpeg,.svg"
+              className="hidden"
+            />
             <div className="flex flex-col items-center text-gray-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -64,13 +74,17 @@ export default function ViewWorship() {
                 <div className="flex flex-wrap gap-4 justify-center">
                   {/* First table */}
                   <div className="w-full rounded-lg p-4 pb-0">
-                    <h2 className="text-lg font-semibold mb-2">Members Attended</h2>
+                    <h2 className="text-lg font-semibold mb-2">
+                      Members Attended
+                    </h2>
                     <Table data={data} columns={columnConfig} />
                   </div>
 
                   {/* Second table */}
                   <div className="w-full rounded-lg p-4">
-                    <h2 className="text-lg font-semibold mb-2">Guests Attended</h2>
+                    <h2 className="text-lg font-semibold mb-2">
+                      Guests Attended
+                    </h2>
                     <Table
                       data={data}
                       columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
@@ -87,6 +101,12 @@ export default function ViewWorship() {
               <form className="flex flex-col gap-4 text-left pl-8 w-full">
                 <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Worship ID:</label>
+                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
+                    <p className="text-base">Placeholder</p>
+                  </div>
+                </div>
+                <div className="flex flex-col mb-1 w-full">
+                  <label className="text-base font-bold">Event Name:</label>
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
                     <p className="text-base">Placeholder</p>
                   </div>
