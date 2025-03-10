@@ -1,7 +1,12 @@
 "use client"
 import { FaUserCircle } from "react-icons/fa";
+import { useState } from "react";
 
 export default function DisplayMember() {
+  const [blessings, setBlessings] = useState([
+    { name: "Marriage", date: "01/31/2025" },
+    { name: "Baptism", date: "08/19/1999" },
+  ]);
 
     return (<div className="p-8 bg-[#D9D9D9] min-h-screen">
     {/*Banner */}
@@ -121,98 +126,32 @@ export default function DisplayMember() {
 
     {/*Section for Spiritual Information*/}
     <section>
-      <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">SPIRITUAL INFORMATION</p>
-
+      <p className="text-lg text-[#BE9231] font-[700] mt-10 mb-10">SPIRITUAL INFORMATION</p>
       <div className="flex flex-col w-full">
-        <div className="flex flex-row w-full gap-5 mt-5 mb-5">
-
-          {/*Generation*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Generation</label>
-            </div>
-            <div className="w-2/3">
-            <input 
-              type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
-          </div>
-
-          {/*Spiritual Birthday*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Spiritual Birthday</label>
-            </div>
-            <div className="w-2/3">
-            <input 
-              type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
-          </div>
-
-          {/*Membership Category*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Membership Category</label>
-            </div>
-            <div className="w-2/3">
-            <input 
-              type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-row w-full gap-5 mt-5 mb-5">
-
-          {/*Spiritual Parent*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Spiritual Parent</label>
-            </div>
-            <div className="w-2/3">
-            <input 
-              type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            <input 
-              type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3 mt-5 mb-5" />
-            </div>
-            
-          </div>
-      </div>
-
-    </section>
-
-    <section>
-      <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">SPIRITUAL INFORMATION</p>
-
-      <div className="flex flex-col w-full">
-        <div className="flex flex-col md:flex-row w-full gap-5 mt-5 mb-5">
+        <div className="flex flex-col md:flex-row w-full gap-5">
 
           {/*Generation*/}
           <div className="w-full md:w-1/3 flex flex-row gap-2">
-            <label className="whitespace-nowrap">Generation</label>
+            <label className=" md:w-1/3 w-full">Generation</label>
             <input 
               type="text"
-              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3" />
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
           </div>
 
           {/*Spiritual Birthday*/}
           <div className="w-full md:w-1/3 flex flex-row gap-2">
-            <label className="whitespace-nowrap">Spiritual Birthday</label>
+            <label className=" md:w-1/3 w-full">Spiritual Birthday</label>
             <input 
               type="text"
-              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3" />
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
           </div>
 
           {/*Membership Category*/}
           <div className="w-full md:w-1/3 flex flex-row gap-2">
-            <label className="whitespace-nowrap">Membership Category</label>
+            <label className=" md:w-1/3 w-full">Membership Category</label>
             <input 
               type="text"
-              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3" />
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
           </div>
         </div>
       </div>
@@ -221,14 +160,14 @@ export default function DisplayMember() {
 
         {/*Spiritual Parent*/}
         <div className="w-full md:w-1/3 flex flex-row gap-2">
-          <label className="whitespace-nowrap">Spiritual Parent</label>
-          <div className="w-full">
+          <label className=" md:w-1/3 w-full">Spiritual Parent</label>
+          <div className="w-full md:max-w-60">
             <input 
               type="text"
-              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3" />
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
             <input 
               type="text"
-              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3 mt-2" />
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3 mt-5"/>
           </div>
         </div>
 
@@ -239,18 +178,15 @@ export default function DisplayMember() {
 
     {/*Section for Mission History*/}
     <section>
-      <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">MISSION HISTORY</p>
+      <p className="text-lg text-[#BE9231] font-[700] mt-10 mb-10">MISSION HISTORY</p>
 
       <div className="flex flex-col w-full">
-        {/* Responsive Wrapper */}
-        <div className="flex flex-col md:flex-row w-full md:w-11/12 gap-5 mt-5 mb-5">
+        <div className="flex flex-col md:flex-row w-full md:w-11/12 gap-5">
           
           {/* Mission Title/Role */}
-          <div className="w-full md:w-1/4 gap-5">
-            <div className="mb-2">
-              <label htmlFor="">Mission Title/Role</label>
-            </div>
-            <div className="mb-2">
+          <div className="w-full md:w-1/4">
+            <div className="flex flex-row md:flex-col items-center md:items-start gap-2">
+              <label className="w-full">Mission Title/Role</label>
               <input 
                 type="text"
                 className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
@@ -258,11 +194,9 @@ export default function DisplayMember() {
           </div>
 
           {/* Organization */}
-          <div className="w-full md:w-1/4 gap-5">
-            <div className="mb-2">
-              <label htmlFor="">Organization</label>
-            </div>
-            <div className="mb-2">
+          <div className="w-full md:w-1/4">
+            <div className="flex flex-row md:flex-col items-center md:items-start gap-2">
+              <label className="w-full">Organization</label>
               <input 
                 type="text"
                 className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
@@ -270,11 +204,9 @@ export default function DisplayMember() {
           </div>
 
           {/* Country */}
-          <div className="w-full md:w-1/4 gap-5">
-            <div className="mb-2">
-              <label htmlFor="">Country</label>
-            </div>
-            <div className="mb-2">
+          <div className="w-full md:w-1/4">
+            <div className="flex flex-row md:flex-col items-center md:items-start gap-2">
+              <label className="w-full">Country</label>
               <input 
                 type="text"
                 className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
@@ -282,25 +214,66 @@ export default function DisplayMember() {
           </div>
 
           {/* Date */}
-          <div className="w-full md:w-1/4 gap-5">
-            <div className="mb-2">
-              <label htmlFor="">Date</label>
-            </div>
-            <div className="mb-2">
+          <div className="w-full md:w-1/4">
+            <div className="flex flex-row md:flex-col items-center md:items-start gap-2">
+              <label className="w-full">Date</label>
               <input 
                 type="text"
                 className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
             </div>
           </div>
+
         </div>
       </div>
-
     </section>
 
     {/*Section for List of Blessings*/}
     <section>
-      <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">List of Blessings</p>
+      <p className="text-lg text-[#BE9231] font-[700] mt-10 mb-10">LIST OF BLESSINGS</p>
 
+      <div className="flex flex-col w-full">
+        {/* Desktop Labels (Only on first row in large screens) */}
+        <div className="hidden md:flex flex-row w-full md:w-11/12 gap-5">
+          <div className="w-1/4">
+            <label className="">Name of Blessing/s</label>
+          </div>
+          <div className="w-1/4">
+            <label className="">Date</label>
+          </div>
+        </div>
+        
+        {blessings.map((blessing, index) => (
+          <div key={index} className="flex flex-col md:flex-row w-full md:w-11/12 gap-5 mt-5">
+            
+            {/* Name of Blessing/s */}
+            <div className="w-full md:w-1/4">
+              <div className="flex flex-row md:flex-col items-center md:items-start gap-2">
+                {/* Show label only in mobile view */}
+                <label className="w-full block md:hidden">Name of Blessing/s</label>
+                <input
+                  type="text"
+                  defaultValue={blessing.name}
+                  className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3"
+                />
+              </div>
+            </div>
+
+            {/* Date */}
+            <div className="w-full md:w-1/4">
+              <div className="flex flex-row md:flex-col items-center md:items-start gap-2">
+                {/* Show label only in mobile view */}
+                <label className="w-full block md:hidden">Date</label>
+                <input
+                  type="text"
+                  defaultValue={blessing.date}
+                  className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3"
+                />
+              </div>
+            </div>
+
+          </div>
+        ))}
+      </div>
     </section>
 
     </div>
