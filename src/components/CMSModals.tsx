@@ -19,6 +19,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { axiosInstance } from "@/app/axiosInstance";
+import Cookies from "js-cookie";
+
 // Helper function for button styles
 const buttonStyle =
   "font-bold border-2 border-[#01438F] bg-[#FCC346] py-2 px-7 transition-all duration-300 hover:opacity-90 rounded-lg";
@@ -398,7 +401,29 @@ export function AddNewAdminModal() {
 
   const handleAddAdmin = () => {
     // Add logic to handle adding a new admin
-    console.log("Adding new admin:", adminName, adminEmail);
+    axiosInstance
+      .post(
+        "/add-admin/",
+        {
+          username: adminName,
+          email: adminEmail,
+          password: adminPassword,
+        },
+        { headers: { Authorization: `Bearer ${Cookies.get("access_token")}` } }
+      )
+      .then((response) => {
+        if (response.status == 201) {
+          alert(`Successfully added admin ${adminName}!`);
+        }
+      })
+      .catch((err) => {
+        if (err.response) {
+          alert(err.response.data.error);
+        } else {
+          alert(err.status);
+        }
+      });
+    // console.log("Adding new admin:", adminName, adminEmail);
     // Reset the inputs
     setAdminName("");
     setAdminEmail("");
@@ -426,6 +451,18 @@ export function AddNewAdminModal() {
               id="admin-name"
               value={adminName}
               onChange={(e) => setAdminName(e.target.value)}
+              className="col-span-3 border-2 border-black rounded-sm px-1 py-1"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="admin-password" className="text-right font-bold">
+              Email
+            </Label>
+            <input
+              id="admin-password"
+              type="password"
+              value={adminEmail}
+              onChange={(e) => setAdminEmail(e.target.value)}
               className="col-span-3 border-2 border-black rounded-sm px-1 py-1"
             />
           </div>

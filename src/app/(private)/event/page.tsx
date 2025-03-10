@@ -11,19 +11,93 @@ export default function EventInfo() {
 
   // Sample event data for the table
   const data = [
-    { "Worship ID": 2001, Name: "Sunday Service", Date: "2024-02-01", Church: "Manila Cathedral", Type: "Onsite" },
-    { "Worship ID": 2002, Name: "Bible Study", Date: "2024-02-02", Church: "San Agustin Church", Type: "Online" },
-    { "Worship ID": 2003, Name: "Youth Fellowship", Date: "2024-02-03", Church: "Sto. Nino de Pandacan Parish Church", Type: "Onsite" },
-    { "Worship ID": 2001, Name: "Sunday Service", Date: "2024-02-01", Church: "Manila Cathedral", Type: "Onsite" },
-    { "Worship ID": 2002, Name: "Bible Study", Date: "2024-02-02", Church: "San Agustin Church", Type: "Online" },
-    { "Worship ID": 2003, Name: "Youth Fellowship", Date: "2024-02-03", Church: "Sto. Nino de Pandacan Parish Church", Type: "Onsite" },
-    { "Worship ID": 2001, Name: "Sunday Service", Date: "2024-02-01", Church: "Manila Cathedral", Type: "Onsite" },
-    { "Worship ID": 2002, Name: "Bible Study", Date: "2024-02-02", Church: "San Agustin Church", Type: "Online" },
-    { "Worship ID": 2003, Name: "Youth Fellowship", Date: "2024-02-03", Church: "Sto. Nino de Pandacan Parish Church", Type: "Onsite" },
-    { "Worship ID": 2001, Name: "Sunday Service", Date: "2024-02-01", Church: "Manila Cathedral", Type: "Onsite" },
-    { "Worship ID": 2002, Name: "Bible Study", Date: "2024-02-02", Church: "San Agustin Church", Type: "Online" },
-    { "Worship ID": 2003, Name: "Youth Fellowship", Date: "2024-02-03", Church: "Sto. Nino de Pandacan Parish Church", Type: "Onsite" },
+    {
+      "Worship ID": 2001,
+      Name: "Sunday Service",
+      Date: "2024-02-01",
+      Church: "Manila Cathedral",
+      Type: "Onsite",
+    },
+    {
+      "Worship ID": 2002,
+      Name: "Bible Study",
+      Date: "2024-02-02",
+      Church: "San Agustin Church",
+      Type: "Online",
+    },
+    {
+      "Worship ID": 2003,
+      Name: "Youth Fellowship",
+      Date: "2024-02-03",
+      Church: "Sto. Nino de Pandacan Parish Church",
+      Type: "Onsite",
+    },
+    {
+      "Worship ID": 2001,
+      Name: "Sunday Service",
+      Date: "2024-02-01",
+      Church: "Manila Cathedral",
+      Type: "Onsite",
+    },
+    {
+      "Worship ID": 2002,
+      Name: "Bible Study",
+      Date: "2024-02-02",
+      Church: "San Agustin Church",
+      Type: "Online",
+    },
+    {
+      "Worship ID": 2003,
+      Name: "Youth Fellowship",
+      Date: "2024-02-03",
+      Church: "Sto. Nino de Pandacan Parish Church",
+      Type: "Onsite",
+    },
+    {
+      "Worship ID": 2001,
+      Name: "Sunday Service",
+      Date: "2024-02-01",
+      Church: "Manila Cathedral",
+      Type: "Onsite",
+    },
+    {
+      "Worship ID": 2002,
+      Name: "Bible Study",
+      Date: "2024-02-02",
+      Church: "San Agustin Church",
+      Type: "Online",
+    },
+    {
+      "Worship ID": 2003,
+      Name: "Youth Fellowship",
+      Date: "2024-02-03",
+      Church: "Sto. Nino de Pandacan Parish Church",
+      Type: "Onsite",
+    },
+    {
+      "Worship ID": 2001,
+      Name: "Sunday Service",
+      Date: "2024-02-01",
+      Church: "Manila Cathedral",
+      Type: "Onsite",
+    },
+    {
+      "Worship ID": 2002,
+      Name: "Bible Study",
+      Date: "2024-02-02",
+      Church: "San Agustin Church",
+      Type: "Online",
+    },
+    {
+      "Worship ID": 2003,
+      Name: "Youth Fellowship",
+      Date: "2024-02-03",
+      Church: "Sto. Nino de Pandacan Parish Church",
+      Type: "Onsite",
+    },
   ];
+
+  const dataID = "Worship ID";
 
   // Column configuration for responsive table
   const columnConfig = {
@@ -142,6 +216,8 @@ export default function EventInfo() {
         <Table
           data={filteredData}
           columns={columnConfig}
+          rowDoubleClickPath="/event"
+          idName={dataID}
           onRowSelect={(row) => setSelectedRow(row)}
         />
       </div>
@@ -155,7 +231,10 @@ export default function EventInfo() {
           ADD
         </button>
         <button
-          onClick={() => router.push("/event/edit-event")}
+          onClick={() =>
+            selectedRow &&
+            router.push(`/event/edit-event/${selectedRow[dataID]}`)
+          }
           disabled={!selectedRow}
           className={`w-[106px] h-[40px] ${
             selectedRow
