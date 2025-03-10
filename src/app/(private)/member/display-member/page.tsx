@@ -34,127 +34,88 @@ export default function DisplayMember() {
       <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">PERSONAL INFORMATION</p>
       {/*Div for Personal Info Form*/}
       <div className="flex flex-col w-full">
-        {/*Div for 1st Row*/}
-        <div className="flex flex-row w-full gap-5 mt-5 mb-5">
 
-          {/*Gender*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Gender</label>
-            </div>
-            <div className="w-2/3">
+        {/* Div for 1st Row */}
+        <div className="flex flex-col md:flex-row w-full gap-5 mt-5 mb-5">
+          {/* Gender */}
+          <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-2">
+            <label className="md:w-1/3">Gender</label>
             <input 
               type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
-          </div>
-          
-          {/*Date of Birth*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Date of Birth</label>
-            </div>
-            <div className="w-2/3">
-            <input 
-              type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
           </div>
 
-          {/*Age*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Age</label>
-            </div>
-            <div className="w-2/3">
+          {/* Date of Birth */}
+          <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-2">
+            <label className="md:w-1/3">Date of Birth</label>
+            <input 
+              type="text"
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
+          </div>
+
+          {/* Age */}
+          <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-2">
+            <label className="md:w-1/3">Age</label>
             <input 
               type="number"
               min={0}
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
           </div>
         </div>
 
-
-        {/*Div for 2nd Row*/}
-        <div className="flex flex-row w-full gap-5 mt-5 mb-5">
-
-          {/*Nation*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Nation</label>
-            </div>
-            <div className="w-2/3">
+        {/* Div for 2nd Row */}
+        <div className="flex flex-col md:flex-row w-full gap-5 mt-5 mb-5">
+          {/* Nation */}
+          <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-2">
+            <label className="md:w-1/3">Nation</label>
             <input 
               type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
-          </div>
-          
-          {/*Marital Status*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Marital Status</label>
-            </div>
-            <div className="w-2/3">
-            <input 
-              type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
           </div>
 
-          {/*Name of Spouse*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Name of Spouse</label>
-            </div>
-            <div className="w-2/3">
+          {/* Marital Status */}
+          <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-2">
+            <label className="md:w-1/3">Marital Status</label>
             <input 
               type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
+          </div>
+
+          {/* Name of Spouse */}
+          <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-2">
+            <label className="md:w-1/3">Name of Spouse</label>
+            <input 
+              type="text"
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
           </div>
         </div>
 
-
-        {/*Div for 3rd Row*/}
-        <div className="flex flex-row w-full gap-5 mt-5 mb-5">
-
-          {/*Phone*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Phone</label>
-            </div>
-            <div className="w-2/3">
+        {/* Div for 3rd Row */}
+        <div className="flex flex-col md:flex-row w-full gap-5 mt-5 mb-5">
+          {/* Phone */}
+          <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-2">
+            <label className="md:w-1/3">Phone</label>
             <input 
               type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
-          </div>
-          
-          {/*Email*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Email</label>
-            </div>
-            <div className="w-2/3">
-            <input 
-              type="text"
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-8 text-base px-3" />
-            </div>
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
           </div>
 
-          {/*Address*/}
-          <div className="w-1/3 flex flex-row gap-5">
-            <div className="w-1/3">
-              <label htmlFor="">Address</label>
-            </div>
-            <div className="w-2/3">
+          {/* Email */}
+          <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-2">
+            <label className="md:w-1/3">Email</label>
+            <input 
+              type="text"
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
+          </div>
+
+          {/* Address */}
+          <div className="w-full md:w-1/3 flex flex-col md:flex-row gap-2">
+            <label className="md:w-1/3">Address</label>
             <textarea 
-              className="border-[#01438F] border rounded-[5px] w-full max-w-60 h-40 text-base px-3 py-3 resize-none" />
-            </div>
+              className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-40 text-base px-3 py-3 resize-none" />
           </div>
         </div>
+
       </div>
     </section>
 
@@ -224,13 +185,121 @@ export default function DisplayMember() {
 
     </section>
 
+    <section>
+      <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">SPIRITUAL INFORMATION</p>
+
+      <div className="flex flex-col w-full">
+        <div className="flex flex-col md:flex-row w-full gap-5 mt-5 mb-5">
+
+          {/*Generation*/}
+          <div className="w-full md:w-1/3 flex flex-row gap-2">
+            <label className="whitespace-nowrap">Generation</label>
+            <input 
+              type="text"
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3" />
+          </div>
+
+          {/*Spiritual Birthday*/}
+          <div className="w-full md:w-1/3 flex flex-row gap-2">
+            <label className="whitespace-nowrap">Spiritual Birthday</label>
+            <input 
+              type="text"
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3" />
+          </div>
+
+          {/*Membership Category*/}
+          <div className="w-full md:w-1/3 flex flex-row gap-2">
+            <label className="whitespace-nowrap">Membership Category</label>
+            <input 
+              type="text"
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3" />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row w-full gap-5 mt-5 mb-5">
+
+        {/*Spiritual Parent*/}
+        <div className="w-full md:w-1/3 flex flex-row gap-2">
+          <label className="whitespace-nowrap">Spiritual Parent</label>
+          <div className="w-full">
+            <input 
+              type="text"
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3" />
+            <input 
+              type="text"
+              className="border-[#01438F] border rounded-[5px] w-full h-8 text-base px-3 mt-2" />
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
     {/*Section for Mission History*/}
     <section>
+      <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">MISSION HISTORY</p>
+
+      <div className="flex flex-col w-full">
+        {/* Responsive Wrapper */}
+        <div className="flex flex-col md:flex-row w-full md:w-11/12 gap-5 mt-5 mb-5">
+          
+          {/* Mission Title/Role */}
+          <div className="w-full md:w-1/4 gap-5">
+            <div className="mb-2">
+              <label htmlFor="">Mission Title/Role</label>
+            </div>
+            <div className="mb-2">
+              <input 
+                type="text"
+                className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
+            </div>
+          </div>
+
+          {/* Organization */}
+          <div className="w-full md:w-1/4 gap-5">
+            <div className="mb-2">
+              <label htmlFor="">Organization</label>
+            </div>
+            <div className="mb-2">
+              <input 
+                type="text"
+                className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
+            </div>
+          </div>
+
+          {/* Country */}
+          <div className="w-full md:w-1/4 gap-5">
+            <div className="mb-2">
+              <label htmlFor="">Country</label>
+            </div>
+            <div className="mb-2">
+              <input 
+                type="text"
+                className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
+            </div>
+          </div>
+
+          {/* Date */}
+          <div className="w-full md:w-1/4 gap-5">
+            <div className="mb-2">
+              <label htmlFor="">Date</label>
+            </div>
+            <div className="mb-2">
+              <input 
+                type="text"
+                className="border-[#01438F] border rounded-[5px] w-full md:max-w-60 h-8 text-base px-3" />
+            </div>
+          </div>
+        </div>
+      </div>
 
     </section>
 
     {/*Section for List of Blessings*/}
     <section>
+      <p className="text-lg text-[#BE9231] font-[700] mt-5 mb-5">List of Blessings</p>
 
     </section>
 
