@@ -23,20 +23,27 @@ const exchangeRates = {
   EUR: 60,
   WON: 0.042,
   CNY: 0.37,
-  JPY: 0.38
+  JPY: 0.38,
 };
 
 export default function DonationModals({
-  handleSort, openSortDropdown,toggleSortDropdown,
+  handleSort,
+  openSortDropdown,
+  toggleSortDropdown,
 }: FilterDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: "Ascending" | "Descending" }>({});
+  const [selectedFilters, setSelectedFilters] = useState<{
+    [key: string]: "Ascending" | "Descending";
+  }>({});
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         toggleSortDropdown(null);
-  
+
         setSelectedFilters((prevFilters) => {
           const updatedFilters = { ...prevFilters };
           if (openSortDropdown) {
@@ -46,7 +53,7 @@ export default function DonationModals({
         });
       }
     };
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [toggleSortDropdown, openSortDropdown]);
@@ -60,63 +67,74 @@ export default function DonationModals({
 
   return (
     <div className="flex flex-wrap items-center gap-4">
-      <div className="relative min-w-[250px] sm:w-[275px] md:w-[300px] lg:w-[325px]">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#01438F]" />
+      <div className="relative w-full sm:max-w-xs">
         <input
-          className="w-full h-10 pl-10 border border-[#01438F] rounded-md outline-none"
+          className="w-full h-7 pl-8 py-3 border border-[#01438F] rounded outline-none text-sm"
           type="text"
           placeholder="Search"
         />
+        <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
       </div>
 
-      <span className="text-[14px] flex-wrap sm:w-auto w-full">Filter by:</span>
+      <div className="flex justify-center align-center">
+        <div ref={dropdownRef} className="flex flex-wrap items-center gap-4">
+          {["Member ID", "Date", "Church", "Amount"].map((filter) => (
+            <div key={filter} className="relative">
+              <button
+                onClick={() =>
+                  toggleSortDropdown(
+                    openSortDropdown === filter ? null : filter
+                  )
+                }
+                className="w-[160px] py-1 border border-[#01438F] rounded-md px-3 outline-none
+              bg-white text-gray-600 flex justify-between items-center text-sm"
+              >
+                {filter}
+                <ChevronDown className="w-4 h-4 text-[#01438F]" />
+              </button>
 
-      <div ref={dropdownRef} className="flex flex-wrap items-center gap-4 sm:w-auto">
-        {["Member ID", "Date", "Church", "Amount"].map((filter) => (
-          <div key={filter} className="relative">
-            <button
-              onClick={() => toggleSortDropdown(openSortDropdown === filter ? null : filter)}
-              className="w-[120px] md:w-[140px] lg:w-[160px] h-10 border border-[#01438F] rounded-md px-3 outline-none
-              bg-white text-gray-600 flex justify-between items-center">
-              {filter}
-              <ChevronDown className="w-4 h-4 text-[#01438F]" />
-            </button>
-
-            {openSortDropdown === filter && (
-              <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md z-10">
-                <label className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm">
-                  <input
-                    type="radio"
-                    name={filter}
-                    className="mr-2"
-                    checked={selectedFilters[filter] === "Ascending"}
-                    onChange={() => {
-                      setSelectedFilters({ ...selectedFilters, [filter]: "Ascending" });
-                      handleSort(filterKeyMap[filter], "asc");
-                      toggleSortDropdown(null);
-                    }}
+              {openSortDropdown === filter && (
+                <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md z-10">
+                  <label className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer text-sm">
+                    <input
+                      type="radio"
+                      name={filter}
+                      className="mr-2"
+                      checked={selectedFilters[filter] === "Ascending"}
+                      onChange={() => {
+                        setSelectedFilters({
+                          ...selectedFilters,
+                          [filter]: "Ascending",
+                        });
+                        handleSort(filterKeyMap[filter], "asc");
+                        toggleSortDropdown(null);
+                      }}
                     />
-                  Ascending
-                </label>
+                    Ascending
+                  </label>
 
-                <label className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm">
-                  <input
-                    type="radio"
-                    name={filter}
-                    className="mr-2"
-                    checked={selectedFilters[filter] === "Descending"}
-                    onChange={() => {
-                      setSelectedFilters({ ...selectedFilters, [filter]: "Descending" });
-                      handleSort(filterKeyMap[filter], "desc");
-                      toggleSortDropdown(null);
-                    }}
+                  <label className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer text-sm">
+                    <input
+                      type="radio"
+                      name={filter}
+                      className="mr-2"
+                      checked={selectedFilters[filter] === "Descending"}
+                      onChange={() => {
+                        setSelectedFilters({
+                          ...selectedFilters,
+                          [filter]: "Descending",
+                        });
+                        handleSort(filterKeyMap[filter], "desc");
+                        toggleSortDropdown(null);
+                      }}
                     />
-                  Descending
-                </label>
-              </div>
-            )}
-          </div>
-        ))}
+                    Descending
+                  </label>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

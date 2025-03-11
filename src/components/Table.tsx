@@ -8,7 +8,7 @@ interface TableProps {
   columns: { [key in "lg" | "md" | "sm"]: string[] };
   rowDoubleClickPath?: string; // Path where the row should redirect
   onRowSelect?: (row: any | null) => void;
-  idName: string;
+  idName?: string;
 }
 
 const Table: React.FC<TableProps> = ({
@@ -81,7 +81,7 @@ const Table: React.FC<TableProps> = ({
   return (
     <div
       ref={tableRef}
-      className="overflow-x-auto min-h-[300px] max-h-[450px] overflow-y-auto rounded-lg"
+      className="overflow-x-auto min-h-[500px] max-h-[500px] overflow-y-auto rounded-lg"
     >
       <table className="min-w-full border-gray-300 bg-white rounded-lg">
         {/* Table Head */}

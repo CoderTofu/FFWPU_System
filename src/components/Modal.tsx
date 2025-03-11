@@ -51,14 +51,14 @@ export default function Modal({
             <div className="flex justify-center gap-4 w-full">
               <Button
                 variant="default"
-                className="bg-blue-800 hover:bg-blue-700 text-[#FCC346]"
+                className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
                 onClick={onConfirm}
               >
                 {confirmText}
               </Button>
               <Button
                 variant="default"
-                className="bg-blue-800 hover:bg-blue-700 text-[#FCC346]"
+                className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
                 onClick={onClose}
               >
                 {cancelText}

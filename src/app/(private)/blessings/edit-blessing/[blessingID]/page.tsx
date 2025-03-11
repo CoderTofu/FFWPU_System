@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Calendar, PlusCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-export default function AddBlessing() {
+export default function EditBlessing() {
+  const params = useParams();
+  const router = useRouter();
+
+  // This is the blessing ID from the URL
+  console.log(params.blessingID);
+
   const [members, setMembers] = useState([
     { "Member ID": "M001", Name: "Binose" },
     { "Member ID": "M002", Name: "Lans" },
@@ -25,12 +33,8 @@ export default function AddBlessing() {
     { Name: "Hiro" },
   ]);
 
-  const [selectedMember, setSelectedMember] = useState<{
-    "Member ID": number;
-  } | null>(null);
-  const [selectedGuest, setSelectedGuest] = useState<{
-    "Guest ID": number;
-  } | null>(null);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [selectedGuest, setSelectedGuest] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const [date, setDate] = useState("");
@@ -43,10 +47,30 @@ export default function AddBlessing() {
     setIsRegistrationModalOpen(true);
   };
 
+  const handleConfirm = () => {
+    console.log("Saving...");
+    setShowModal(false);
+    router.push("/blessings");
+  };
+
+  const handleSubmit = (formData: Record<string, string>) => {
+    if (registrationType === "member") {
+      setMembers([
+        ...members,
+        // Kung ano name associated with the ID
+        { "Member ID": formData.memberId, Name: "Placeholder" },
+      ]);
+    } else if (registrationType === "guest") {
+      setGuests([...guests, { Name: formData.fullName }]);
+    }
+  };
+
   const handleGuestDelete = () => {
+    setGuests(guests.filter((guest) => guest !== selectedGuest));
     console.log("Deleting Guest: " + selectedGuest);
   };
   const handleMemberDelete = () => {
+    setMembers(members.filter((member) => member !== selectedMember));
     console.log("Deleting Member: " + selectedMember);
   };
 
@@ -71,15 +95,17 @@ export default function AddBlessing() {
               />
             </div>
           </h2>
-          <Table
-            data={members}
-            columns={{
-              lg: ["Member ID", "Name"],
-              md: ["Member ID", "Name"],
-              sm: ["Name"],
-            }}
-            onRowSelect={setSelectedMember}
-          />
+          <div className="max-h-[250px] overflow-y-auto">
+            <Table
+              data={members}
+              columns={{
+                lg: ["Member ID", "Name"],
+                md: ["Member ID", "Name"],
+                sm: ["Name"],
+              }}
+              onRowSelect={setSelectedMember}
+            />
+          </div>
 
           <button
             onClick={handleMemberDelete}
@@ -103,11 +129,13 @@ export default function AddBlessing() {
               />
             </div>
           </h2>
-          <Table
-            data={guests}
-            columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
-            onRowSelect={setSelectedGuest}
-          />
+          <div className="max-h-[250px] overflow-y-auto">
+            <Table
+              data={guests}
+              columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+              onRowSelect={setSelectedGuest}
+            />
+          </div>
           <button
             onClick={handleGuestDelete}
             disabled={!selectedGuest}
@@ -161,10 +189,10 @@ export default function AddBlessing() {
       {/* Save Button Below Container */}
       <div className="w-full max-w-[1420px] flex justify-center my-3">
         <button
-          className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
+          className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
           onClick={() => setShowModal(true)}
         >
-          EDIT BLESSING
+          SAVE CHANGES
         </button>
       </div>
 
@@ -173,15 +201,13 @@ export default function AddBlessing() {
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
-          onConfirm={() => {
-            console.log("Saving...");
-            setShowModal(false);
-          }}
-          message="Are you sure you want to add the data?"
-          confirmText="Add"
+          onConfirm={handleConfirm}
+          message="Are you sure you want to edit the blessing?"
+          confirmText="Confirm"
           cancelText="Cancel"
         />
       )}
+      {/* Registration Modal */}
       {/* Registration Modal */}
       {isRegistrationModalOpen && (
         <RegistrationModal
@@ -189,7 +215,7 @@ export default function AddBlessing() {
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
             console.log("Registered:", formData);
-            setIsRegistrationModalOpen(false);
+            handleSubmit(formData);
           }}
           title={
             registrationType === "member"
@@ -199,14 +225,27 @@ export default function AddBlessing() {
           fields={
             registrationType === "member"
               ? [
-                  { name: "memberId", label: "Member ID", type: "text" },
-                  { name: "fullName", label: "Full Name", type: "text" },
+                  {
+                    name: "memberId",
+                    label: "Member ID:",
+                    type: "text",
+                    required: true,
+                  },
                 ]
               : [
-                  { name: "fullName", label: "Full Name", type: "text" },
-                  { name: "nation", label: "Nation", type: "text" },
-                  { name: "email", label: "Email", type: "email" },
-                  { name: "invitedBy", label: "Invited By", type: "text" },
+                  {
+                    name: "fullName",
+                    label: "Full Name:",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    name: "email",
+                    label: "Email:",
+                    type: "email",
+                    required: true,
+                  },
+                  { name: "invitedBy", label: "Invited By:", type: "text" },
                 ]
           }
         />

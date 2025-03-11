@@ -60,7 +60,7 @@ export default function CMS() {
             className="w-full border-2 border-black rounded-sm px-1 py-1"
           />
           <button
-            className="font-bold border-2 border-[#01438F] bg-[#FCC346] py-2 px-7 transition-all duration-300 hover:opacity-90 rounded-lg"
+            className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
             onClick={handleSiteNameChange}
           >
             Edit

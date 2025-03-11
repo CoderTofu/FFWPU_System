@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import { Search, ChevronDown } from "lucide-react";
 
-export default function ViewBlessing() {
+export default function ViewBlessings() {
   const router = useRouter();
   const [selectedRow, setSelectedRow] = useState<{
     "Blessing ID": number;
@@ -23,6 +23,78 @@ export default function ViewBlessing() {
   };
 
   const [blessing, setBlessing] = useState([
+    {
+      "Blessing ID": 102010,
+      Date: "02/19/2021",
+      "Name of Blessing": "Blessing 1",
+      Year: 2021,
+    },
+    {
+      "Blessing ID": 124495,
+      Date: "02/21/2025",
+      "Name of Blessing": "First Sunday Event",
+      Year: 2025,
+    },
+    {
+      "Blessing ID": 321345,
+      Date: "02/26/2025",
+      "Name of Blessing": "Blessing 3",
+      Year: 2025,
+    },
+    {
+      "Blessing ID": 124495,
+      Date: "02/21/2025",
+      "Name of Blessing": "Blessing 4",
+      Year: 2019,
+    },
+    {
+      "Blessing ID": 102010,
+      Date: "02/19/2021",
+      "Name of Blessing": "Blessing 1",
+      Year: 2021,
+    },
+    {
+      "Blessing ID": 124495,
+      Date: "02/21/2025",
+      "Name of Blessing": "First Sunday Event",
+      Year: 2025,
+    },
+    {
+      "Blessing ID": 321345,
+      Date: "02/26/2025",
+      "Name of Blessing": "Blessing 3",
+      Year: 2025,
+    },
+    {
+      "Blessing ID": 124495,
+      Date: "02/21/2025",
+      "Name of Blessing": "Blessing 4",
+      Year: 2019,
+    },
+    {
+      "Blessing ID": 102010,
+      Date: "02/19/2021",
+      "Name of Blessing": "Blessing 1",
+      Year: 2021,
+    },
+    {
+      "Blessing ID": 124495,
+      Date: "02/21/2025",
+      "Name of Blessing": "First Sunday Event",
+      Year: 2025,
+    },
+    {
+      "Blessing ID": 321345,
+      Date: "02/26/2025",
+      "Name of Blessing": "Blessing 3",
+      Year: 2025,
+    },
+    {
+      "Blessing ID": 124495,
+      Date: "02/21/2025",
+      "Name of Blessing": "Blessing 4",
+      Year: 2019,
+    },
     {
       "Blessing ID": 102010,
       Date: "02/19/2021",
@@ -101,7 +173,7 @@ export default function ViewBlessing() {
   };
 
   return (
-    <div className="px-0 md:px-[150px] mt-8">
+    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
       {/* Header */}
       <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
         <p className="text-3xl font-bold uppercase">BLESSINGS INFORMATION</p>
@@ -202,9 +274,9 @@ export default function ViewBlessing() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={handleConfirm}
-        message="Are you sure you want to delete the data?"
+        message="Are you sure you want to delete the blessing?"
         confirmText="Yes"
-        cancelText="No"
+        cancelText="Cancel"
       />
     </div>
   );

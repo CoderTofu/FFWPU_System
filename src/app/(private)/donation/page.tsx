@@ -16,17 +16,16 @@ interface DataItem {
 }
 
 export default function Donation() {
-  const [selectedRow, setSelectedRow] = useState<{ ID: number } | null>(null);
+  const [selectedRow, setSelectedRow] = useState(null);
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
-  const [openSortDropdown, setOpenSortDropdown] = useState<string | null>(null); // For sorting dropdowns
   const [openCurrencyDropdown, setOpenCurrencyDropdown] =
     useState<boolean>(false); // For currency dropdown
+  const [openSortDropdown, setOpenSortDropdown] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortedData, setSortedData] = useState<DataItem[]>([]);
   const [originalData, setOriginalData] = useState<DataItem[]>([]);
-  const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
 
   const data: DataItem[] = [
     {
@@ -96,6 +95,15 @@ export default function Donation() {
     },
   ];
 
+  const exchangeRates = {
+    USD: 55,
+    PHP: 1,
+    EUR: 60,
+    KRW: 0.042,
+    CNY: 0.37,
+    JPY: 0.38,
+  };
+
   useEffect(() => {
     setOriginalData(data);
     setSortedData(data);
@@ -107,101 +115,71 @@ export default function Donation() {
     sm: ["Name", "Amount"],
   };
 
-  const toggleSortDropdown = (dropdown: string | null) => {
-    setOpenSortDropdown(openSortDropdown === dropdown ? null : dropdown);
-    setOpenCurrencyDropdown(false); // Close currency dropdown when sorting is opened
+  const getAmountInPHP = (amount: string): number => {
+    const [currency, value] = amount.split(" ");
+    const numericValue = parseFloat(value);
+
+    if (!exchangeRates[currency as keyof typeof exchangeRates]) {
+      console.warn(`Unknown currency: ${currency}`);
+      return NaN;
+    }
+
+    return numericValue * exchangeRates[currency as keyof typeof exchangeRates];
   };
 
-  const toggleCurrencyDropdown = () => {
-    setOpenCurrencyDropdown(!openCurrencyDropdown);
-    setOpenSortDropdown(null); // Close sorting dropdown when currency is opened
-  };
-
-  const filterAmount = (order: "PHP" | "USD") => {
-    return [...originalData].filter((item) => item.Amount.startsWith(order));
-  };
-
-  const handleSort = (
-    key: keyof DataItem | "Amount",
-    order: "asc" | "desc" | "PHP" | "USD" | "ALL"
-  ) => {
-    let sorted;
-
-    if (order === "PHP" || order === "USD") {
-      sorted = filterAmount(order);
-    } else if (order === "ALL") {
-      sorted = [...originalData];
-    } else {
-      sorted = [...originalData].sort((a, b) => {
+  const handleSort = (key: keyof DataItem, order: "asc" | "desc") => {
+    setSortedData((prevData) => {
+      const sorted = [...prevData].sort((a, b) => {
         if (key === "Amount") {
-          const aAmount = parseFloat(a.Amount.replace(/[^0-9.]/g, ""));
-          const bAmount = parseFloat(b.Amount.replace(/[^0-9.]/g, ""));
-          if (aAmount < bAmount) return order === "asc" ? -1 : 1;
-          if (aAmount > bAmount) return order === "asc" ? 1 : -1;
-          return 0;
-        } else {
-          if (a[key] < b[key]) return order === "asc" ? -1 : 1;
-          if (a[key] > b[key]) return order === "asc" ? 1 : -1;
-          return 0;
+          const aAmount = getAmountInPHP(a[key]);
+          const bAmount = getAmountInPHP(b[key]);
+
+          if (isNaN(aAmount) && isNaN(bAmount)) return 0;
+          if (isNaN(aAmount)) return 1;
+          if (isNaN(bAmount)) return -1;
+
+          return order === "asc" ? aAmount - bAmount : bAmount - aAmount;
         }
+
+        if (typeof a[key] === "string" && typeof b[key] === "string") {
+          return order === "asc"
+            ? (a[key] as string).localeCompare(b[key] as string)
+            : (b[key] as string).localeCompare(a[key] as string);
+        }
+
+        if (typeof a[key] === "number" && typeof b[key] === "number") {
+          return order === "asc" ? a[key] - b[key] : b[key] - a[key];
+        }
+
+        return 0;
       });
-    }
-
-    setSortedData(sorted);
+      return sorted;
+    });
   };
 
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    if (!term) {
-      setSortedData(originalData);
-      return;
-    }
-
-    const filtered = originalData.filter(
-      (item) =>
-        item.Name.toLowerCase().includes(term.toLowerCase()) ||
-        item.Church.toLowerCase().includes(term.toLowerCase()) ||
-        String(item["Donation ID"]).includes(term) ||
-        String(item["Member ID"]).includes(term) ||
-        item.Amount.includes(term) ||
-        item.Date.includes(term)
-    );
-    setSortedData(filtered);
-  };
-
-  const handleAddClick = () => {
-    setIsExiting(true);
-    setTimeout(() => {
-      router.push("/donation/add-donation");
-    }, 400);
-  };
+  const dataId = "Donation ID";
 
   const handleEditClick = () => {
-    setIsExiting(true);
-    setTimeout(() => {
-      router.push("/donation/edit-donation");
-    }, 400);
+    if (selectedRow) {
+      router.push(`/donation/edit-donation/${selectedRow[dataId]}`);
+    }
   };
 
   return (
-    <div className="bg-[#D9D9D9] min-h-screen flex flex-col">
-      <div className="w-full mx-auto max-w-[1450px] flex flex-col md:flex-row justify-center items-center bg-white rounded-md shadow-md shadow-black/25 p-4 mt-8">
+    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
+      <div className="w-full flex flex-col md:flex-row justify-center items-center bg-white rounded-md shadow-md shadow-black/25 p-4">
         <p className="text-[28px] font-bold">DONATIONS</p>
       </div>
 
-      <div className="w-full max-w-6xl flex flex-wrap items-start justify-start gap-4 p-4 mt-6 ml-[18px]">
+      <div className="w-full flex flex-col mt-4">
         <DonationModals
-          openSortDropdown={openSortDropdown} // Pass sorting dropdown state
-          openCurrencyDropdown={openCurrencyDropdown} // Pass currency dropdown state
-          toggleSortDropdown={toggleSortDropdown} // Pass sorting dropdown toggle
-          setOpenCurrencyDropdown={setOpenCurrencyDropdown} // Pass currency dropdown toggle
+          openSortDropdown={openSortDropdown}
+          toggleSortDropdown={setOpenSortDropdown}
           handleSort={handleSort}
-          selectedCurrency={selectedCurrency}
-          setSelectedCurrency={setSelectedCurrency}
         />
       </div>
 
-      <div className="overflow-hidden rounded-lg mt-5 mx-auto sm:w-[90%] md:w-[90%] lg:w-[90%] xl:w-[96%] items-center justify-center">
+      <div className="rounded-lg items-center justify-center mt-4">
         <div className="bg-white">
           <Table
             data={sortedData}
@@ -210,25 +188,21 @@ export default function Donation() {
           />
         </div>
 
-        <div className="font-bold text-[#FCC346] text-[20px] mt-[32px] mb-[180px] flex flex-wrap justify-center gap-[22px]">
+        <div className="flex justify-center items-center m-7 gap-5">
           <button
-            onClick={handleAddClick}
-            className="w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25"
+            onClick={() => router.push("/donation/add-donation")}
+            className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
           >
             ADD
           </button>
 
           <button
-            onClick={() => {
-              console.log(selectedRow);
-              setSelectedRow(null);
-              handleEditClick();
-            }}
+            onClick={handleEditClick}
             disabled={!selectedRow}
-            className={`${
+            className={`px-6 py-2 rounded ${
               selectedRow
-                ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25"
-                : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"
+                ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
             }`}
           >
             EDIT
@@ -237,10 +211,10 @@ export default function Donation() {
           <button
             onClick={() => setShowDeleteModal(true)}
             disabled={!selectedRow}
-            className={`${
+            className={`px-6 py-2 rounded ${
               selectedRow
-                ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25"
-                : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"
+                ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
             }`}
           >
             DELETE

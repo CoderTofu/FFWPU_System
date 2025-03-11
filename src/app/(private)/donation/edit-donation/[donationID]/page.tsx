@@ -3,10 +3,15 @@
 import { useState, useRef, useEffect } from "react";
 import Modal from "@/components/Modal";
 import { ChevronDown } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
-export default function AddDonation() {
+export default function EditDonation() {
+  const params = useParams();
   const router = useRouter();
+
+  // This is the donation ID from the URL
+  console.log(params.donationID);
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -17,7 +22,7 @@ export default function AddDonation() {
   const handleConfirm = () => {
     console.log("Confirmed!");
     setIsOpen(false);
-    router.push("/donation");
+    router.push("/blessings");
   };
 
   const toggleDropdown = (dropdown: string) => {
@@ -49,7 +54,7 @@ export default function AddDonation() {
   return (
     <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7">
       <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
-        <p className="text-3xl font-bold uppercase">Add Donation</p>
+        <p className="text-3xl font-bold uppercase">Edit Donation</p>
       </div>
 
       <div className="flex flex-col items-center mt-16">
@@ -206,7 +211,7 @@ export default function AddDonation() {
               className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
               onSubmit={() => setIsOpen(true)}
             >
-              ADD
+              SAVE CHANGES
             </button>
           </div>
         </form>
@@ -215,7 +220,7 @@ export default function AddDonation() {
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           onConfirm={handleConfirm}
-          message="Are you sure you want to add the data?"
+          message="Are you sure you want to edit the donation?"
           confirmText="Confirm"
           cancelText="Cancel"
         />
