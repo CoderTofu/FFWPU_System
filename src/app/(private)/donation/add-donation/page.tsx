@@ -3,8 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import Modal from "@/components/Modal";
 import { ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function AddDonation() {
+  const router = useRouter();
+
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -14,6 +17,7 @@ export default function AddDonation() {
   const handleConfirm = () => {
     console.log("Confirmed!");
     setIsOpen(false);
+    router.push("/donation");
   };
 
   const toggleDropdown = (dropdown: string) => {
@@ -43,12 +47,12 @@ export default function AddDonation() {
   };
 
   return (
-    <div>
-      <div className="w-full mx-auto max-w-[1450px] flex flex-col md:flex-row justify-center items-center bg-white rounded-md shadow-md shadow-black/25 p-4 mt-8">
-        <p className="text-[28px] font-bold">ADD DONATION</p>
+    <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7">
+      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
+        <p className="text-3xl font-bold uppercase">Add Donation</p>
       </div>
 
-      <div className="flex flex-col items-center mt-[63px]">
+      <div className="flex flex-col items-center mt-16">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -196,10 +200,11 @@ export default function AddDonation() {
             </div>
           </div>
 
-          <div className="font-bold text-[#FCC346] text-[20px] mt-[40px] mb-[180px] flex flex-wrap justify-center">
+          <div className="flex flex-wrap justify-center">
             <button
               type="submit"
-              className="w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25"
+              className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+              onSubmit={() => setIsOpen(true)}
             >
               ADD
             </button>

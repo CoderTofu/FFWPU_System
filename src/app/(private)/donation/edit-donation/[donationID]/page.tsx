@@ -1,139 +1,229 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
+import Modal from "@/components/Modal";
+import { ChevronDown } from "lucide-react";
 import { useParams } from "next/navigation";
-
-// Donation interface for type safety
-interface Donation {
-  "Member ID"?: number;
-  Date: string;
-  Church: string;
-  Amount?: number;
-  Currency: string;
-}
+import { useRouter } from "next/navigation";
 
 export default function EditDonation() {
   const params = useParams();
+  const router = useRouter();
 
+  // This is the donation ID from the URL
   console.log(params.donationID);
 
-  // Initial donation state with added Currency field
-  const [donation, setDonation] = useState<Donation>({
-    "Member ID": undefined,
-    Date: "",
-    Church: "",
-    Amount: undefined,
-    Currency: "PHP", // Default currency
-  });
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
+  const dropdownButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Currency options
-  const currencyOptions = ["PHP", "USD"];
-
-  // Handle input change
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-
-    setDonation({
-      ...donation,
-      [name]: value,
-    });
+  const handleConfirm = () => {
+    console.log("Confirmed!");
+    setIsOpen(false);
+    router.push("/blessings");
   };
 
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Hooray! Form submitted!");
+  const toggleDropdown = (dropdown: string) => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        openDropdown &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        (!dropdownButtonRef.current ||
+          !dropdownButtonRef.current.contains(event.target as Node))
+      ) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [openDropdown]);
+
+  const handleCurrencySelect = (currency: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setSelectedCurrency(currency);
+    setOpenDropdown(null);
   };
 
   return (
-    <div className="bg-[#D9D9D9] min-h-screen flex flex-col">
-      {/* Title Section */}
-      <div className="bg-white p-4 rounded-md flex justify-center items-center shadow-md shadow-black/25 mt-8 mx-auto max-w-[1450px] w-full">
-        <h1 className="text-[28px] font-bold">DONATIONS</h1>
+    <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7">
+      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
+        <p className="text-3xl font-bold uppercase">Edit Donation</p>
       </div>
-      <div className="w-full max-w-md mx-auto mt-8 p-4">
-        <form onSubmit={handleSubmit} className="flex flex-col items-center">
-          {/* Member ID */}
-          <div className="mb-6 w-full">
-            <label className="block mb-2 font-medium">Member ID</label>
+
+      <div className="flex flex-col items-center mt-16">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setIsOpen(true);
+          }}
+        >
+          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+            <label className="text-[14px] mb-1">Member ID</label>
             <input
+              className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
               type="number"
-              name="Member ID"
-              value={donation?.["Member ID"]}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-blue-900 rounded-md"
-              placeholder="Enter Member ID"
+              required
             />
           </div>
 
-          {/* Date */}
-          <div className="mb-6 w-full">
-            <label className="block mb-2 font-medium">Date</label>
+          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+            <label className="text-[14px] mb-1">Date</label>
             <input
+              className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
               type="date"
-              name="Date"
-              value={donation.Date}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-blue-900 rounded-md"
+              required
             />
           </div>
 
-          {/* Church */}
-          <div className="mb-6 w-full">
-            <label className="block mb-2 font-medium">Church</label>
+          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+            <label className="text-[14px] mb-1">Church</label>
             <input
+              className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
               type="text"
-              name="Church"
-              value={donation.Church}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-blue-900 rounded-md"
-              placeholder="Enter church name"
+              required
             />
           </div>
 
-          {/* Amount */}
-          <div className="mb-6 w-full">
-            <label className="block mb-2 font-medium">Amount</label>
+          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+            <label className="text-[14px] mb-1">Amount</label>
             <input
+              className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
               type="number"
-              name="Amount"
-              value={donation.Amount}
-              onChange={handleInputChange}
-              step="0.1"
-              min="0"
-              className="w-full p-2 border border-blue-900 rounded-md"
-              placeholder="Enter Amount"
+              required
             />
           </div>
 
-          {/* Currency */}
-          <div className="mb-6 w-full">
-            <label className="block mb-2 font-medium">Currency</label>
-            <select
-              name="Currency"
-              value={donation.Currency}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-blue-900 rounded-md"
-            >
-              {currencyOptions.map((currency) => (
-                <option key={currency} value={currency}>
-                  {currency === "PHP" ? "₱ PHP" : "$ USD"}
-                </option>
-              ))}
-            </select>
+          <div className="flex flex-col mb-4">
+            <label className="text-[14px] mb-1">Currency</label>
+            <div ref={dropdownRef} className="relative">
+              <button
+                ref={dropdownButtonRef}
+                onClick={() => toggleDropdown("Select")}
+                className="w-[394px] h-[36px] border border-[#01438F] rounded-md px-[12px] outline-none
+                 bg-white text-[16px] text-black flex justify-between items-center
+                 max-w-[100%] min-w-[50%] flex-shrink-1"
+                type="button"
+              >
+                {selectedCurrency || "Select"}
+                <ChevronDown className="w-[16px] h-[16px] text-[#01438F]" />
+              </button>
+
+              {openDropdown === "Select" && (
+                <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md">
+                  <div
+                    className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
+                    onClick={(event) => handleCurrencySelect("$ USD", event)}
+                  >
+                    <input
+                      type="radio"
+                      name="currency"
+                      className="mr-2"
+                      checked={selectedCurrency === "$ USD"}
+                      readOnly
+                    />{" "}
+                    $ USD
+                  </div>
+
+                  <div
+                    className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
+                    onClick={(event) => handleCurrencySelect("₱ PHP", event)}
+                  >
+                    <input
+                      type="radio"
+                      name="currency"
+                      className="mr-2"
+                      checked={selectedCurrency === "₱ PHP"}
+                      readOnly
+                    />{" "}
+                    ₱ PHP
+                  </div>
+
+                  <div
+                    className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
+                    onClick={(event) => handleCurrencySelect("€ EUR", event)}
+                  >
+                    <input
+                      type="radio"
+                      name="currency"
+                      className="mr-2"
+                      checked={selectedCurrency === "€ EUR"}
+                      readOnly
+                    />{" "}
+                    € EUR
+                  </div>
+
+                  <div
+                    className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
+                    onClick={(event) => handleCurrencySelect("¥ JPY", event)}
+                  >
+                    <input
+                      type="radio"
+                      name="currency"
+                      className="mr-2"
+                      checked={selectedCurrency === "¥ JPY"}
+                      readOnly
+                    />{" "}
+                    ¥ JPY
+                  </div>
+
+                  <div
+                    className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
+                    onClick={(event) => handleCurrencySelect("₩ KRW", event)}
+                  >
+                    <input
+                      type="radio"
+                      name="currency"
+                      className="mr-2"
+                      checked={selectedCurrency === "₩ KRW"}
+                      readOnly
+                    />{" "}
+                    ₩ KRW
+                  </div>
+
+                  <div
+                    className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
+                    onClick={(event) => handleCurrencySelect("¥ CNY", event)}
+                  >
+                    <input
+                      type="radio"
+                      name="currency"
+                      className="mr-2"
+                      checked={selectedCurrency === "¥ CNY"}
+                      readOnly
+                    />{" "}
+                    ¥ CNY
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-          {/* Buttons in center below the form */}
-          <div className="flex justify-center gap-10 mt-10 mb-10">
+
+          <div className="flex flex-wrap justify-center">
             <button
               type="submit"
-              className="bg-blue-900 text-yellow-400 p-3 rounded-md hover:bg-blue-600"
+              className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+              onSubmit={() => setIsOpen(true)}
             >
-              Save Changes
+              SAVE CHANGES
             </button>
           </div>
         </form>
+
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          onConfirm={handleConfirm}
+          message="Are you sure you want to edit the donation?"
+          confirmText="Confirm"
+          cancelText="Cancel"
+        />
       </div>
     </div>
   );

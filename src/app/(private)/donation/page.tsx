@@ -166,12 +166,12 @@ export default function Donation() {
   };
 
   return (
-    <div className="bg-[#D9D9D9] min-h-screen flex flex-col">
-      <div className="w-full mx-auto max-w-[1450px] flex flex-col md:flex-row justify-center items-center bg-white rounded-md shadow-md shadow-black/25 p-4 mt-8">
+    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
+      <div className="w-full flex flex-col md:flex-row justify-center items-center bg-white rounded-md shadow-md shadow-black/25 p-4">
         <p className="text-[28px] font-bold">DONATIONS</p>
       </div>
 
-      <div className="w-full max-w-6xl flex flex-wrap items-start justify-start gap-4 p-4 mt-6 ml-[18px]">
+      <div className="w-full flex flex-col mt-4">
         <DonationModals
           openSortDropdown={openSortDropdown}
           toggleSortDropdown={setOpenSortDropdown}
@@ -179,7 +179,7 @@ export default function Donation() {
         />
       </div>
 
-      <div className="overflow-hidden rounded-lg mt-5 mx-auto sm:w-[90%] md:w-[90%] lg:w-[90%] xl:w-[96%] items-center justify-center">
+      <div className="rounded-lg items-center justify-center mt-4">
         <div className="bg-white">
           <Table
             data={sortedData}
@@ -188,10 +188,10 @@ export default function Donation() {
           />
         </div>
 
-        <div className="font-bold text-[#FCC346] text-[20px] mt-[32px] mb-[180px] flex flex-wrap justify-center gap-[22px]">
+        <div className="flex justify-center items-center m-7 gap-5">
           <button
             onClick={() => router.push("/donation/add-donation")}
-            className="w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25"
+            className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
           >
             ADD
           </button>
@@ -199,10 +199,10 @@ export default function Donation() {
           <button
             onClick={handleEditClick}
             disabled={!selectedRow}
-            className={`${
+            className={`px-6 py-2 rounded ${
               selectedRow
-                ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25"
-                : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"
+                ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
             }`}
           >
             EDIT
@@ -211,10 +211,10 @@ export default function Donation() {
           <button
             onClick={() => setShowDeleteModal(true)}
             disabled={!selectedRow}
-            className={`${
+            className={`px-6 py-2 rounded ${
               selectedRow
-                ? "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25"
-                : "w-[101px] bg-[#01438F] p-2 rounded-sm shadow-md shadow-black/25 opacity-50 cursor-not-allowed"
+                ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
             }`}
           >
             DELETE
