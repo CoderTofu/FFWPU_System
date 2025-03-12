@@ -76,11 +76,11 @@ export default function DisplayMember() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
-        <p className="text-3xl font-bold uppercase">BLESSINGS INFORMATION</p>
+        <p className="text-3xl font-bold uppercase">MEMBER PROFILE</p>
       </div>
 
       <Card className="shadow-lg mt-4">
-        <CardContent className="pt-6">
+        <CardContent className="p-[30px] pt-6">
           {/* Profile Header */}
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
             <Avatar className="w-24 h-24 border-2 border-primary">
