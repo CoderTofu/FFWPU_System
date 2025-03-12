@@ -5,6 +5,7 @@ import { PlusCircle, Calendar, XCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
+import { useParams } from "next/navigation";
 
 interface Field {
   name: string;
@@ -12,7 +13,12 @@ interface Field {
   type: string;
 }
 
-export default function AddWorshipEvent() {
+export default function EditWorshipEvent() {
+  const params = useParams();
+
+  // This is the blessing ID from the URL
+  console.log(params.eventID);
+
   const [members, setMembers] = useState([
     { "Member ID": "M001", Name: "Binose" },
     { "Member ID": "M002", Name: "Lans" },
@@ -30,6 +36,9 @@ export default function AddWorshipEvent() {
     { Name: "Chiki" },
     { Name: "Hiro" },
   ]);
+
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [selectedGuest, setSelectedGuest] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const [date, setDate] = useState<string>("");
@@ -59,14 +68,24 @@ export default function AddWorshipEvent() {
     setIsRegistrationModalOpen(true);
   };
 
+  const handleGuestDelete = () => {
+    setGuests(guests.filter((guest) => guest !== selectedGuest));
+    console.log("Deleting Guest: " + selectedGuest);
+  };
+
+  const handleMemberDelete = () => {
+    setMembers(members.filter((member) => member !== selectedMember));
+    console.log("Deleting Member: " + selectedMember);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center p-4 bg-[#D9D9D9]">
-      {/* Page Title */}
-      <div className="w-full max-w-[1420px] h-[72px] mt-[15px] mb-[10px] mx-[65px] bg-white rounded-md drop-shadow-lg flex items-center justify-center">
-        <p className="text-[28px] font-bold">EDIT WORSHIP EVENT</p>
+    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
+        <p className="text-3xl font-bold uppercase">EDIT WORSHIP EVENT</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row min-h-screen p-4 w-full max-w-[1420px] gap-6">
+      <div className="flex flex-col lg:flex-row min-h-screen py-4 w-full gap-6">
         {/* Attendance Tables */}
         <div className="lg:w-1/2 p-8 bg-white rounded-lg shadow-md flex flex-col relative">
           <h2 className="text-lg font-semibold mb-3 flex justify-between">
@@ -80,14 +99,28 @@ export default function AddWorshipEvent() {
               />
             </div>
           </h2>
-          <Table
-            data={members}
-            columns={{
-              lg: ["Member ID", "Name"],
-              md: ["Member ID", "Name"],
-              sm: ["Name"],
-            }}
-          />
+          <div className="max-h-[250px] overflow-y-auto">
+            <Table
+              data={members}
+              columns={{
+                lg: ["Member ID", "Name"],
+                md: ["Member ID", "Name"],
+                sm: ["Name"],
+              }}
+              onRowSelect={setSelectedMember}
+            />
+          </div>
+          <button
+            onClick={handleMemberDelete}
+            disabled={!selectedMember}
+            className={`py-1 w-[100px] text-sm rounded mt-5 transition duration-300 ease-in-out border-2 ${
+              selectedMember
+                ? "border-red-600 text-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg"
+                : "border-gray-400 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            Remove
+          </button>
           <h2 className="text-lg font-semibold mt-4 mb-3 flex justify-between">
             Guest Attendees
             <div title="Register Guest">
@@ -99,10 +132,24 @@ export default function AddWorshipEvent() {
               />
             </div>
           </h2>
-          <Table
-            data={guests}
-            columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
-          />
+          <div className="max-h-[250px] overflow-y-auto">
+            <Table
+              data={guests}
+              columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+              onRowSelect={setSelectedGuest}
+            />
+          </div>
+          <button
+            onClick={handleGuestDelete}
+            disabled={!selectedGuest}
+            className={`py-1 w-[100px] rounded mt-5 text-sm transition duration-300 ease-in-out border-2 ${
+              selectedGuest
+                ? "border-red-600 text-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg"
+                : "border-gray-400 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            Remove
+          </button>
         </div>
 
         {/* Worship Event Details */}
@@ -187,12 +234,12 @@ export default function AddWorshipEvent() {
       </div>
 
       {/* Save Button */}
-      <div className="w-full max-w-[1420px] flex justify-center my-3">
+      <div className="w-full flex justify-center my-4">
         <button
           className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
-          onClick={() => setShowModal(true)}
+          onSubmit={() => setShowModal(true)}
         >
-          SAVE
+          SAVE CHANGES
         </button>
       </div>
 
@@ -218,7 +265,7 @@ export default function AddWorshipEvent() {
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
             console.log("Registered:", formData);
-            setIsRegistrationModalOpen(false);
+            handleSubmit(formData);
           }}
           title={
             registrationType === "member"
@@ -228,14 +275,27 @@ export default function AddWorshipEvent() {
           fields={
             registrationType === "member"
               ? [
-                  { name: "memberId", label: "Member ID", type: "text" },
-                  { name: "fullName", label: "Full Name", type: "text" },
+                  {
+                    name: "memberId",
+                    label: "Member ID:",
+                    type: "text",
+                    required: true,
+                  },
                 ]
               : [
-                  { name: "fullName", label: "Full Name", type: "text" },
-                  { name: "nation", label: "Nation", type: "text" },
-                  { name: "email", label: "Email", type: "email" },
-                  { name: "invitedBy", label: "Invited By", type: "text" },
+                  {
+                    name: "fullName",
+                    label: "Full Name:",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    name: "email",
+                    label: "Email:",
+                    type: "email",
+                    required: true,
+                  },
+                  { name: "invitedBy", label: "Invited By:", type: "text" },
                 ]
           }
         />

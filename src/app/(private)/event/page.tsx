@@ -141,12 +141,15 @@ export default function EventInfo() {
   );
 
   return (
-    <div className="bg-[#D9D9D9] min-h-screen flex flex-col items-center p-4">
-      <div className="w-full max-w-[1420px] h-[72px] mt-[15px] bg-white rounded-md drop-shadow-lg flex items-center justify-center">
-        <p className="text-[28px] font-bold">WORSHIP EVENT INFORMATION</p>
+    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
+        <p className="text-3xl font-bold uppercase">
+          WORSHIP EVENT INFORMATION
+        </p>
       </div>
 
-      <div className="w-full max-w-[1350px] flex flex-wrap items-center justify-between mt-[30px] gap-4">
+      <div className="w-full flex flex-wrap items-center justify-between mt-[30px] gap-4">
         <div className="relative w-full sm:w-[310px] h-[29px] ">
           <Search className="absolute left-[10px] top-1/2 transform -translate-y-1/2 text-[#01438F] w-[18px] h-[18px]" />
           <input
@@ -212,7 +215,7 @@ export default function EventInfo() {
       </div>
 
       {/* Table Section */}
-      <div className="w-full max-w-[1350px] mt-[25px]">
+      <div className="w-full mt-[25px]">
         <Table
           data={filteredData}
           columns={columnConfig}
@@ -223,10 +226,10 @@ export default function EventInfo() {
       </div>
 
       {/* Action Buttons Section */}
-      <div className="w-full max-w-6xl flex flex-wrap justify-center gap-[22px] mt-[28px] mb-[15px]">
+      <div className="w-full flex flex-wrap justify-center gap-[22px] mt-[28px] mb-[15px]">
         <button
           onClick={() => router.push("/event/add-event")}
-          className="w-[106px] h-[40px] bg-[#01438F] text-[#FCC346] text-[16px] font-bold rounded-md shadow-md"
+          className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
         >
           ADD
         </button>
@@ -236,22 +239,22 @@ export default function EventInfo() {
             router.push(`/event/edit-event/${selectedRow[dataID]}`)
           }
           disabled={!selectedRow}
-          className={`w-[106px] h-[40px] ${
+          className={`px-6 py-2 rounded ${
             selectedRow
-              ? "bg-[#01438F] text-[#FCC346]"
-              : "bg-[#01438F] text-[#FCC346] cursor-not-allowed"
-          } text-[16px] font-bold rounded-md shadow-md`}
+              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
+          }`}
         >
           EDIT
         </button>
         <button
           onClick={() => setShowDeleteModal(true)}
           disabled={!selectedRow}
-          className={`w-[106px] h-[40px] ${
+          className={`px-6 py-2 rounded ${
             selectedRow
-              ? "bg-[#01438F] text-[#FCC346]"
-              : "bg-[#01438F] text-[#FCC346] cursor-not-allowed"
-          } text-[16px] font-bold rounded-md shadow-md`}
+              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
+          }`}
         >
           DELETE
         </button>

@@ -1,14 +1,14 @@
 "use client";
 
 import Table from "@/components/Table";
+import { useParams } from "next/navigation";
 
-export default function ViewWorship({
-  params,
-}: {
-  params: {
-    eventID: string;
-  };
-}) {
+export default function ViewWorship() {
+  const params = useParams();
+
+  // This is the blessing ID from the URL
+  console.log(params.eventID);
+
   const data = [
     { ID: 6001, Name: "Orton, Johan H." },
     { ID: 6002, Name: "Reigns, Jeff T." },

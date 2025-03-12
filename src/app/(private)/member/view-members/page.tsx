@@ -47,6 +47,8 @@ export default function Member() {
     },
   ];
 
+  const dataID = "ID";
+
   const columnConfig = {
     lg: [
       "ID",
@@ -67,7 +69,6 @@ export default function Member() {
   const [isOpen, setIsOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<{ ID: number } | null>(null);
   const router = useRouter();
-  const url = "/user";
 
   // Toggle dropdown visibility
   const toggleDropdown = (dropdown: string) => {
@@ -308,7 +309,8 @@ export default function Member() {
           <Table
             data={filteredData}
             columns={columnConfig}
-            rowDoubleClickPath={url}
+            rowDoubleClickPath={`/member/display-member`}
+            idName={dataID}
             onRowSelect={setSelectedRow}
           />
         ) : (
