@@ -4,7 +4,6 @@ import { AxiosResponse } from "axios";
 import { useRouter } from "next/navigation";
 import { axiosInstance } from "@/app/axiosInstance";
 import Cookies from "js-cookie";
-
 export default function Login() {
   const [loginForm, setLoginForm] = useState({ username: "", password: "" });
 

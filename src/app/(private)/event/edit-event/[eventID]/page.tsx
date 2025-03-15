@@ -7,7 +7,6 @@ import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
 import { axiosInstance } from "@/app/axiosInstance";
-import Cookies from "js-cookie";
 import { ChevronDown, ChevronUp } from "lucide-react";
 interface Field {
   name: string;

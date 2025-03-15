@@ -12,7 +12,6 @@ import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { axiosInstance } from "@/app/axiosInstance";
-import Cookies from "js-cookie";
 
 export default function AddWorshipEvent() {
   const [memberIds, setMemberIds] = useState([]);

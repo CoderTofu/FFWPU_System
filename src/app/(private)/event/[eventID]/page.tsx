@@ -4,7 +4,6 @@ import { axiosInstance } from "@/app/axiosInstance";
 import Table from "@/components/Table";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 export default function ViewWorship() {
   const params = useParams();
 

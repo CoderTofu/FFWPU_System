@@ -7,35 +7,32 @@ import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { axiosInstance } from "@/app/axiosInstance";
 import { useParams } from "next/navigation";
-import Cookies from "js-cookie";
 
 export default function AddBlessing() {
   const params = useParams();
   const [members, setMembers] = useState([]);
-  const [blessingInfo, setBlessingInfo] = useState({});
-  // const [members, setMembers] = useState([
-  //   { "Member ID": "M001", Name: "Binose" },
-  //   { "Member ID": "M002", Name: "Lans" },
-  //   { "Member ID": "M001", Name: "Ye Em" },
-  //   { "Member ID": "M002", Name: "Cess" },
-  //   { "Member ID": "M001", Name: "Dril" },
-  //   { "Member ID": "M002", Name: "Pao" },
-  // ]);
-
+  const [memberIds, setMemberIds] = useState([]);
   const [guests, setGuests] = useState([]);
-  // const [guests, setGuests] = useState([
-  //   { Name: "Blake" },
-  //   { Name: "Sloane" },
-  //   { Name: "Nisamon" },
-  //   { Name: "Chekwa" },
-  //   { Name: "Chiki" },
-  //   { Name: "Hiro" },
-  // ]);
-
+  const [formData, setFormData] = useState({
+    name_of_blessing: "",
+    blessing_date: "",
+    chaenbo: 1,
+  });
+  const chaenboMap = { Vertical: 1, Horizontal: 2 };
   useEffect(() => {
     axiosInstance.get(`/blessings/${params.blessingID}`).then((res) => {
       setMembers(res.data.Members);
-      setBlessingInfo(res.data);
+      const ids = [];
+      res.data.Members.map((member) => {
+        ids.push(member["Member ID"]);
+      });
+      setMemberIds([...ids]);
+
+      setFormData({
+        name_of_blessing: res.data["Name Of Blessing"],
+        blessing_date: res.data["Blessing Date"],
+        chaenbo: chaenboMap[res.data.Chaenbo],
+      });
     });
   }, []);
   const [selectedMember, setSelectedMember] = useState<{
@@ -46,7 +43,6 @@ export default function AddBlessing() {
   } | null>(null);
 
   const [showModal, setShowModal] = useState(false);
-  const [date, setDate] = useState("");
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [registrationType, setRegistrationType] = useState<
     "member" | "guest" | null
@@ -61,7 +57,29 @@ export default function AddBlessing() {
   };
   const handleMemberDelete = () => {
     console.log("Deleting Member: " + selectedMember);
+    axiosInstance
+      .patch(`/blessings/${params.blessingID}/remove-member`, {
+        member_id: selectedMember["Member ID"],
+      })
+      .then((res) => {
+        location.reload();
+      })
+      .catch((err) => {
+        alert("An error occurred while removing member");
+      });
   };
+
+  useEffect(() => {
+    const fetched = [];
+    memberIds.forEach((id) =>
+      axiosInstance
+        .get(`/members/${id}`)
+        .then((res) => {
+          fetched.push(res.data);
+        })
+        .finally(() => setMembers([...fetched]))
+    );
+  }, [memberIds]);
 
   return (
     <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7 mb-10">
@@ -141,7 +159,10 @@ export default function AddBlessing() {
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Name"
-            value={blessingInfo["Name Of Blessing"]}
+            value={formData.name_of_blessing}
+            onChange={(e) =>
+              setFormData({ ...formData, name_of_blessing: e.target.value })
+            }
           />
           <label className="block font-medium mt-5">Date</label>
           <div className="relative w-full">
@@ -149,8 +170,10 @@ export default function AddBlessing() {
               className="w-full border border-[#01438F] p-2 rounded mt-2 pr-10"
               type="text"
               placeholder="MM/DD/YYYY"
-              value={blessingInfo["Blessing Date"]}
-              onChange={(e) => setDate(e.target.value)}
+              value={formData.blessing_date}
+              onChange={(e) =>
+                setFormData({ ...formData, blessing_date: e.target.value })
+              }
             />
             <Calendar
               className="absolute right-3 top-4 text-[#01438F] cursor-pointer"
@@ -159,15 +182,39 @@ export default function AddBlessing() {
           </div>
           {/*Checkbox*/}
           <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-2">Chaenbo/HTM</h2>
-            <div className="block mb-1">
-              <input type="checkbox" className="mr-2" />
-              <label>Vertical</label>
-            </div>
-            <div className="block">
-              <input type="checkbox" className="mr-2" />
-              <label>Horizontal</label>
-            </div>
+            <fieldset>
+              <h2 className="text-lg font-semibold mb-2">Chaenbo/HTM</h2>
+              <div className="block mb-1">
+                <input
+                  type="radio"
+                  className="mr-2"
+                  name="chaenbo"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      chaenbo: e.target.checked ? 1 : 2,
+                    })
+                  }
+                  checked={formData.chaenbo === 1}
+                />
+                <label>Vertical</label>
+              </div>
+              <div className="block">
+                <input
+                  type="radio"
+                  className="mr-2"
+                  name="chaenbo"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      chaenbo: e.target.checked ? 2 : 1,
+                    })
+                  }
+                  checked={formData.chaenbo === 2}
+                />
+                <label>Horizontal</label>
+              </div>
+            </fieldset>
           </div>
         </div>
       </div>
@@ -189,6 +236,24 @@ export default function AddBlessing() {
           onClose={() => setShowModal(false)}
           onConfirm={() => {
             console.log("Saving...");
+            console.log(memberIds);
+            axiosInstance
+              .patch(`/blessings/${params.blessingID}`, formData)
+              .then((res) => {
+                axiosInstance
+                  .patch(`/blessings/${params.blessingID}/add-member`, {
+                    members: memberIds,
+                  })
+                  .then((res) => {
+                    alert("Sucessfully added members.");
+                  })
+                  .catch((err) => {
+                    alert("Error updating members");
+                  });
+              })
+              .catch((err) => {
+                alert("Error updating blessing: " + err);
+              });
             setShowModal(false);
           }}
           message="Are you sure you want to add the data?"
@@ -203,6 +268,17 @@ export default function AddBlessing() {
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
             console.log("Registered:", formData);
+            if (registrationType === "member") {
+              const id = parseInt(formData.memberId);
+              if (memberIds.includes(id)) {
+                alert(
+                  `Member ID ${formData.memberId} is already in the blessing.`
+                );
+              } else {
+                setMemberIds([...memberIds, id]);
+              }
+            } else {
+            }
             setIsRegistrationModalOpen(false);
           }}
           title={
@@ -212,10 +288,7 @@ export default function AddBlessing() {
           }
           fields={
             registrationType === "member"
-              ? [
-                  { name: "memberId", label: "Member ID", type: "text" },
-                  { name: "fullName", label: "Full Name", type: "text" },
-                ]
+              ? [{ name: "memberId", label: "Member ID", type: "text" }]
               : [
                   { name: "fullName", label: "Full Name", type: "text" },
                   { name: "nation", label: "Nation", type: "text" },

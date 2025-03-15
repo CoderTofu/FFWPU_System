@@ -6,14 +6,12 @@ import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal"; // Assuming you have a Modal component
 import { axiosInstance } from "@/app/axiosInstance";
-import Cookies from "js-cookie";
 
 export default function Member() {
   const [searchQuery, setSearchQuery] = useState("");
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    console.log(Cookies.get("access_token"));
     axiosInstance.get("/members").then((res) => {
       console.log(res.data);
       setData(res.data);

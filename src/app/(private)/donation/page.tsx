@@ -6,7 +6,6 @@ import Modal from "@/components/Modal";
 import Table from "@/components/Table";
 import DonationModals from "@/components/DonationModals";
 import { axiosInstance } from "@/app/axiosInstance";
-import Cookies from "js-cookie";
 interface DataItem {
   "Donation ID": number;
   "Member ID": number;

@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/select";
 
 import { axiosInstance } from "@/app/axiosInstance";
-import Cookies from "js-cookie";
 
 // Helper function for button styles
 const buttonStyle =

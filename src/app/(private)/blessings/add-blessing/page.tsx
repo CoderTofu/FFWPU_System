@@ -1,21 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar, PlusCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
+import { axiosInstance } from "@/app/axiosInstance";
 
 export default function AddBlessing() {
-  const [members, setMembers] = useState([
-    { "Member ID": "M001", Name: "Binose" },
-    { "Member ID": "M002", Name: "Lans" },
-    { "Member ID": "M001", Name: "Ye Em" },
-    { "Member ID": "M002", Name: "Cess" },
-    { "Member ID": "M001", Name: "Dril" },
-    { "Member ID": "M002", Name: "Pao" },
-  ]);
-
+  const [members, setMembers] = useState([]);
+  const [memberIds, setMemberIds] = useState([]);
+  const [blessingName, setBlessingName] = useState("");
+  const [chaenbo, setChaenbo] = useState(1);
   const [guests, setGuests] = useState([
     { Name: "Blake" },
     { Name: "Sloane" },
@@ -52,6 +48,19 @@ export default function AddBlessing() {
     console.log("Deleting Member: " + selectedMember);
   };
 
+  useEffect(() => {
+    const fetched = [];
+
+    memberIds.forEach((id) =>
+      axiosInstance
+        .get(`/members/${id}`)
+        .then((res) => {
+          fetched.push(res.data);
+        })
+        .finally(() => setMembers([...fetched]))
+    );
+  }, [memberIds]);
+
   return (
     <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7 mb-10">
       {/* Page Title */}
@@ -76,9 +85,9 @@ export default function AddBlessing() {
           <Table
             data={members}
             columns={{
-              lg: ["Member ID", "Name"],
-              md: ["Member ID", "Name"],
-              sm: ["Name"],
+              lg: ["Member ID", "Full Name"],
+              md: ["Member ID", "Full Name"],
+              sm: ["Full Name"],
             }}
             onRowSelect={setSelectedMember}
           />
@@ -129,32 +138,42 @@ export default function AddBlessing() {
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Name"
+            type="text"
+            onChange={(e) => setBlessingName(e.target.value)}
           />
           <label className="block font-medium mt-5">Date:</label>
           <div className="relative w-full">
             <input
-              className="w-full border border-[#01438F] p-2 rounded mt-2 pr-10"
-              type="text"
+              className="w-full border border-[#01438F] p-2 rounded mt-2"
+              type="date"
               placeholder="MM/DD/YYYY"
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <Calendar
-              className="absolute right-3 top-4 text-[#01438F] cursor-pointer"
-              size={16}
-            />
           </div>
           {/*Checkbox*/}
           <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-2">Chaenbo/HTM</h2>
-            <div className="block mb-1">
-              <input type="checkbox" className="mr-2" />
-              <label>Vertical</label>
-            </div>
-            <div className="block">
-              <input type="checkbox" className="mr-2" />
-              <label>Horizontal</label>
-            </div>
+            <fieldset>
+              <h2 className="text-lg font-semibold mb-2">Chaenbo/HTM</h2>
+              <div className="block mb-1">
+                <input
+                  type="radio"
+                  className="mr-2"
+                  name="chaenbo"
+                  onChange={(e) => setChaenbo(e.target.checked ? 1 : 2)}
+                />
+                <label>Vertical</label>
+              </div>
+              <div className="block">
+                <input
+                  type="radio"
+                  className="mr-2"
+                  name="chaenbo"
+                  onChange={(e) => setChaenbo(e.target.checked ? 2 : 1)}
+                />
+                <label>Horizontal</label>
+              </div>
+            </fieldset>
           </div>
         </div>
       </div>
@@ -176,6 +195,31 @@ export default function AddBlessing() {
           onClose={() => setShowModal(false)}
           onConfirm={() => {
             console.log("Saving...");
+            console.log(blessingName);
+            console.log(date);
+            console.log(chaenbo);
+            axiosInstance
+              .post("/blessings/", {
+                blessing_date: date,
+                name_of_blessing: blessingName,
+                chaenbo,
+              })
+              .then((res) => {
+                if (res.status >= 200 && res.status <= 299) {
+                  axiosInstance
+                    .patch(`/blessings/${res.data["Blessing ID"]}/add-member`, {
+                      members: memberIds,
+                    })
+                    .then((res) => {
+                      if (res.status >= 200 && res.status <= 299) {
+                      }
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                  alert("Successfully added blessing!");
+                }
+              });
             setShowModal(false);
           }}
           message="Are you sure you want to add the data?"
@@ -189,8 +233,12 @@ export default function AddBlessing() {
           isOpen={isRegistrationModalOpen}
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
+            if (registrationType === "member") {
+              setMemberIds((prev) => [...prev, formData.memberId]);
+            } else {
+            }
             console.log("Registered:", formData);
-            handleSubmit(formData);
+            // handleSubmit(formData);
           }}
           title={
             registrationType === "member"

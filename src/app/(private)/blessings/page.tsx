@@ -6,7 +6,6 @@ import { useParams, useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import { Search, ChevronDown } from "lucide-react";
 import { axiosInstance } from "@/app/axiosInstance";
-import Cookies from "js-cookie";
 export default function ViewBlessing() {
   const router = useRouter();
   const [selectedRow, setSelectedRow] = useState<{
@@ -19,7 +18,7 @@ export default function ViewBlessing() {
   const [blessings, setBlessings] = useState([]);
   const [rowToDelete, setRowToDelete] = useState(null);
   const columns = {
-    lg: ["Blessing ID", "Blessing Date", "Name Of Blessing"],
+    lg: ["Blessing ID", "Blessing Date", "Name Of Blessing", "Chaenbo"],
     md: ["Blessing ID", "Blessing Date", "Name Of Blessing"],
     sm: ["Blessing ID", "Blessing Date"],
   };

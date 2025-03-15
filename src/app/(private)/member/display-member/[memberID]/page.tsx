@@ -17,7 +17,6 @@ import {
   Briefcase,
 } from "lucide-react";
 import { axiosInstance } from "@/app/axiosInstance";
-import Cookies from "js-cookie";
 
 export default function DisplayMember() {
   const params = useParams();

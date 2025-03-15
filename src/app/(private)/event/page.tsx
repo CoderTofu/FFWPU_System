@@ -6,7 +6,6 @@ import Table from "@/components/Table";
 import { Search, ChevronDown } from "lucide-react";
 import Modal from "@/components/Modal";
 import { axiosInstance } from "@/app/axiosInstance";
-import Cookies from "js-cookie";
 
 export default function EventInfo() {
   const router = useRouter();
