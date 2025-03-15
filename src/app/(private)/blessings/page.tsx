@@ -17,6 +17,7 @@ export default function ViewBlessing() {
   const [selectedYear, setSelectedYear] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [blessings, setBlessings] = useState([]);
+  const [rowToDelete, setRowToDelete] = useState(null);
   const columns = {
     lg: ["Blessing ID", "Blessing Date", "Name Of Blessing"],
     md: ["Blessing ID", "Blessing Date", "Name Of Blessing"],
@@ -99,14 +100,19 @@ export default function ViewBlessing() {
 
   const [isOpen, setIsOpen] = useState(false);
   const handleConfirm = () => {
-    if (selectedRow) {
-      setBlessings(
-        blessings.filter(
-          (item) => item["Blessing ID"] !== selectedRow["Blessing ID"]
-        )
-      );
-    }
-    console.log("Data deleted successfully!");
+    // if (selectedRow) {
+    //   setBlessings(
+    //     blessings.filter(
+    //       (item) => item["Blessing ID"] !== selectedRow["Blessing ID"]
+    //     )
+    //   );
+    // }
+    axiosInstance
+      .delete(`/blessings/${rowToDelete["Blessing ID"]}`, {
+        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+      })
+      .then(() => location.reload());
+
     setIsOpen(false);
   };
 
@@ -195,7 +201,12 @@ export default function ViewBlessing() {
           EDIT
         </button>
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            if (selectedRow) {
+              setRowToDelete(selectedRow);
+              setIsOpen(true);
+            }
+          }}
           disabled={!selectedRow}
           className={`px-4 py-2 rounded ${
             selectedRow

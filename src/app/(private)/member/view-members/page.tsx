@@ -92,7 +92,13 @@ export default function Member() {
   const handleConfirm = () => {
     console.log("Confirmed!", rowToDelete);
     // Add your deletion logic here
-    setIsOpen(false);
+    axiosInstance
+      .delete(`/members/${rowToDelete["Member ID"]}`, {
+        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+      })
+      .then(() => {
+        location.reload();
+      });
   };
 
   const filteredData = data.filter((member) =>

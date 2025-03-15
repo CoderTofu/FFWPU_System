@@ -28,6 +28,7 @@ export default function Donation() {
   const [sortedData, setSortedData] = useState<DataItem[]>([]);
   const [originalData, setOriginalData] = useState<DataItem[]>([]);
   const [data, setData] = useState([]);
+  const [rowToDelete, setRowToDelete] = useState(null);
   // const data: DataItem[] = [
   //   {
   //     "Donation ID": 1001,
@@ -230,7 +231,12 @@ export default function Donation() {
           </button>
 
           <button
-            onClick={() => setShowDeleteModal(true)}
+            onClick={() => {
+              if (selectedRow) {
+                setRowToDelete(selectedRow);
+                setShowDeleteModal(true);
+              }
+            }}
             disabled={!selectedRow}
             className={`px-6 py-2 rounded ${
               selectedRow
@@ -247,7 +253,9 @@ export default function Donation() {
             isOpen={showDeleteModal}
             onClose={() => setShowDeleteModal(false)}
             onConfirm={() => {
-              console.log("");
+              axiosInstance
+                .delete(`/donations/${rowToDelete["Donation ID"]}`)
+                .then(() => location.reload());
               setShowDeleteModal(false);
             }}
           />

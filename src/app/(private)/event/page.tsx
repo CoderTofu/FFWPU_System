@@ -125,6 +125,7 @@ export default function EventInfo() {
   const [selectedType, setSelectedType] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
+  const [rowToDelete, setRowToDelete] = useState(null);
 
   const toggleDropdown = (dropdown: string) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
@@ -233,7 +234,7 @@ export default function EventInfo() {
           columns={columnConfig}
           rowDoubleClickPath="/event"
           idName={dataID}
-          onRowSelect={(row) => setSelectedRow(row)}
+          onRowSelect={setSelectedRow}
         />
       </div>
 
@@ -260,7 +261,12 @@ export default function EventInfo() {
           EDIT
         </button>
         <button
-          onClick={() => setShowDeleteModal(true)}
+          onClick={() => {
+            if (selectedRow) {
+              setRowToDelete(selectedRow);
+              setShowDeleteModal(true);
+            }
+          }}
           disabled={!selectedRow}
           className={`px-6 py-2 rounded ${
             selectedRow
@@ -279,6 +285,13 @@ export default function EventInfo() {
           onClose={() => setShowDeleteModal(false)}
           onConfirm={() => {
             console.log("Deleting event...");
+            axiosInstance
+              .delete(`/worship/${rowToDelete["Worship ID"]}`, {
+                headers: {
+                  Authorization: `Bearer ${Cookies.get("access_token")}`,
+                },
+              })
+              .then(() => location.reload());
             setShowDeleteModal(false);
           }}
           message="Are you sure you want to delete this worship event?"
