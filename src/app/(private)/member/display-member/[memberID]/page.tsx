@@ -16,54 +16,65 @@ import {
   Award,
   Briefcase,
 } from "lucide-react";
+import { axiosInstance } from "@/app/axiosInstance";
+import Cookies from "js-cookie";
 
 export default function DisplayMember() {
   const params = useParams();
   const memberID = params.memberID;
+  const [userData, setUserData] = useState({});
 
   // In a real app, you would fetch data based on memberID
   useEffect(() => {
     // This would be replaced with an actual API call
     console.log("Fetching data for member ID:", memberID);
-  }, [memberID]);
+    axiosInstance
+      .get(`/members/${memberID}`, {
+        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+      })
+      .then((res) => {
+        setUserData(res.data);
+        console.log(res.data);
+      });
+  }, []);
 
   // Dummy data (would come from API in real implementation)
-  const [userData] = useState({
-    name: "Taylor Marie Swift Batumbakal",
-    gender: "Female",
-    birthday: "12/13/1989",
-    age: "35",
-    nation: "Philippines",
-    maritalStatus: "Single",
-    spouseName: "",
-    phone: "09999999999",
-    email: "taylormariebatumbakal@gmail.com",
-    address:
-      "General Luna, corner Muralla St, Intramuros, Manila, 1002 Metro Manila",
-    generation: "1st",
-    spiritualBirthday: "01/31/2024",
-    membershipCategory: "Member",
-    spiritualParent1: "Rafael Torres",
-    spiritualParent2: "Paolo Dionisio",
-    missions: [
-      {
-        role: "Priest",
-        organization: "Main Branch",
-        country: "Philippines",
-        date: "01/31/2025",
-      },
-      {
-        role: "Staff",
-        organization: "2nd Branch",
-        country: "Philippines",
-        date: "06/19/2024",
-      },
-    ],
-    blessings: [
-      { name: "Marriage", date: "01/31/2025" },
-      { name: "Baptism", date: "08/19/1999" },
-    ],
-  });
+  // const [userData] = useState({
+  //   name: "Taylor Marie Swift Batumbakal",
+  //   gender: "Female",
+  //   birthday: "12/13/1989",
+  //   age: "35",
+  //   nation: "Philippines",
+  //   maritalStatus: "Single",
+  //   spouseName: "",
+  //   phone: "09999999999",
+  //   email: "taylormariebatumbakal@gmail.com",
+  //   address:
+  //     "General Luna, corner Muralla St, Intramuros, Manila, 1002 Metro Manila",
+  //   generation: "1st",
+  //   spiritualBirthday: "01/31/2024",
+  //   membershipCategory: "Member",
+  //   spiritualParent1: "Rafael Torres",
+  //   spiritualParent2: "Paolo Dionisio",
+  //   missions: [
+  //     {
+  //       role: "Priest",
+  //       organization: "Main Branch",
+  //       country: "Philippines",
+  //       date: "01/31/2025",
+  //     },
+  //     {
+  //       role: "Staff",
+  //       organization: "2nd Branch",
+  //       country: "Philippines",
+  //       date: "06/19/2024",
+  //     },
+  //   ],
+  //   blessings: [
+  //     { name: "Marriage", date: "01/31/2025" },
+  //     { name: "Baptism", date: "08/19/1999" },
+  //   ],
+  // });
 
   // Helper function to render field with label
   const InfoField = ({ label, value }) => (
@@ -86,7 +97,7 @@ export default function DisplayMember() {
             <Avatar className="w-24 h-24 border-2 border-primary">
               <AvatarImage
                 src="/placeholder.svg?height=96&width=96"
-                alt={userData.name}
+                alt={userData["Full Name"]}
               />
               <AvatarFallback className="bg-primary/10">
                 <User className="h-12 w-12 text-primary" />
@@ -95,24 +106,24 @@ export default function DisplayMember() {
 
             <div className="flex flex-col items-center md:items-start">
               <h2 className="text-2xl md:text-3xl font-bold">
-                {userData.name}
+                {userData["Full Name"]}
               </h2>
               <div className="flex items-center gap-2 mt-2">
                 <Badge variant="outline" className="bg-primary/10">
-                  {userData.membershipCategory}
+                  {userData["Membership Category"]}
                 </Badge>
                 <Badge variant="outline" className="bg-primary/10">
-                  Generation: {userData.generation}
+                  Generation: {userData.Generation}
                 </Badge>
               </div>
 
               <div className="flex items-center gap-2 mt-4">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">{userData.email}</span>
+                <span className="text-sm">{userData.Email}</span>
               </div>
               <div className="flex items-center gap-2 mt-1">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">{userData.phone}</span>
+                <span className="text-sm">{userData.Phone}</span>
               </div>
             </div>
           </div>
@@ -131,26 +142,29 @@ export default function DisplayMember() {
                   Personal Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <InfoField label="Gender" value={userData.gender} />
-                  <InfoField label="Date of Birth" value={userData.birthday} />
-                  <InfoField label="Age" value={userData.age} />
-                  <InfoField label="Nation" value={userData.nation} />
+                  <InfoField label="Gender" value={userData.Gender} />
+                  <InfoField
+                    label="Date of Birth"
+                    value={userData["Date Of Birth"]}
+                  />
+                  <InfoField label="Age" value={userData.Age} />
+                  <InfoField label="Nation" value={userData.Country} />
                   <InfoField
                     label="Marital Status"
-                    value={userData.maritalStatus}
+                    value={userData["Marital Status"]}
                   />
-                  <InfoField
+                  {/* <InfoField
                     label="Name of Spouse"
                     value={userData.spouseName}
-                  />
+                  /> */}
                 </div>
 
                 <div className="mt-6">
-                  <InfoField label="Address" value={userData.address} />
+                  <InfoField label="Address" value={userData.Address} />
                   <div className="flex items-start gap-2 mt-2">
                     <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                     <span className="text-sm text-muted-foreground">
-                      {userData.address}
+                      {userData.Address}
                     </span>
                   </div>
                 </div>
@@ -164,14 +178,14 @@ export default function DisplayMember() {
                   Spiritual Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InfoField label="Generation" value={userData.generation} />
+                  <InfoField label="Generation" value={userData.Generation} />
                   <InfoField
                     label="Spiritual Birthday"
-                    value={userData.spiritualBirthday}
+                    value={userData["Spiritual Birthday"]}
                   />
                   <InfoField
                     label="Membership Category"
-                    value={userData.membershipCategory}
+                    value={userData["Membership Category"]}
                   />
 
                   <div className="flex flex-col space-y-1">
@@ -180,16 +194,16 @@ export default function DisplayMember() {
                     </span>
                     <ul className="space-y-1">
                       <li className="font-medium">
-                        {userData.spiritualParent1}
+                        {userData["Spiritual Parent"]}
                       </li>
-                      <li className="font-medium">
+                      {/* <li className="font-medium">
                         {userData.spiritualParent2}
-                      </li>
+                      </li> */}
                     </ul>
                   </div>
                 </div>
 
-                <div className="mt-8">
+                {/* <div className="mt-8">
                   <h4 className="text-md font-semibold mb-3 text-[#BE9231]">
                     Blessings
                   </h4>
@@ -210,12 +224,12 @@ export default function DisplayMember() {
                       </div>
                     ))}
                   </div>
-                </div>
+                </div> */}
               </div>
             </TabsContent>
 
             {/* Mission History Tab */}
-            <TabsContent value="history" className="space-y-6">
+            {/* <TabsContent value="history" className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-[#BE9231] mb-4">
                   Mission History
@@ -248,7 +262,7 @@ export default function DisplayMember() {
                   ))}
                 </div>
               </div>
-            </TabsContent>
+            </TabsContent> */}
           </Tabs>
         </CardContent>
       </Card>

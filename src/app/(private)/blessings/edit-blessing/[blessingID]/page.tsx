@@ -5,26 +5,43 @@ import { Calendar, PlusCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
+import { axiosInstance } from "@/app/axiosInstance";
+import { useParams } from "next/navigation";
+import Cookies from "js-cookie";
 
 export default function AddBlessing() {
-  const [members, setMembers] = useState([
-    { "Member ID": "M001", Name: "Binose" },
-    { "Member ID": "M002", Name: "Lans" },
-    { "Member ID": "M001", Name: "Ye Em" },
-    { "Member ID": "M002", Name: "Cess" },
-    { "Member ID": "M001", Name: "Dril" },
-    { "Member ID": "M002", Name: "Pao" },
-  ]);
+  const params = useParams();
+  const [members, setMembers] = useState([]);
+  const [blessingInfo, setBlessingInfo] = useState({});
+  // const [members, setMembers] = useState([
+  //   { "Member ID": "M001", Name: "Binose" },
+  //   { "Member ID": "M002", Name: "Lans" },
+  //   { "Member ID": "M001", Name: "Ye Em" },
+  //   { "Member ID": "M002", Name: "Cess" },
+  //   { "Member ID": "M001", Name: "Dril" },
+  //   { "Member ID": "M002", Name: "Pao" },
+  // ]);
 
-  const [guests, setGuests] = useState([
-    { Name: "Blake" },
-    { Name: "Sloane" },
-    { Name: "Nisamon" },
-    { Name: "Chekwa" },
-    { Name: "Chiki" },
-    { Name: "Hiro" },
-  ]);
+  const [guests, setGuests] = useState([]);
+  // const [guests, setGuests] = useState([
+  //   { Name: "Blake" },
+  //   { Name: "Sloane" },
+  //   { Name: "Nisamon" },
+  //   { Name: "Chekwa" },
+  //   { Name: "Chiki" },
+  //   { Name: "Hiro" },
+  // ]);
 
+  useEffect(() => {
+    axiosInstance
+      .get(`/blessings/${params.blessingID}`, {
+        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+      })
+      .then((res) => {
+        setMembers(res.data.Members);
+        setBlessingInfo(res.data);
+      });
+  }, []);
   const [selectedMember, setSelectedMember] = useState<{
     "Member ID": number;
   } | null>(null);
@@ -74,8 +91,8 @@ export default function AddBlessing() {
           <Table
             data={members}
             columns={{
-              lg: ["Member ID", "Name"],
-              md: ["Member ID", "Name"],
+              lg: ["Member ID", "Full Name"],
+              md: ["Member ID", "Full Name"],
               sm: ["Name"],
             }}
             onRowSelect={setSelectedMember}
@@ -128,6 +145,7 @@ export default function AddBlessing() {
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Name"
+            value={blessingInfo["Name Of Blessing"]}
           />
           <label className="block font-medium mt-5">Date</label>
           <div className="relative w-full">
@@ -135,7 +153,7 @@ export default function AddBlessing() {
               className="w-full border border-[#01438F] p-2 rounded mt-2 pr-10"
               type="text"
               placeholder="MM/DD/YYYY"
-              value={date}
+              value={blessingInfo["Blessing Date"]}
               onChange={(e) => setDate(e.target.value)}
             />
             <Calendar

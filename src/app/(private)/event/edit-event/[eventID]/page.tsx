@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PlusCircle, Calendar, XCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
-
+import { axiosInstance } from "@/app/axiosInstance";
+import Cookies from "js-cookie";
 interface Field {
   name: string;
   label: string;
@@ -18,24 +19,39 @@ export default function EditWorshipEvent() {
 
   // This is the blessing ID from the URL
   console.log(params.eventID);
+  const [worshipInfo, setWorshipInfo] = useState({});
+  const [attendees, setAttendees] = useState([]);
+  const [guests, setGuests] = useState([]);
 
-  const [members, setMembers] = useState([
-    { "Member ID": "M001", Name: "Binose" },
-    { "Member ID": "M002", Name: "Lans" },
-    { "Member ID": "M001", Name: "Ye Em" },
-    { "Member ID": "M002", Name: "Cess" },
-    { "Member ID": "M001", Name: "Dril" },
-    { "Member ID": "M002", Name: "Pao" },
-  ]);
+  useEffect(() => {
+    axiosInstance
+      .get(`/worship/${params.eventID}`, {
+        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setWorshipInfo(res.data);
+        setAttendees(res.data.Attendees);
+      });
+  }, []);
 
-  const [guests, setGuests] = useState([
-    { Name: "Blake" },
-    { Name: "Sloane" },
-    { Name: "Nisamon" },
-    { Name: "Chekwa" },
-    { Name: "Chiki" },
-    { Name: "Hiro" },
-  ]);
+  // const [members, setMembers] = useState([
+  //   { "Member ID": "M001", Name: "Binose" },
+  //   { "Member ID": "M002", Name: "Lans" },
+  //   { "Member ID": "M001", Name: "Ye Em" },
+  //   { "Member ID": "M002", Name: "Cess" },
+  //   { "Member ID": "M001", Name: "Dril" },
+  //   { "Member ID": "M002", Name: "Pao" },
+  // ]);
+
+  // const [guests, setGuests] = useState([
+  //   { Name: "Blake" },
+  //   { Name: "Sloane" },
+  //   { Name: "Nisamon" },
+  //   { Name: "Chekwa" },
+  //   { Name: "Chiki" },
+  //   { Name: "Hiro" },
+  // ]);
 
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
@@ -69,12 +85,12 @@ export default function EditWorshipEvent() {
   };
 
   const handleGuestDelete = () => {
-    setGuests(guests.filter((guest) => guest !== selectedGuest));
+    // setGuests(guests.filter((guest) => guest !== selectedGuest));
     console.log("Deleting Guest: " + selectedGuest);
   };
 
   const handleMemberDelete = () => {
-    setMembers(members.filter((member) => member !== selectedMember));
+    // setMembers(members.filter((member) => member !== selectedMember));
     console.log("Deleting Member: " + selectedMember);
   };
 
@@ -101,11 +117,11 @@ export default function EditWorshipEvent() {
           </h2>
           <div className="max-h-[250px] overflow-y-auto">
             <Table
-              data={members}
+              data={attendees}
               columns={{
-                lg: ["Member ID", "Name"],
-                md: ["Member ID", "Name"],
-                sm: ["Name"],
+                lg: ["Member ID", "Full Name"],
+                md: ["Member ID", "Full Name"],
+                sm: ["Full Name"],
               }}
               onRowSelect={setSelectedMember}
             />
@@ -134,7 +150,7 @@ export default function EditWorshipEvent() {
           </h2>
           <div className="max-h-[250px] overflow-y-auto">
             <Table
-              data={guests}
+              data={[]}
               columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
               onRowSelect={setSelectedGuest}
             />
@@ -160,12 +176,14 @@ export default function EditWorshipEvent() {
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Worship ID"
+            value={worshipInfo["Worship ID"]}
           />
 
           <label className="block font-medium mt-5">Event Name</label>
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Event Name"
+            value={worshipInfo.Name}
           />
 
           {/* Date Picker */}
@@ -174,7 +192,7 @@ export default function EditWorshipEvent() {
             <input
               ref={dateInputRef}
               type="date"
-              value={date}
+              value={worshipInfo.Date}
               onChange={(e) => setDate(e.target.value)}
               className="w-full border border-[#01438F] p-2 rounded mt-2 appearance-none"
             />
@@ -184,6 +202,8 @@ export default function EditWorshipEvent() {
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Worship Type"
+            value={worshipInfo["Worship Type"]}
+            disabled
           />
 
           <label className="block font-medium mt-5">Sub-region</label>

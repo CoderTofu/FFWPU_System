@@ -5,13 +5,28 @@ import Modal from "@/components/Modal";
 import { ChevronDown } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-
+import { axiosInstance } from "@/app/axiosInstance";
+import Cookies from "js-cookie";
 export default function EditDonation() {
   const params = useParams();
   const router = useRouter();
 
   // This is the donation ID from the URL
   console.log(params.donationID);
+  const [data, setData] = useState({});
+  const [member, setMember] = useState({});
+  const [church, setChurch] = useState({});
+  useEffect(() => {
+    axiosInstance
+      .get(`/donations/${params.donationID}`, {
+        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+      })
+      .then((res) => {
+        setData(res.data);
+        setMember(res.data.Member);
+        setChurch(res.data.Church);
+      });
+  }, []);
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -69,6 +84,7 @@ export default function EditDonation() {
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
               type="number"
+              value={member["Member ID"]}
               required
             />
           </div>
@@ -78,6 +94,7 @@ export default function EditDonation() {
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
               type="date"
+              value={data.Date}
               required
             />
           </div>
@@ -87,6 +104,7 @@ export default function EditDonation() {
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
               type="text"
+              value={church.ID}
               required
             />
           </div>
@@ -96,6 +114,7 @@ export default function EditDonation() {
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
               type="number"
+              value={data.Amount}
               required
             />
           </div>

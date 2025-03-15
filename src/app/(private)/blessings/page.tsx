@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import Table from "@/components/Table";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import { Search, ChevronDown } from "lucide-react";
-
+import { axiosInstance } from "@/app/axiosInstance";
+import Cookies from "js-cookie";
 export default function ViewBlessing() {
   const router = useRouter();
   const [selectedRow, setSelectedRow] = useState<{
@@ -15,47 +16,56 @@ export default function ViewBlessing() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const [blessings, setBlessings] = useState([]);
   const columns = {
-    lg: ["Blessing ID", "Date", "Name of Blessing", "Year"],
-    md: ["Blessing ID", "Date", "Name of Blessing"],
-    sm: ["Blessing ID", "Date"],
+    lg: ["Blessing ID", "Blessing Date", "Name Of Blessing"],
+    md: ["Blessing ID", "Blessing Date", "Name Of Blessing"],
+    sm: ["Blessing ID", "Blessing Date"],
   };
+  useEffect(() => {
+    axiosInstance
+      .get(`/blessings`, {
+        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+      })
+      .then((res) => {
+        setBlessings(res.data);
+      });
+  }, []);
 
-  const [blessing, setBlessing] = useState([
-    {
-      "Blessing ID": 102010,
-      Date: "02/19/2021",
-      "Name of Blessing": "Blessing 1",
-      Year: 2021,
-    },
-    {
-      "Blessing ID": 124495,
-      Date: "02/21/2025",
-      "Name of Blessing": "First Sunday Event",
-      Year: 2025,
-    },
-    {
-      "Blessing ID": 321345,
-      Date: "02/26/2025",
-      "Name of Blessing": "Blessing 3",
-      Year: 2025,
-    },
-    {
-      "Blessing ID": 124495,
-      Date: "02/21/2025",
-      "Name of Blessing": "Blessing 4",
-      Year: 2019,
-    },
-  ]);
+  // const [blessing, setBlessing] = useState([
+  //   {
+  //     "Blessing ID": 102010,
+  //     Date: "02/19/2021",
+  //     "Name of Blessing": "Blessing 1",
+  //     Year: 2021,
+  //   },
+  //   {
+  //     "Blessing ID": 124495,
+  //     Date: "02/21/2025",
+  //     "Name of Blessing": "First Sunday Event",
+  //     Year: 2025,
+  //   },
+  //   {
+  //     "Blessing ID": 321345,
+  //     Date: "02/26/2025",
+  //     "Name of Blessing": "Blessing 3",
+  //     Year: 2025,
+  //   },
+  //   {
+  //     "Blessing ID": 124495,
+  //     Date: "02/21/2025",
+  //     "Name of Blessing": "Blessing 4",
+  //     Year: 2019,
+  //   },
+  // ]);
 
   // DATA ID
   const dataId = "Blessing ID";
 
-  const availableYears = [
-    "All Years",
-    ...Array.from(new Set(blessing.map((item) => item.Year.toString()))),
-  ];
+  // const availableYears = [
+  //   "All Years",
+  //   ...Array.from(new Set(blessings.map((item) => item.Year.toString()))),
+  // ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -70,15 +80,15 @@ export default function ViewBlessing() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredData = blessing.filter(
+  const filteredData = blessings.filter(
     (item) =>
       Object.values(item)
         .join(" ")
         .toLowerCase()
-        .includes(searchQuery.toLowerCase()) &&
-      (selectedYear && selectedYear !== "All Years"
-        ? item.Year.toString() === selectedYear
-        : true)
+        .includes(searchQuery.toLowerCase())
+    // (selectedYear && selectedYear !== "All Years"
+    //   ? item.Year.toString() === selectedYear
+    //   : true)
   );
 
   const handleEditClick = () => {
@@ -90,8 +100,8 @@ export default function ViewBlessing() {
   const [isOpen, setIsOpen] = useState(false);
   const handleConfirm = () => {
     if (selectedRow) {
-      setBlessing(
-        blessing.filter(
+      setBlessings(
+        blessings.filter(
           (item) => item["Blessing ID"] !== selectedRow["Blessing ID"]
         )
       );

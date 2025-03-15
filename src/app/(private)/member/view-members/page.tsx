@@ -5,62 +5,45 @@ import { useRouter } from "next/navigation";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal"; // Assuming you have a Modal component
+import { axiosInstance } from "@/app/axiosInstance";
+import Cookies from "js-cookie";
 
 export default function Member() {
   const [searchQuery, setSearchQuery] = useState("");
-  const data = [
-    {
-      ID: 645969,
-      "Full Name": "Gregorio, Venus Aira L.",
-      Gender: "M",
-      Nation: "Philippines",
-      Region: "Asia Pacific",
-      "Marital Status": "Widowed",
-      Age: 69,
-    },
-    {
-      ID: 645970,
-      "Full Name": "Sanchez, Princess Nicole A.",
-      Gender: "F",
-      Nation: "USA",
-      Region: "North America",
-      "Marital Status": "Single",
-      Age: 40,
-    },
-    {
-      ID: 645969,
-      "Full Name": "Gregorio, Venus Aira L.",
-      Gender: "M",
-      Nation: "Philippines",
-      Region: "Asia Pacific",
-      "Marital Status": "Widowed",
-      Age: 69,
-    },
-    {
-      ID: 645970,
-      "Full Name": "Sanchez, Princess Nicole A.",
-      Gender: "F",
-      Nation: "USA",
-      Region: "North America",
-      "Marital Status": "Single",
-      Age: 40,
-    },
-  ];
+  const [data, setData] = useState([]);
 
-  const dataID = "ID";
+  useEffect(() => {
+    axiosInstance
+      .get("/members", {
+        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setData(res.data);
+      });
+  }, []);
+
+  const dataID = "Member ID";
 
   const columnConfig = {
     lg: [
-      "ID",
+      "Member ID",
+      "Title",
       "Full Name",
       "Gender",
-      "Nation",
-      "Region",
-      "Marital Status",
+      "Date Of Birth",
       "Age",
+      "Marital Status",
+      "Address",
+      "Country",
+      "Region",
+      "Membership Category",
+      "Generation",
+      "Blessing Status",
+      "Spiritual Birthday",
     ],
-    md: ["ID", "Full Name", "Gender", "Age"],
-    sm: ["ID", "Full Name"],
+    md: ["Member ID", "Full Name", "Gender", "Age"],
+    sm: ["Member ID", "Full Name"],
   };
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);

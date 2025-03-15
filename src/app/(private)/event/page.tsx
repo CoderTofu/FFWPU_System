@@ -5,104 +5,116 @@ import { useRouter } from "next/navigation";
 import Table from "@/components/Table";
 import { Search, ChevronDown } from "lucide-react";
 import Modal from "@/components/Modal";
+import { axiosInstance } from "@/app/axiosInstance";
+import Cookies from "js-cookie";
 
 export default function EventInfo() {
   const router = useRouter();
-
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    axiosInstance
+      .get("/worship", {
+        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setData(res.data);
+      });
+  }, []);
   // Sample event data for the table
-  const data = [
-    {
-      "Worship ID": 2001,
-      Name: "Sunday Service",
-      Date: "2024-02-01",
-      Church: "Manila Cathedral",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2002,
-      Name: "Bible Study",
-      Date: "2024-02-02",
-      Church: "San Agustin Church",
-      Type: "Online",
-    },
-    {
-      "Worship ID": 2003,
-      Name: "Youth Fellowship",
-      Date: "2024-02-03",
-      Church: "Sto. Nino de Pandacan Parish Church",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2001,
-      Name: "Sunday Service",
-      Date: "2024-02-01",
-      Church: "Manila Cathedral",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2002,
-      Name: "Bible Study",
-      Date: "2024-02-02",
-      Church: "San Agustin Church",
-      Type: "Online",
-    },
-    {
-      "Worship ID": 2003,
-      Name: "Youth Fellowship",
-      Date: "2024-02-03",
-      Church: "Sto. Nino de Pandacan Parish Church",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2001,
-      Name: "Sunday Service",
-      Date: "2024-02-01",
-      Church: "Manila Cathedral",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2002,
-      Name: "Bible Study",
-      Date: "2024-02-02",
-      Church: "San Agustin Church",
-      Type: "Online",
-    },
-    {
-      "Worship ID": 2003,
-      Name: "Youth Fellowship",
-      Date: "2024-02-03",
-      Church: "Sto. Nino de Pandacan Parish Church",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2001,
-      Name: "Sunday Service",
-      Date: "2024-02-01",
-      Church: "Manila Cathedral",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2002,
-      Name: "Bible Study",
-      Date: "2024-02-02",
-      Church: "San Agustin Church",
-      Type: "Online",
-    },
-    {
-      "Worship ID": 2003,
-      Name: "Youth Fellowship",
-      Date: "2024-02-03",
-      Church: "Sto. Nino de Pandacan Parish Church",
-      Type: "Onsite",
-    },
-  ];
+  // const data = [
+  //   {
+  //     "Worship ID": 2001,
+  //     Name: "Sunday Service",
+  //     Date: "2024-02-01",
+  //     Church: "Manila Cathedral",
+  //     Type: "Onsite",
+  //   },
+  //   {
+  //     "Worship ID": 2002,
+  //     Name: "Bible Study",
+  //     Date: "2024-02-02",
+  //     Church: "San Agustin Church",
+  //     Type: "Online",
+  //   },
+  //   {
+  //     "Worship ID": 2003,
+  //     Name: "Youth Fellowship",
+  //     Date: "2024-02-03",
+  //     Church: "Sto. Nino de Pandacan Parish Church",
+  //     Type: "Onsite",
+  //   },
+  //   {
+  //     "Worship ID": 2001,
+  //     Name: "Sunday Service",
+  //     Date: "2024-02-01",
+  //     Church: "Manila Cathedral",
+  //     Type: "Onsite",
+  //   },
+  //   {
+  //     "Worship ID": 2002,
+  //     Name: "Bible Study",
+  //     Date: "2024-02-02",
+  //     Church: "San Agustin Church",
+  //     Type: "Online",
+  //   },
+  //   {
+  //     "Worship ID": 2003,
+  //     Name: "Youth Fellowship",
+  //     Date: "2024-02-03",
+  //     Church: "Sto. Nino de Pandacan Parish Church",
+  //     Type: "Onsite",
+  //   },
+  //   {
+  //     "Worship ID": 2001,
+  //     Name: "Sunday Service",
+  //     Date: "2024-02-01",
+  //     Church: "Manila Cathedral",
+  //     Type: "Onsite",
+  //   },
+  //   {
+  //     "Worship ID": 2002,
+  //     Name: "Bible Study",
+  //     Date: "2024-02-02",
+  //     Church: "San Agustin Church",
+  //     Type: "Online",
+  //   },
+  //   {
+  //     "Worship ID": 2003,
+  //     Name: "Youth Fellowship",
+  //     Date: "2024-02-03",
+  //     Church: "Sto. Nino de Pandacan Parish Church",
+  //     Type: "Onsite",
+  //   },
+  //   {
+  //     "Worship ID": 2001,
+  //     Name: "Sunday Service",
+  //     Date: "2024-02-01",
+  //     Church: "Manila Cathedral",
+  //     Type: "Onsite",
+  //   },
+  //   {
+  //     "Worship ID": 2002,
+  //     Name: "Bible Study",
+  //     Date: "2024-02-02",
+  //     Church: "San Agustin Church",
+  //     Type: "Online",
+  //   },
+  //   {
+  //     "Worship ID": 2003,
+  //     Name: "Youth Fellowship",
+  //     Date: "2024-02-03",
+  //     Church: "Sto. Nino de Pandacan Parish Church",
+  //     Type: "Onsite",
+  //   },
+  // ];
 
   const dataID = "Worship ID";
 
   // Column configuration for responsive table
   const columnConfig = {
-    lg: ["Worship ID", "Name", "Date", "Church", "Type"],
-    md: ["Name", "Date", "Church", "Type"],
+    lg: ["Worship ID", "Name", "Date", "Church", "Worship Type"],
+    md: ["Name", "Date", "Church", "Worship Type"],
     sm: ["Name", "Church"],
   };
 
