@@ -107,28 +107,24 @@ export default function Donation() {
   };
 
   useEffect(() => {
-    axiosInstance
-      .get("/donations", {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then((res) => {
-        const donations = res.data;
+    axiosInstance.get("/donations").then((res) => {
+      const donations = res.data;
 
-        const simplified = donations.map((donation) => {
-          console.log(donation);
-          return {
-            "Donation ID": donation["Donation ID"],
-            "Member ID": donation.Member["Member ID"],
-            "Full Name": donation.Member["Full Name"],
-            Date: donation.Date,
-            Church: donation.Church["Name"],
-            Amount: donation.Amount,
-          };
-        });
-        setData(simplified);
-        setOriginalData(simplified);
-        setSortedData(simplified);
+      const simplified = donations.map((donation) => {
+        console.log(donation);
+        return {
+          "Donation ID": donation["Donation ID"],
+          "Member ID": donation.Member["Member ID"],
+          "Full Name": donation.Member["Full Name"],
+          Date: donation.Date,
+          Church: donation.Church["Name"],
+          Amount: donation.Amount,
+        };
       });
+      setData(simplified);
+      setOriginalData(simplified);
+      setSortedData(simplified);
+    });
   }, []);
 
   const column = {

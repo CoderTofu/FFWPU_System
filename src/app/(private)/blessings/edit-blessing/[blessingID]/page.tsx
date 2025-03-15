@@ -33,14 +33,10 @@ export default function AddBlessing() {
   // ]);
 
   useEffect(() => {
-    axiosInstance
-      .get(`/blessings/${params.blessingID}`, {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then((res) => {
-        setMembers(res.data.Members);
-        setBlessingInfo(res.data);
-      });
+    axiosInstance.get(`/blessings/${params.blessingID}`).then((res) => {
+      setMembers(res.data.Members);
+      setBlessingInfo(res.data);
+    });
   }, []);
   const [selectedMember, setSelectedMember] = useState<{
     "Member ID": number;

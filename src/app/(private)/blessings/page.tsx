@@ -24,13 +24,9 @@ export default function ViewBlessing() {
     sm: ["Blessing ID", "Blessing Date"],
   };
   useEffect(() => {
-    axiosInstance
-      .get(`/blessings`, {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then((res) => {
-        setBlessings(res.data);
-      });
+    axiosInstance.get(`/blessings`).then((res) => {
+      setBlessings(res.data);
+    });
   }, []);
 
   // const [blessing, setBlessing] = useState([
@@ -108,9 +104,7 @@ export default function ViewBlessing() {
     //   );
     // }
     axiosInstance
-      .delete(`/blessings/${rowToDelete["Blessing ID"]}`, {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
+      .delete(`/blessings/${rowToDelete["Blessing ID"]}`)
       .then(() => location.reload());
 
     setIsOpen(false);

@@ -34,9 +34,7 @@ export default function EditWorshipEvent() {
   useEffect(() => {
     const ids = [];
     axiosInstance
-      .get(`/worship/${params.eventID}`, {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
+      .get(`/worship/${params.eventID}`)
       .then((res) => {
         setWorshipInfo(res.data);
         setWorshipType(res.data["Worship Type"]);
@@ -52,11 +50,7 @@ export default function EditWorshipEvent() {
       .finally(() => {
         setMemberIds(ids);
       });
-    axiosInstance
-      .get("/members/church", {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then((res) => setChurches(res.data));
+    axiosInstance.get("/members/church").then((res) => setChurches(res.data));
   }, []);
 
   useEffect(() => {
@@ -74,9 +68,7 @@ export default function EditWorshipEvent() {
     const fetched = [];
     memberIds.forEach((id) => {
       axiosInstance
-        .get(`/members/${id}`, {
-          headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-        })
+        .get(`/members/${id}`)
         .then((res) => {
           fetched.push(res.data);
         })
@@ -147,13 +139,9 @@ export default function EditWorshipEvent() {
     // setMembers(members.filter((member) => member !== selectedMember));
     console.log(selectedMember);
     axiosInstance
-      .post(
-        `/worship/${params.eventID}/remove-attendee`,
-        { member_id: selectedMember["Member ID"] },
-        {
-          headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-        }
-      )
+      .post(`/worship/${params.eventID}/remove-attendee`, {
+        member_id: selectedMember["Member ID"],
+      })
       .then((res) => {
         console.log(res.status);
       })
@@ -245,7 +233,7 @@ export default function EditWorshipEvent() {
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Worship ID"
             disabled
-            value={worshipInfo["Worship ID"]}
+            value={worshipInfo["Worship ID"] || ""}
           />
 
           <label className="block font-medium mt-5">Event Name</label>
@@ -395,20 +383,12 @@ export default function EditWorshipEvent() {
           onConfirm={() => {
             console.log("Updating...");
             axiosInstance
-              .patch(
-                `/worship/${params.eventID}`,
-                {
-                  name: eventName,
-                  date: date,
-                  worship_type: worshipTypes[worshipType],
-                  church: church.ID,
-                },
-                {
-                  headers: {
-                    Authorization: `Bearer ${Cookies.get("access_token")}`,
-                  },
-                }
-              )
+              .patch(`/worship/${params.eventID}`, {
+                name: eventName,
+                date: date,
+                worship_type: worshipTypes[worshipType],
+                church: church.ID,
+              })
               .then((res) => {
                 if (res.status === 200) {
                   console.log(res.data);
@@ -418,17 +398,9 @@ export default function EditWorshipEvent() {
                   const addedID = res.data["Worship ID"];
                   memberIds.forEach((id) => {
                     axiosInstance
-                      .post(
-                        `/worship/${addedID}/add-attendee`,
-                        { member_id: id },
-                        {
-                          headers: {
-                            Authorization: `Bearer ${Cookies.get(
-                              "access_token"
-                            )}`,
-                          },
-                        }
-                      )
+                      .post(`/worship/${addedID}/add-attendee`, {
+                        member_id: id,
+                      })
                       .then((res) => {
                         console.log("added " + id);
                       });

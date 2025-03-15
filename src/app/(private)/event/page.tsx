@@ -12,14 +12,10 @@ export default function EventInfo() {
   const router = useRouter();
   const [data, setData] = useState([]);
   useEffect(() => {
-    axiosInstance
-      .get("/worship", {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setData(res.data);
-      });
+    axiosInstance.get("/worship").then((res) => {
+      console.log(res.data);
+      setData(res.data);
+    });
   }, []);
   // Sample event data for the table
   // const data = [
@@ -113,9 +109,9 @@ export default function EventInfo() {
 
   // Column configuration for responsive table
   const columnConfig = {
-    lg: ["Worship ID", "Name", "Date", "Church", "Worship Type"],
-    md: ["Name", "Date", "Church", "Worship Type"],
-    sm: ["Name", "Church"],
+    lg: ["Worship ID", "Name", "Date", "Church Name", "Worship Type"],
+    md: ["Name", "Date", "Church Name", "Worship Type"],
+    sm: ["Name", "Church Name"],
   };
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -286,11 +282,7 @@ export default function EventInfo() {
           onConfirm={() => {
             console.log("Deleting event...");
             axiosInstance
-              .delete(`/worship/${rowToDelete["Worship ID"]}`, {
-                headers: {
-                  Authorization: `Bearer ${Cookies.get("access_token")}`,
-                },
-              })
+              .delete(`/worship/${rowToDelete["Worship ID"]}`)
               .then(() => location.reload());
             setShowDeleteModal(false);
           }}

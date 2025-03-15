@@ -13,14 +13,11 @@ export default function Member() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axiosInstance
-      .get("/members", {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setData(res.data);
-      });
+    console.log(Cookies.get("access_token"));
+    axiosInstance.get("/members").then((res) => {
+      console.log(res.data);
+      setData(res.data);
+    });
   }, []);
 
   const dataID = "Member ID";
@@ -92,13 +89,9 @@ export default function Member() {
   const handleConfirm = () => {
     console.log("Confirmed!", rowToDelete);
     // Add your deletion logic here
-    axiosInstance
-      .delete(`/members/${rowToDelete["Member ID"]}`, {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then(() => {
-        location.reload();
-      });
+    axiosInstance.delete(`/members/${rowToDelete["Member ID"]}`).then(() => {
+      location.reload();
+    });
   };
 
   const filteredData = data.filter((member) =>

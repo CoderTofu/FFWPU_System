@@ -7,6 +7,10 @@ export async function middleware(request: NextRequest) {
   if (auth) {
     if (pathname.startsWith("/login"))
       return NextResponse.redirect(new URL("/member", request.url));
+    request.headers.set(
+      "Authorization",
+      `Bearer ${request.cookies.get("access_token")?.value}`
+    );
     return NextResponse.next();
   }
   if (pathname.startsWith("/login")) return NextResponse.next();

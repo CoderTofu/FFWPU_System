@@ -58,11 +58,7 @@ export default function AddWorshipEvent() {
   const [church, setChurch] = useState(null);
 
   useEffect(() => {
-    axiosInstance
-      .get("/members/church", {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then((res) => setChurches(res.data));
+    axiosInstance.get("/members/church").then((res) => setChurches(res.data));
   }, []);
   const handleDeleteImage = (index: number) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
@@ -89,9 +85,7 @@ export default function AddWorshipEvent() {
     const fetched = [];
     memberIds.forEach((id) => {
       axiosInstance
-        .get(`/members/${id}`, {
-          headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-        })
+        .get(`/members/${id}`)
         .then((res) => {
           fetched.push(res.data);
         })
@@ -328,23 +322,13 @@ export default function AddWorshipEvent() {
           onClose={() => setShowModal(false)}
           onConfirm={() => {
             console.log("Saving...");
-            // axiosInstance.post('/worship', {})
-            console.log(church.ID);
             axiosInstance
-              .post(
-                "/worship/",
-                {
-                  name: eventName,
-                  date: date,
-                  worship_type: worshipTypes[worshipType],
-                  church: church.ID,
-                },
-                {
-                  headers: {
-                    Authorization: `Bearer ${Cookies.get("access_token")}`,
-                  },
-                }
-              )
+              .post("/worship/", {
+                name: eventName,
+                date: date,
+                worship_type: worshipTypes[worshipType],
+                church: church.ID,
+              })
               .then((res) => {
                 if (res.status === 201) {
                   console.log(res.data);
@@ -354,17 +338,9 @@ export default function AddWorshipEvent() {
                   const addedID = res.data["Worship ID"];
                   memberIds.forEach((id) => {
                     axiosInstance
-                      .post(
-                        `/worship/${addedID}/add-attendee`,
-                        { member_id: id },
-                        {
-                          headers: {
-                            Authorization: `Bearer ${Cookies.get(
-                              "access_token"
-                            )}`,
-                          },
-                        }
-                      )
+                      .post(`/worship/${addedID}/add-attendee`, {
+                        member_id: id,
+                      })
                       .then((res) => {
                         console.log("added " + id);
                       });

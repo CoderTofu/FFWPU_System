@@ -17,15 +17,11 @@ export default function EditDonation() {
   const [member, setMember] = useState({});
   const [church, setChurch] = useState({});
   useEffect(() => {
-    axiosInstance
-      .get(`/donations/${params.donationID}`, {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then((res) => {
-        setData(res.data);
-        setMember(res.data.Member);
-        setChurch(res.data.Church);
-      });
+    axiosInstance.get(`/donations/${params.donationID}`).then((res) => {
+      setData(res.data);
+      setMember(res.data.Member);
+      setChurch(res.data.Church);
+    });
   }, []);
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);

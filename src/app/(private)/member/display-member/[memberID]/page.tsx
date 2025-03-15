@@ -28,14 +28,10 @@ export default function DisplayMember() {
   useEffect(() => {
     // This would be replaced with an actual API call
     console.log("Fetching data for member ID:", memberID);
-    axiosInstance
-      .get(`/members/${memberID}`, {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then((res) => {
-        setUserData(res.data);
-        console.log(res.data);
-      });
+    axiosInstance.get(`/members/${memberID}`).then((res) => {
+      setUserData(res.data);
+      console.log(res.data);
+    });
   }, []);
 
   // Dummy data (would come from API in real implementation)

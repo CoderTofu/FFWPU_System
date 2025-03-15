@@ -15,14 +15,10 @@ export default function ViewWorship() {
   const [worshipInfo, setWorshipInfo] = useState({});
 
   useEffect(() => {
-    axiosInstance
-      .get(`worship/${params.eventID}`, {
-        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-      })
-      .then((res) => {
-        setAttendees(res.data.Attendees);
-        setWorshipInfo(res.data);
-      });
+    axiosInstance.get(`worship/${params.eventID}`).then((res) => {
+      setAttendees(res.data.Attendees);
+      setWorshipInfo(res.data);
+    });
   }, []);
   // const data = [
   //   { ID: 6001, Name: "Orton, Johan H." },
