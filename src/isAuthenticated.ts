@@ -19,8 +19,10 @@ export default async function isAuthenticated(request: NextRequest) {
     const refresh = await axiosInstance.post("/refresh-token", {
       refresh: refresh_token,
     });
-    if (refresh.status === 200) return true;
-    request.cookies.set("access_token", refresh.data.access);
+    if (refresh.status === 200) {
+      request.cookies.set("access_token", refresh.data.access);
+      return true;
+    }
   } catch (err) {}
 
   return false;

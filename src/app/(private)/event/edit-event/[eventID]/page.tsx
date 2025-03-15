@@ -8,6 +8,7 @@ import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
 import { axiosInstance } from "@/app/axiosInstance";
 import Cookies from "js-cookie";
+import { ChevronDown, ChevronUp } from "lucide-react";
 interface Field {
   name: string;
   label: string;
@@ -22,19 +23,72 @@ export default function EditWorshipEvent() {
   const [worshipInfo, setWorshipInfo] = useState({});
   const [attendees, setAttendees] = useState([]);
   const [guests, setGuests] = useState([]);
+  const [churches, setChurches] = useState([]);
+  const [memberIds, setMemberIds] = useState([]);
+  const worshipTypes = { Onsite: 1, Online: 2 };
+  const [worshipType, setWorshipType] = useState("");
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [church, setChurch] = useState(null);
+  const [eventName, setEventName] = useState("");
 
   useEffect(() => {
+    const ids = [];
     axiosInstance
       .get(`/worship/${params.eventID}`, {
         headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
       })
       .then((res) => {
-        console.log(res.data);
         setWorshipInfo(res.data);
+        setWorshipType(res.data["Worship Type"]);
+        setEventName(res.data["Name"]);
+        setDate(res.data["Date"]);
+        // setChurch(churchesres.data["Church"]);
+
         setAttendees(res.data.Attendees);
+        res.data.Attendees.forEach((attendee) => {
+          ids.push(attendee["Member ID"]);
+        });
+      })
+      .finally(() => {
+        setMemberIds(ids);
       });
+    axiosInstance
+      .get("/members/church", {
+        headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+      })
+      .then((res) => setChurches(res.data));
   }, []);
 
+  useEffect(() => {
+    console.log(churches);
+    console.log(worshipInfo);
+
+    const selectedChurch = churches.filter((church) => {
+      return church.ID == worshipInfo.Church;
+    });
+
+    if (selectedChurch) setChurch(selectedChurch[0]);
+  }, [churches, worshipInfo]);
+
+  useEffect(() => {
+    const fetched = [];
+    memberIds.forEach((id) => {
+      axiosInstance
+        .get(`/members/${id}`, {
+          headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+        })
+        .then((res) => {
+          fetched.push(res.data);
+        })
+        .finally(() => {
+          setAttendees(fetched);
+        });
+    });
+  }, [memberIds]);
+
+  const toggleDropdown = (dropdown) => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  };
   // const [members, setMembers] = useState([
   //   { "Member ID": "M001", Name: "Binose" },
   //   { "Member ID": "M002", Name: "Lans" },
@@ -91,7 +145,21 @@ export default function EditWorshipEvent() {
 
   const handleMemberDelete = () => {
     // setMembers(members.filter((member) => member !== selectedMember));
-    console.log("Deleting Member: " + selectedMember);
+    console.log(selectedMember);
+    axiosInstance
+      .post(
+        `/worship/${params.eventID}/remove-attendee`,
+        { member_id: selectedMember["Member ID"] },
+        {
+          headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+        }
+      )
+      .then((res) => {
+        console.log(res.status);
+      })
+      .finally(() => {
+        location.reload();
+      });
   };
 
   return (
@@ -176,6 +244,7 @@ export default function EditWorshipEvent() {
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Worship ID"
+            disabled
             value={worshipInfo["Worship ID"]}
           />
 
@@ -183,7 +252,8 @@ export default function EditWorshipEvent() {
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Event Name"
-            value={worshipInfo.Name}
+            onChange={(e) => setEventName(e.target.value)}
+            value={eventName}
           />
 
           {/* Date Picker */}
@@ -199,24 +269,78 @@ export default function EditWorshipEvent() {
           </div>
 
           <label className="block font-medium mt-5">Worship Type</label>
-          <input
-            className="w-full border border-[#01438F] p-2 rounded mt-2"
-            placeholder="Enter Worship Type"
-            value={worshipInfo["Worship Type"]}
-            disabled
-          />
+          <div
+            onClick={() => toggleDropdown("type")}
+            className="relative flex flex-col justify-start items-start border border-[#01438F] rounded p-2 hover:cursor-pointer "
+          >
+            <div className="flex w-full justify-between">
+              {worshipType === "" ? (
+                <button className="opacity-50">Worship Type</button>
+              ) : (
+                <button>{worshipType}</button>
+              )}
+              {openDropdown === "type" ? (
+                <ChevronUp style={{ color: "#01438F" }} />
+              ) : (
+                <ChevronDown style={{ color: "#01438F" }} />
+              )}
+            </div>
+            {openDropdown === "type" && (
+              <div className="absolute z-50 mt-10 flex flex-col w-full bg-white border border-[#01438F] rounded">
+                {["Onsite", "Online"].map((val) => {
+                  return (
+                    <button
+                      key={val}
+                      className="hover:bg-gray-200 w-full text-left rounded p-2"
+                      onClick={() => {
+                        setWorshipType(val);
+                        toggleDropdown("type");
+                      }}
+                    >
+                      {val}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
-          <label className="block font-medium mt-5">Sub-region</label>
-          <input
-            className="w-full border border-[#01438F] p-2 rounded mt-2"
-            placeholder="Enter Sub-region"
-          />
-
-          <label className="block font-medium mt-5">Nation</label>
-          <input
-            className="w-full border border-[#01438F] p-2 rounded mt-2"
-            placeholder="Enter Nation"
-          />
+          <label className="block font-medium mt-5">Church</label>
+          <div
+            onClick={() => toggleDropdown("church")}
+            className="relative flex flex-col justify-start items-start border border-[#01438F] rounded p-2 hover:cursor-pointer "
+          >
+            <div className="flex w-full justify-between">
+              {!church ? (
+                <button className="opacity-50">Church</button>
+              ) : (
+                <button> {`${church.Name} (${church.Country})`}</button>
+              )}
+              {openDropdown === "church" ? (
+                <ChevronUp style={{ color: "#01438F" }} />
+              ) : (
+                <ChevronDown style={{ color: "#01438F" }} />
+              )}
+            </div>
+            {openDropdown === "church" && (
+              <div className="absolute mt-10 flex flex-col w-full bg-white border border-[#01438F] rounded">
+                {churches.map((val) => {
+                  return (
+                    <button
+                      key={val.ID}
+                      className="hover:bg-gray-200 w-full text-left rounded p-2"
+                      onClick={() => {
+                        setChurch(val);
+                        toggleDropdown("church");
+                      }}
+                    >
+                      {`${val.Name} (${val.Country})`}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Upload Multiple Photos */}
           <label className="block font-medium mt-5">Upload Photos</label>
@@ -257,7 +381,7 @@ export default function EditWorshipEvent() {
       <div className="w-full flex justify-center my-4">
         <button
           className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
-          onSubmit={() => setShowModal(true)}
+          onClick={() => setShowModal(true)}
         >
           SAVE CHANGES
         </button>
@@ -270,6 +394,51 @@ export default function EditWorshipEvent() {
           onClose={() => setShowModal(false)}
           onConfirm={() => {
             console.log("Updating...");
+            axiosInstance
+              .patch(
+                `/worship/${params.eventID}`,
+                {
+                  name: eventName,
+                  date: date,
+                  worship_type: worshipTypes[worshipType],
+                  church: church.ID,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${Cookies.get("access_token")}`,
+                  },
+                }
+              )
+              .then((res) => {
+                if (res.status === 200) {
+                  console.log(res.data);
+                  alert("Successfully edited worship! " + res.data);
+                  console.log(res.data);
+
+                  const addedID = res.data["Worship ID"];
+                  memberIds.forEach((id) => {
+                    axiosInstance
+                      .post(
+                        `/worship/${addedID}/add-attendee`,
+                        { member_id: id },
+                        {
+                          headers: {
+                            Authorization: `Bearer ${Cookies.get(
+                              "access_token"
+                            )}`,
+                          },
+                        }
+                      )
+                      .then((res) => {
+                        console.log("added " + id);
+                      });
+                  });
+                } else {
+                  alert(
+                    "An error occurred while adding worship: " + res.statusText
+                  );
+                }
+              });
             setShowModal(false);
           }}
           message="Are you sure you want to update this worship event?"
@@ -284,8 +453,17 @@ export default function EditWorshipEvent() {
           isOpen={isRegistrationModalOpen}
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
+            if (registrationType === "member") {
+              if (memberIds.includes(formData.memberId)) {
+                alert(`${formData.memberId} was already added to the event.`);
+              } else {
+                setMemberIds((prev) => [...prev, formData.memberId]);
+              }
+            } else {
+              console.log(formData);
+              setGuests((prev) => [...prev, formData]);
+            }
             console.log("Registered:", formData);
-            handleSubmit(formData);
           }}
           title={
             registrationType === "member"
