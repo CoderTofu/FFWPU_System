@@ -1,29 +1,29 @@
 import { NextResponse, NextRequest } from "next/server";
 import isAuthenticated from "./isAuthenticated";
+import { getAccessToken, getRefreshToken, setTokens } from "./lib/auth";
 
 export async function middleware(request: NextRequest) {
-  const auth = await isAuthenticated(request);
+  let access_token = await getAccessToken();
+  const refresh_token = await getRefreshToken();
   const pathname = request.nextUrl.pathname;
-  if (auth) {
-    if (request.nextUrl.pathname === "/logout") {
-      const response = NextResponse.redirect(new URL("/", request.url));
-      response.cookies.set("access_token", "", {
-        httpOnly: true,
-        expires: new Date(0), // Expire immediately
-        path: "/",
-      });
 
-      response.cookies.set("refresh_token", "", {
-        httpOnly: true,
-        expires: new Date(0),
-        path: "/",
-      });
-      return response;
-    }
-    request.headers.set(
-      "Authorization",
-      `Bearer ${request.cookies.get("access_token")?.value}`
+  if (!access_token && refresh_token) {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/refresh-token/`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh: refresh_token }),
+      }
     );
+    if (response.ok) {
+      const { access } = await response.json();
+      await setTokens(access, refresh_token);
+      access_token = access;
+    }
+  }
+
+  if (access_token) {
     if (pathname.startsWith("/login"))
       return NextResponse.redirect(new URL("/member", request.url));
     return NextResponse.next();
@@ -42,6 +42,6 @@ export const config = {
     "/reporting/:path*",
     "/event/:path*",
     "/blessings/:path*",
-    "/logout",
+    // "/logout",
   ],
 };

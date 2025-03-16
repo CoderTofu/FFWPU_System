@@ -31,32 +31,44 @@ export default function EditWorshipEvent() {
   const [eventName, setEventName] = useState("");
 
   useEffect(() => {
-    const ids = [];
-    axiosInstance
-      .get(`/worship/${params.eventID}`)
-      .then((res) => {
-        setWorshipInfo(res.data);
-        setWorshipType(res.data["Worship Type"]);
-        setEventName(res.data["Name"]);
-        setDate(res.data["Date"]);
-        // setChurch(churchesres.data["Church"]);
-
-        setAttendees(res.data.Attendees);
-        res.data.Attendees.forEach((attendee) => {
-          ids.push(attendee["Member ID"]);
-        });
-        setGuests(res.data.Guests);
-      })
-      .finally(() => {
-        setMemberIds(ids);
+    (async function () {
+      let ids = [];
+      const resp = await fetch(`/api/event/${params.eventID}`, {
+        method: "GET",
       });
-    axiosInstance.get("/members/church").then((res) => setChurches(res.data));
+      if (resp.ok) {
+        const data = await resp.json();
+        setWorshipInfo(data);
+        setWorshipType(data["Worship Type"]);
+        setEventName(data.Name);
+        setDate(data.Date);
+        setAttendees([...data.Attendees]);
+        data.Attendees.forEach((attendee) => {
+          ids = [...ids, attendee["Member ID"]];
+        });
+        setGuests([...data.Guests]);
+        setMemberIds([...ids]);
+        console.log("here");
+      } else {
+        alert("Error while fetching events: " + resp.statusText);
+      }
+
+      const resp2 = await fetch("/api/members/church", { method: "GET" });
+      if (resp2.ok) {
+        const data = await resp2.json();
+        setChurches(data);
+      } else {
+        alert("Error while fetching churches: " + resp2.statusText);
+      }
+    })();
   }, []);
 
   useEffect(() => {
-    console.log(churches);
-    console.log(worshipInfo);
+    console.log("aaa");
+    console.log(attendees);
+  }, [attendees]);
 
+  useEffect(() => {
     const selectedChurch = churches.filter((church) => {
       return church.ID == worshipInfo.Church;
     });
@@ -65,39 +77,22 @@ export default function EditWorshipEvent() {
   }, [churches, worshipInfo]);
 
   useEffect(() => {
-    const fetched = [];
-    memberIds.forEach((id) => {
-      axiosInstance
-        .get(`/members/${id}`)
-        .then((res) => {
-          fetched.push(res.data);
-        })
-        .finally(() => {
-          setAttendees([...fetched]);
-        });
+    let fetched = [];
+    memberIds.forEach(async (id) => {
+      const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+      if (resp.ok) {
+        const data = await resp.json();
+        fetched = [...fetched, data];
+      } else {
+        alert("Error while fetching member id: " + member);
+      }
     });
+    setAttendees([...fetched]);
   }, [memberIds]);
 
   const toggleDropdown = (dropdown) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
-  // const [members, setMembers] = useState([
-  //   { "Member ID": "M001", Name: "Binose" },
-  //   { "Member ID": "M002", Name: "Lans" },
-  //   { "Member ID": "M001", Name: "Ye Em" },
-  //   { "Member ID": "M002", Name: "Cess" },
-  //   { "Member ID": "M001", Name: "Dril" },
-  //   { "Member ID": "M002", Name: "Pao" },
-  // ]);
-
-  // const [guests, setGuests] = useState([
-  //   { Name: "Blake" },
-  //   { Name: "Sloane" },
-  //   { Name: "Nisamon" },
-  //   { Name: "Chekwa" },
-  //   { Name: "Chiki" },
-  //   { Name: "Hiro" },
-  // ]);
 
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
@@ -130,18 +125,17 @@ export default function EditWorshipEvent() {
     setIsRegistrationModalOpen(true);
   };
 
-  const handleGuestDelete = () => {
+  const handleGuestDelete = async () => {
     console.log("Deleting Guest: " + selectedGuest);
-    axiosInstance
-      .post(`/worship/${params.eventID}/remove-guest`, {
-        guest_id: selectedGuest["Guest ID"],
-      })
-      .then((res) => {
-        console.log(res.status);
-      })
-      .finally(() => {
-        location.reload();
-      });
+    const resp = await fetch(`/api/event/${params.eventID}/remove-guest`, {
+      method: "POST",
+      body: JSON.stringify({ guest_id: selectedGuest["Guest ID"] }),
+    });
+    if (resp.ok) {
+      location.reload();
+    } else {
+      alert("An error occurred while deleting guest: " + resp.statusText);
+    }
   };
 
   const handleMemberDelete = () => {

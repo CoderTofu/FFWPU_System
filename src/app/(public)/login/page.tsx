@@ -4,6 +4,7 @@ import { AxiosResponse } from "axios";
 import { useRouter } from "next/navigation";
 import { axiosInstance } from "@/app/axiosInstance";
 import Cookies from "js-cookie";
+
 export default function Login() {
   const [loginForm, setLoginForm] = useState({ username: "", password: "" });
 
@@ -11,14 +12,27 @@ export default function Login() {
 
   const logIn = async (e: FormEvent) => {
     e.preventDefault();
-    const res = await axiosInstance.post("/login/", loginForm);
-    if (res.status === 200) {
-      Cookies.set("access_token", res.data.access);
-      Cookies.set("refresh_token", res.data.refresh);
-      router.refresh();
+
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(loginForm),
+    });
+
+    if (res.ok) {
+      router.push("/member");
     } else {
-      alert("An error occurred while logging in.");
+      alert("An error occurred while logging in: " + res);
     }
+
+    // await axiosInstance.post("/login/", loginForm);
+    // if (res.status === 200) {
+    //   Cookies.set("access_token", res.data.access);
+    //   Cookies.set("refresh_token", res.data.refresh);
+    //   router.refresh();
+    // } else {
+    //   alert("An error occurred while logging in.");
+    // }
   };
 
   return (

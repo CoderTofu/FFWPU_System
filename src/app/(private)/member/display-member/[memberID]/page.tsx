@@ -22,15 +22,21 @@ export default function DisplayMember() {
   const params = useParams();
   const memberID = params.memberID;
   const [userData, setUserData] = useState({});
-
+  const [userBlessings, setUserBlessings] = useState([]);
   // In a real app, you would fetch data based on memberID
   useEffect(() => {
     // This would be replaced with an actual API call
+    console.log("here");
     console.log("Fetching data for member ID:", memberID);
-    axiosInstance.get(`/members/${memberID}`).then((res) => {
-      setUserData(res.data);
-      console.log(res.data);
-    });
+    (async function () {
+      const response = await fetch(`/api/members/${params.memberID}`, {
+        method: "GET",
+      });
+      const data = await response.json();
+      console.log(data.Blessings);
+      setUserData(data);
+      setUserBlessings(data.Blessings);
+    })();
   }, []);
 
   // Dummy data (would come from API in real implementation)
@@ -198,28 +204,30 @@ export default function DisplayMember() {
                   </div>
                 </div>
 
-                {/* <div className="mt-8">
+                <div className="mt-8">
                   <h4 className="text-md font-semibold mb-3 text-[#BE9231]">
                     Blessings
                   </h4>
                   <div className="space-y-3">
-                    {userData.blessings.map((blessing, index) => (
+                    {userBlessings.map((blessing, index) => (
                       <div
                         key={index}
                         className="flex items-center gap-4 p-3 rounded-md bg-muted/50"
                       >
                         <Award className="h-5 w-5 text-primary" />
                         <div>
-                          <div className="font-medium">{blessing.name}</div>
+                          <div className="font-medium">
+                            {blessing["Name Of Blessing"]}
+                          </div>
                           <div className="text-sm text-muted-foreground flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {blessing.date}
+                            {blessing["Blessing Date"]}
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div> */}
+                </div>
               </div>
             </TabsContent>
 

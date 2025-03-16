@@ -28,9 +28,11 @@ export default function NavbarPrivate() {
     { name: "CMS", href: "/cms" },
   ];
 
-  const logout = (e: MouseEvent) => {
-    router.push("/logout");
-    // window.location.href = "/";
+  const logout = async (e: MouseEvent) => {
+    const response = await fetch("/api/logout", { method: "POST" });
+    if (response.ok) {
+      router.push("/");
+    }
   };
 
   return (

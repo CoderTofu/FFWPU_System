@@ -5,17 +5,23 @@ import { useRouter } from "next/navigation";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal"; // Assuming you have a Modal component
-import { axiosInstance } from "@/app/axiosInstance";
 
 export default function Member() {
   const [searchQuery, setSearchQuery] = useState("");
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axiosInstance.get("/members").then((res) => {
-      console.log(res.data);
-      setData(res.data);
-    });
+    (async function () {
+      const response = await fetch("/api/members", {
+        method: "GET",
+      });
+      if (response.ok) {
+        const resp = await response.json();
+        setData(resp);
+      } else {
+        alert("An error occurred while fetching data: " + response.statusText);
+      }
+    })();
   }, []);
 
   const dataID = "Member ID";
@@ -69,7 +75,7 @@ export default function Member() {
 
   const handleEditClick = () => {
     if (selectedRow) {
-      router.push(`${url}/${selectedRow.ID}/edit`);
+      router.push(`/member/edit-member/${selectedRow["Member ID"]}`);
     }
   };
 
@@ -84,12 +90,15 @@ export default function Member() {
     }
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     console.log("Confirmed!", rowToDelete);
     // Add your deletion logic here
-    axiosInstance.delete(`/members/${rowToDelete["Member ID"]}`).then(() => {
+    const response = await fetch(`/api/members/${rowToDelete["Member ID"]}`);
+    if (response.ok) {
       location.reload();
-    });
+    } else {
+      alert("An error occurred while deleting member: " + response.statusText);
+    }
   };
 
   const filteredData = data.filter((member) =>
