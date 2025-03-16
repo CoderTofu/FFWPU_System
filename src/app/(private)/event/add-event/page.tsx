@@ -94,6 +94,9 @@ export default function AddWorshipEvent() {
     });
   }, [memberIds]);
 
+  useEffect(() => {
+    console.log(guests);
+  }, [guests]);
   return (
     <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
       {/* Header */}
@@ -152,7 +155,11 @@ export default function AddWorshipEvent() {
           <div className="max-h-[250px] overflow-y-auto">
             <Table
               data={guests}
-              columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+              columns={{
+                lg: ["Name", "Email"],
+                md: ["Name", "Email"],
+                sm: ["Name"],
+              }}
               onRowSelect={setSelectedGuest}
             />
           </div>
@@ -344,19 +351,24 @@ export default function AddWorshipEvent() {
                         console.log("added " + id);
                       });
                   });
+                  guests.forEach((guest) => {
+                    axiosInstance
+                      .post(`/worship/${addedID}/add-guest`, {
+                        name: guest.Name,
+                        email: guest.Email,
+                        invited_by: guest.invitedBy || null,
+                      })
+                      .then((res) => {
+                        console.log("added " + guest.Name);
+                      });
+                  });
                 } else {
                   alert(
                     "An error occurred while adding worship: " + res.statusText
                   );
                 }
-              })
-              .finally(() => {});
+              });
 
-            // guests.forEach((guest) => {
-            //   axiosInstance.post('/worship/add-guest/', guest,  {
-            //     headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
-            //   })
-            // })
             setShowModal(false);
           }}
           message="Are you sure you want to add this worship event?"
@@ -406,12 +418,16 @@ export default function AddWorshipEvent() {
                     required: true,
                   },
                   {
-                    name: "email",
+                    name: "Email",
                     label: "Email:",
                     type: "email",
                     required: true,
                   },
-                  { name: "invitedBy", label: "Invited By:", type: "text" },
+                  {
+                    name: "invitedBy",
+                    label: "Invited By (Member ID):",
+                    type: "text",
+                  },
                 ]
           }
         />

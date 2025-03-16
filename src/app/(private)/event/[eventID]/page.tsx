@@ -12,13 +12,28 @@ export default function ViewWorship() {
   const [attendees, setAttendees] = useState([]);
   const [guests, setGuests] = useState([]);
   const [worshipInfo, setWorshipInfo] = useState({});
+  const [churches, setChurches] = useState([]);
+  const [church, setChurch] = useState("");
 
   useEffect(() => {
     axiosInstance.get(`worship/${params.eventID}`).then((res) => {
       setAttendees(res.data.Attendees);
       setWorshipInfo(res.data);
+      setGuests(res.data.Guests);
+    });
+    axiosInstance.get("/members/church").then((res) => {
+      setChurches(res.data);
     });
   }, []);
+
+  useEffect(() => {
+    const selectedChurch = churches.filter((church) => {
+      return church.ID == worshipInfo.Church;
+    });
+    if (selectedChurch.length > 0) {
+      setChurch(selectedChurch[0]["Name"]);
+    }
+  }, [churches, worshipInfo]);
   // const data = [
   //   { ID: 6001, Name: "Orton, Johan H." },
   //   { ID: 6002, Name: "Reigns, Jeff T." },
@@ -97,7 +112,11 @@ export default function ViewWorship() {
                     </h2>
                     <Table
                       data={guests}
-                      columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+                      columns={{
+                        lg: ["Name", "Email"],
+                        md: ["Name", "Email"],
+                        sm: ["Name"],
+                      }}
                     />
                   </div>
                 </div>
@@ -127,7 +146,7 @@ export default function ViewWorship() {
                     <p className="text-base">{worshipInfo.Date}</p>
                   </div>
                 </div>
-                <div className="flex flex-col mb-1 w-full">
+                {/* <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Sub Region:</label>
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
                     <p className="text-base"></p>
@@ -138,11 +157,11 @@ export default function ViewWorship() {
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
                     <p className="text-base"></p>
                   </div>
-                </div>
+                </div> */}
                 <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Church:</label>
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">{worshipInfo.Church}</p>
+                    <p className="text-base">{church}</p>
                   </div>
                 </div>
                 <div className="flex flex-col mb-1 w-full">

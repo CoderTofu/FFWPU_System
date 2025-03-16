@@ -45,6 +45,7 @@ export default function EditWorshipEvent() {
         res.data.Attendees.forEach((attendee) => {
           ids.push(attendee["Member ID"]);
         });
+        setGuests(res.data.Guests);
       })
       .finally(() => {
         setMemberIds(ids);
@@ -60,7 +61,7 @@ export default function EditWorshipEvent() {
       return church.ID == worshipInfo.Church;
     });
 
-    if (selectedChurch) setChurch(selectedChurch[0]);
+    if (selectedChurch.length > 0) setChurch(selectedChurch[0]);
   }, [churches, worshipInfo]);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export default function EditWorshipEvent() {
           fetched.push(res.data);
         })
         .finally(() => {
-          setAttendees(fetched);
+          setAttendees([...fetched]);
         });
     });
   }, [memberIds]);
@@ -100,7 +101,7 @@ export default function EditWorshipEvent() {
 
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
-
+  const [newGuests, setNewGuests] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [date, setDate] = useState<string>("");
   const dateInputRef = useRef<HTMLInputElement | null>(null);
@@ -130,8 +131,17 @@ export default function EditWorshipEvent() {
   };
 
   const handleGuestDelete = () => {
-    // setGuests(guests.filter((guest) => guest !== selectedGuest));
     console.log("Deleting Guest: " + selectedGuest);
+    axiosInstance
+      .post(`/worship/${params.eventID}/remove-guest`, {
+        guest_id: selectedGuest["Guest ID"],
+      })
+      .then((res) => {
+        console.log(res.status);
+      })
+      .finally(() => {
+        location.reload();
+      });
   };
 
   const handleMemberDelete = () => {
@@ -205,8 +215,12 @@ export default function EditWorshipEvent() {
           </h2>
           <div className="max-h-[250px] overflow-y-auto">
             <Table
-              data={[]}
-              columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+              data={[...guests, ...newGuests]}
+              columns={{
+                lg: ["Name", "Email"],
+                md: ["Name", "Email"],
+                sm: ["Name"],
+              }}
               onRowSelect={setSelectedGuest}
             />
           </div>
@@ -404,6 +418,18 @@ export default function EditWorshipEvent() {
                         console.log("added " + id);
                       });
                   });
+
+                  newGuests.forEach((guest) => {
+                    axiosInstance
+                      .post(`/worship/${addedID}/add-guest`, {
+                        name: guest.Name,
+                        email: guest.Email,
+                        invited_by: guest.invitedBy || null,
+                      })
+                      .then((res) => {
+                        console.log("added " + guest.Name);
+                      });
+                  });
                 } else {
                   alert(
                     "An error occurred while adding worship: " + res.statusText
@@ -432,7 +458,7 @@ export default function EditWorshipEvent() {
               }
             } else {
               console.log(formData);
-              setGuests((prev) => [...prev, formData]);
+              setNewGuests((prev) => [...prev, formData]);
             }
             console.log("Registered:", formData);
           }}
@@ -453,13 +479,13 @@ export default function EditWorshipEvent() {
                 ]
               : [
                   {
-                    name: "fullName",
+                    name: "Name",
                     label: "Full Name:",
                     type: "text",
                     required: true,
                   },
                   {
-                    name: "email",
+                    name: "Email",
                     label: "Email:",
                     type: "email",
                     required: true,

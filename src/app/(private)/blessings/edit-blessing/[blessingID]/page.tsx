@@ -13,6 +13,7 @@ export default function AddBlessing() {
   const [members, setMembers] = useState([]);
   const [memberIds, setMemberIds] = useState([]);
   const [guests, setGuests] = useState([]);
+  const [newGuests, setNewGuests] = useState([]);
   const [formData, setFormData] = useState({
     name_of_blessing: "",
     blessing_date: "",
@@ -27,7 +28,7 @@ export default function AddBlessing() {
         ids.push(member["Member ID"]);
       });
       setMemberIds([...ids]);
-
+      setGuests(res.data.Guests);
       setFormData({
         name_of_blessing: res.data["Name Of Blessing"],
         blessing_date: res.data["Blessing Date"],
@@ -54,6 +55,14 @@ export default function AddBlessing() {
 
   const handleGuestDelete = () => {
     console.log("Deleting Guest: " + selectedGuest);
+    axiosInstance
+      .post(`/blessings/${params.blessingID}/remove-guest`, {
+        guest_id: selectedGuest["Guest ID"],
+      })
+      .then((res) => {
+        console.log(res.status);
+      })
+      .finally(() => location.reload());
   };
   const handleMemberDelete = () => {
     console.log("Deleting Member: " + selectedMember);
@@ -107,7 +116,7 @@ export default function AddBlessing() {
             columns={{
               lg: ["Member ID", "Full Name"],
               md: ["Member ID", "Full Name"],
-              sm: ["Name"],
+              sm: ["Full Name"],
             }}
             onRowSelect={setSelectedMember}
           />
@@ -135,8 +144,12 @@ export default function AddBlessing() {
             </div>
           </h2>
           <Table
-            data={guests}
-            columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+            data={[...guests, ...newGuests]}
+            columns={{
+              lg: ["Name", "Email"],
+              md: ["Name", "Email"],
+              sm: ["Name"],
+            }}
             onRowSelect={setSelectedGuest}
           />
           <button
@@ -250,6 +263,18 @@ export default function AddBlessing() {
                   .catch((err) => {
                     alert("Error updating members");
                   });
+
+                newGuests.forEach((guest) => {
+                  axiosInstance
+                    .post(`/blessings/${params.blessingID}/add-guest`, {
+                      name: guest.Name,
+                      email: guest.Email,
+                      invited_by: guest.invitedBy || null,
+                    })
+                    .then((res) => {
+                      console.log("added " + guest.Name);
+                    });
+                });
               })
               .catch((err) => {
                 alert("Error updating blessing: " + err);
@@ -278,6 +303,7 @@ export default function AddBlessing() {
                 setMemberIds([...memberIds, id]);
               }
             } else {
+              setNewGuests([...newGuests, formData]);
             }
             setIsRegistrationModalOpen(false);
           }}
@@ -290,9 +316,18 @@ export default function AddBlessing() {
             registrationType === "member"
               ? [{ name: "memberId", label: "Member ID", type: "text" }]
               : [
-                  { name: "fullName", label: "Full Name", type: "text" },
-                  { name: "nation", label: "Nation", type: "text" },
-                  { name: "email", label: "Email", type: "email" },
+                  {
+                    name: "Name",
+                    label: "Full Name",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    name: "Email",
+                    label: "Email",
+                    type: "email",
+                    required: true,
+                  },
                   { name: "invitedBy", label: "Invited By", type: "text" },
                 ]
           }

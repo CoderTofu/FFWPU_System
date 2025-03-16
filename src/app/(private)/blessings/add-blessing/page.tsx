@@ -12,14 +12,7 @@ export default function AddBlessing() {
   const [memberIds, setMemberIds] = useState([]);
   const [blessingName, setBlessingName] = useState("");
   const [chaenbo, setChaenbo] = useState(1);
-  const [guests, setGuests] = useState([
-    { Name: "Blake" },
-    { Name: "Sloane" },
-    { Name: "Nisamon" },
-    { Name: "Chekwa" },
-    { Name: "Chiki" },
-    { Name: "Hiro" },
-  ]);
+  const [guests, setGuests] = useState([]);
 
   const [selectedMember, setSelectedMember] = useState<{
     "Member ID": number;
@@ -43,9 +36,18 @@ export default function AddBlessing() {
 
   const handleGuestDelete = () => {
     console.log("Deleting Guest: " + selectedGuest);
+    setGuests(
+      guests.filter((guest) => guest["Guest ID"] != selectedGuest["ID"])
+    );
   };
   const handleMemberDelete = () => {
     console.log("Deleting Member: " + selectedMember);
+    setMemberIds(memberIds.filter((id) => id != selectedMember["Member ID"]));
+    setMembers(
+      members.filter(
+        (member) => member["Member ID"] != selectedMember["Member ID"]
+      )
+    );
   };
 
   useEffect(() => {
@@ -115,7 +117,11 @@ export default function AddBlessing() {
           </h2>
           <Table
             data={guests}
-            columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+            columns={{
+              lg: ["Name", "Email"],
+              md: ["Name", "Email"],
+              sm: ["Name"],
+            }}
             onRowSelect={setSelectedGuest}
           />
           <button
@@ -217,6 +223,18 @@ export default function AddBlessing() {
                     .catch((err) => {
                       console.log(err);
                     });
+
+                  guests.forEach((guest) => {
+                    axiosInstance
+                      .post(`/blessings/${res.data["Blessing ID"]}/add-guest`, {
+                        name: guest.Name,
+                        email: guest.Email,
+                        invited_by: guest.invitedBy || null,
+                      })
+                      .then((res) => {
+                        console.log("added " + guest.Name);
+                      });
+                  });
                   alert("Successfully added blessing!");
                 }
               });
@@ -236,6 +254,7 @@ export default function AddBlessing() {
             if (registrationType === "member") {
               setMemberIds((prev) => [...prev, formData.memberId]);
             } else {
+              setGuests((prev) => [...prev, formData]);
             }
             console.log("Registered:", formData);
             // handleSubmit(formData);
@@ -257,13 +276,13 @@ export default function AddBlessing() {
                 ]
               : [
                   {
-                    name: "fullName",
+                    name: "Name",
                     label: "Full Name:",
                     type: "text",
                     required: true,
                   },
                   {
-                    name: "email",
+                    name: "Email",
                     label: "Email:",
                     type: "email",
                     required: true,
