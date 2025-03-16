@@ -33,3 +33,20 @@ export async function deleteTokens() {
   (await cookies()).delete("access_token");
   return (await cookies()).delete("refresh_token");
 }
+
+export async function refreshToken(refresh_token) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/refresh-token/`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh: refresh_token }),
+    }
+  );
+  if (response.ok) {
+    const { access } = await response.json();
+    await setTokens(access, refresh_token);
+    return access;
+  }
+  return null;
+}

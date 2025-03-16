@@ -1,6 +1,9 @@
+"use server";
+
 import { axiosInstance } from "@/app/axiosInstance";
 import { getAccessToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
+
 export async function GET(request: Request) {
   const resp = await axiosInstance.get("/worship", {
     headers: { Authorization: `Bearer ${await getAccessToken()}` },

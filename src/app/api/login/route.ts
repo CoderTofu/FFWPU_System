@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
   if (access_token && refresh_token) {
     return NextResponse.json({ status: 200 });
   }
+
   const requestData = await request.json();
   const response = await axiosInstance.post(
     `${process.env.NEXT_PUBLIC_API_URL}/login/`,

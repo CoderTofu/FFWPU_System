@@ -30,70 +30,6 @@ export default function EditWorshipEvent() {
   const [church, setChurch] = useState(null);
   const [eventName, setEventName] = useState("");
 
-  useEffect(() => {
-    (async function () {
-      let ids = [];
-      const resp = await fetch(`/api/event/${params.eventID}`, {
-        method: "GET",
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        setWorshipInfo(data);
-        setWorshipType(data["Worship Type"]);
-        setEventName(data.Name);
-        setDate(data.Date);
-        setAttendees([...data.Attendees]);
-        data.Attendees.forEach((attendee) => {
-          ids = [...ids, attendee["Member ID"]];
-        });
-        setGuests([...data.Guests]);
-        setMemberIds([...ids]);
-        console.log("here");
-      } else {
-        alert("Error while fetching events: " + resp.statusText);
-      }
-
-      const resp2 = await fetch("/api/members/church", { method: "GET" });
-      if (resp2.ok) {
-        const data = await resp2.json();
-        setChurches(data);
-      } else {
-        alert("Error while fetching churches: " + resp2.statusText);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    console.log("aaa");
-    console.log(attendees);
-  }, [attendees]);
-
-  useEffect(() => {
-    const selectedChurch = churches.filter((church) => {
-      return church.ID == worshipInfo.Church;
-    });
-
-    if (selectedChurch.length > 0) setChurch(selectedChurch[0]);
-  }, [churches, worshipInfo]);
-
-  useEffect(() => {
-    let fetched = [];
-    memberIds.forEach(async (id) => {
-      const resp = await fetch(`/api/members/${id}`, { method: "GET" });
-      if (resp.ok) {
-        const data = await resp.json();
-        fetched = [...fetched, data];
-      } else {
-        alert("Error while fetching member id: " + member);
-      }
-    });
-    setAttendees([...fetched]);
-  }, [memberIds]);
-
-  const toggleDropdown = (dropdown) => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
-  };
-
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [newGuests, setNewGuests] = useState([]);
@@ -105,6 +41,66 @@ export default function EditWorshipEvent() {
   const [registrationType, setRegistrationType] = useState<
     "member" | "guest" | null
   >(null);
+
+  useEffect(() => {
+    const callback = async () => {
+      let ids = [];
+      const resp = await fetch(`/api/event/${params.eventID}`, {
+        method: "GET",
+      });
+
+      if (resp.ok) {
+        const data = await resp.json();
+        setWorshipInfo(data);
+        setWorshipType(data["Worship Type"]);
+        setEventName(data.Name);
+        setDate(data.Date);
+        setGuests([...data.Guests]);
+        const here = data.Attendees.map((attendee) => attendee["Member ID"]);
+        setMemberIds([...here]);
+        setAttendees([...data.Attendees]);
+      } else {
+        alert("Error while fetching events: " + resp.statusText);
+      }
+
+      const resp2 = await fetch("/api/members/church", { method: "GET" });
+      if (resp2.ok) {
+        const data = await resp2.json();
+        setChurches(data);
+      } else {
+        alert("Error while fetching churches: " + resp2.statusText);
+      }
+    };
+    callback();
+  }, []);
+
+  useEffect(() => {
+    const selectedChurch = churches.filter((church) => {
+      return church.ID == worshipInfo.Church;
+    });
+
+    if (selectedChurch.length > 0) setChurch(selectedChurch[0]);
+  }, [churches, worshipInfo]);
+
+  useEffect(() => {
+    const fetched = [];
+    memberIds.forEach(async (id) => {
+      const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+      if (resp.ok) {
+        const data = await resp.json();
+        fetched.push(data);
+      } else {
+        alert("Error while fetching member id: " + id);
+      }
+    });
+    if (fetched.length > 0) {
+      setAttendees([...fetched]);
+    }
+  }, [memberIds]);
+
+  const toggleDropdown = (dropdown) => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -257,7 +253,7 @@ export default function EditWorshipEvent() {
             <input
               ref={dateInputRef}
               type="date"
-              value={worshipInfo.Date}
+              value={date}
               onChange={(e) => setDate(e.target.value)}
               className="w-full border border-[#01438F] p-2 rounded mt-2 appearance-none"
             />

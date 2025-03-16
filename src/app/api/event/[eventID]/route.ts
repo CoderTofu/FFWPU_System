@@ -1,8 +1,11 @@
+"use server";
+
 import { getAccessToken } from "@/lib/auth";
 import { NextApiRequest } from "next";
 import { headers } from "next/headers";
 import { axiosInstance } from "@/app/axiosInstance";
 import { NextResponse } from "next/server";
+
 export async function GET(
   request: Request,
   { params }: { params: { eventID: string } }
@@ -17,6 +20,14 @@ export async function GET(
   return NextResponse.json({});
 }
 
-export async function DELETE(request: NextApiRequest) {}
+export async function DELETE(request: NextApiRequest) {
+  const ref = await fetch("/api/refresh-token", {
+    method: "GET",
+  });
+}
 
-export async function PATCH(request: Request) {}
+export async function PATCH(request: Request) {
+  const ref = await fetch("/api/refresh-token", {
+    method: "GET",
+  });
+}

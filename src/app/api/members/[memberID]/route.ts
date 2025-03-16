@@ -1,5 +1,7 @@
+"use server";
+
 import { axiosInstance } from "@/app/axiosInstance";
-import { getAccessToken } from "@/lib/auth";
+import { getAccessToken, getRefreshToken } from "@/lib/auth";
 import { NextApiRequest } from "next";
 import { NextResponse } from "next/server";
 
@@ -11,7 +13,6 @@ export async function GET(
   const response = await axiosInstance.get(`/members/${memberID}`, {
     headers: { Authorization: `Bearer ${await getAccessToken()}` },
   });
-  console.log(response);
   if (response.status >= 200 && response.status <= 299) {
     return NextResponse.json(response.data);
   }
@@ -19,6 +20,10 @@ export async function GET(
 }
 
 export async function DELETE(request: NextApiRequest) {
+  const ref = await fetch("/api/refresh-token", {
+    method: "GET",
+  });
+
   const { memberID } = request.query;
   const response = await axiosInstance.delete(`/members/${memberID}`, {
     headers: { Authorization: `Bearer ${await getAccessToken()}` },
