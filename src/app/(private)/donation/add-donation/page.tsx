@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, use } from "react";
 import Modal from "@/components/Modal";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { axiosInstance } from "@/app/axiosInstance";
 
 export default function AddDonation() {
   const router = useRouter();
@@ -23,17 +22,21 @@ export default function AddDonation() {
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
   const dropdownButtonRef = useRef<HTMLButtonElement>(null);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     console.log("Confirmed!");
     console.log(formData);
     setIsOpen(false);
-    axiosInstance
-      .post("/donations/", formData)
-      .then((res) => {
-        alert("successfully added " + formData);
-      })
-      .catch((err) => alert("an error occurred: " + err));
-    // router.push("/donation");
+
+    const res = await fetch("/api/donations", {
+      method: "POST",
+      body: JSON.stringify(formData),
+    });
+    if (res.ok) {
+      alert("successfully added donation");
+      router.push("/donation");
+    } else {
+      alert("An error occurred: " + res.statusText);
+    }
   };
 
   const toggleDropdown = (dropdown: string) => {
@@ -64,9 +67,14 @@ export default function AddDonation() {
   };
 
   useEffect(() => {
-    axiosInstance.get("/members/church").then((res) => {
-      setChurches(res.data);
-    });
+    (async function () {
+      const res = await fetch("/api/members/church", { method: "GET" });
+      if (res.ok) {
+        setChurches(await res.json());
+      } else {
+        alert("An error occurred while fetching churches: " + res.statusText);
+      }
+    })();
   }, []);
 
   return (

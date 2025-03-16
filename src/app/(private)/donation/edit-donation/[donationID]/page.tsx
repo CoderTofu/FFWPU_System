@@ -5,7 +5,6 @@ import Modal from "@/components/Modal";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { axiosInstance } from "@/app/axiosInstance";
 export default function EditDonation() {
   const params = useParams();
   const router = useRouter();
@@ -24,23 +23,31 @@ export default function EditDonation() {
   });
   const [churches, setChurches] = useState([]);
   useEffect(() => {
-    axiosInstance.get(`/donations/${params.donationID}`).then((res) => {
-      setData(res.data);
-
-      setMember(res.data.Member);
-      setChurch(res.data.Church);
-      setFormData({
-        member: res.data.Member["Member ID"],
-        church: res.data.Church.ID,
-        amount: res.data.Amount,
-        date: res.data.Date,
-        currency: res.data.Currency,
+    (async function () {
+      const res = await fetch(`/api/donations/${params.donationID}`, {
+        method: "GET",
       });
-      setSelectedCurrency(res.data.Currency);
-    });
-    axiosInstance.get("/members/church").then((res) => {
-      setChurches(res.data);
-    });
+      if (res.ok) {
+        const data = await res.json();
+        setData(data);
+        setMember(data.Member);
+        setChurch(data.Church);
+        setFormData({
+          member: data.Member["Member ID"],
+          church: data.Church.ID,
+          amount: data.Amount,
+          date: data.Date,
+          currency: data.Currency,
+        });
+        setSelectedCurrency(data.Currency);
+      } else {
+        alert("An error occurred while fetching donation: " + res.statusText);
+      }
+      const c = await fetch("/api/members/church", { method: "GET" });
+      if (c.ok) {
+        setChurches(await c.json());
+      }
+    })();
   }, []);
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -49,16 +56,19 @@ export default function EditDonation() {
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
   const dropdownButtonRef = useRef<HTMLButtonElement>(null);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     console.log("Confirmed!");
     setIsOpen(false);
     console.log(formData);
-    axiosInstance
-      .patch(`/donations/${params.donationID}`, formData)
-      .then((res) => {
-        alert("successfully edited donation!");
-      })
-      .catch((err) => alert("error: " + err));
+    const res = await fetch(`/api/donations/${params.donationID}`, {
+      method: "PATCH",
+      body: JSON.stringify(formData),
+    });
+    if (res.ok) {
+      location.reload();
+    } else {
+      alert("An error occurred while editing donation: " + res.statusText);
+    }
   };
 
   const toggleDropdown = (dropdown: string) => {
@@ -123,7 +133,7 @@ export default function EditDonation() {
               onChange={(e) =>
                 setFormData({ ...formData, date: e.target.value })
               }
-              value={data.Date}
+              value={formData.date || ""}
               required
             />
           </div>
@@ -180,7 +190,7 @@ export default function EditDonation() {
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
               type="number"
-              value={formData.amount}
+              value={formData.amount || 0}
               onChange={(e) =>
                 setFormData({ ...formData, amount: e.target.value })
               }
