@@ -5,7 +5,6 @@ import { Calendar, PlusCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
-import { axiosInstance } from "@/app/axiosInstance";
 import { useParams } from "next/navigation";
 
 export default function AddBlessing() {
@@ -21,20 +20,23 @@ export default function AddBlessing() {
   });
   const chaenboMap = { Vertical: 1, Horizontal: 2 };
   useEffect(() => {
-    axiosInstance.get(`/blessings/${params.blessingID}`).then((res) => {
-      setMembers(res.data.Members);
-      const ids = [];
-      res.data.Members.map((member) => {
-        ids.push(member["Member ID"]);
+    (async function () {
+      const res = await fetch(`/api/blessings/${params.blessingID}`, {
+        method: "GET",
       });
-      setMemberIds([...ids]);
-      setGuests(res.data.Guests);
-      setFormData({
-        name_of_blessing: res.data["Name Of Blessing"],
-        blessing_date: res.data["Blessing Date"],
-        chaenbo: chaenboMap[res.data.Chaenbo],
-      });
-    });
+      if (res.ok) {
+        const data = await res.json();
+        setMembers(data.Members);
+        const ids = data.Members.map((member) => member["Member ID"]);
+        setMemberIds([...ids]);
+        setGuests(data.Guests);
+        setFormData({
+          name_of_blessing: data["Name Of Blessing"],
+          blessing_date: data["Blessing Date"],
+          chaenbo: chaenboMap[data.Chaenbo],
+        });
+      }
+    })();
   }, []);
   const [selectedMember, setSelectedMember] = useState<{
     "Member ID": number;
@@ -53,41 +55,64 @@ export default function AddBlessing() {
     setIsRegistrationModalOpen(true);
   };
 
-  const handleGuestDelete = () => {
+  const handleGuestDelete = async () => {
     console.log("Deleting Guest: " + selectedGuest);
-    axiosInstance
-      .post(`/blessings/${params.blessingID}/remove-guest`, {
-        guest_id: selectedGuest["Guest ID"],
-      })
-      .then((res) => {
-        console.log(res.status);
-      })
-      .finally(() => location.reload());
+    const res = await fetch(
+      `/api/blessings/${params.blessingID}/remove-guest`,
+      {
+        method: "POST",
+        body: JSON.stringify({ guest_id: selectedGuest["Guest ID"] }),
+      }
+    );
+    if (res.ok) {
+      alert("Successfully deleted guest" + selectedGuest.Name);
+      location.reload();
+    } else {
+      alert("An error occurred while removing guest");
+    }
   };
-  const handleMemberDelete = () => {
+  const handleMemberDelete = async () => {
     console.log("Deleting Member: " + selectedMember);
-    axiosInstance
-      .patch(`/blessings/${params.blessingID}/remove-member`, {
-        member_id: selectedMember["Member ID"],
-      })
-      .then((res) => {
-        location.reload();
-      })
-      .catch((err) => {
-        alert("An error occurred while removing member");
-      });
+    const res = await fetch(
+      `/api/blessings/${params.blessingID}/remove-member`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ member_id: selectedMember["Member ID"] }),
+      }
+    );
+    if (res.ok) {
+      alert("Successfully deleted member");
+      location.reload();
+    } else {
+      alert("An error occurred while removing member: " + res.statusText);
+    }
   };
 
   useEffect(() => {
-    const fetched = [];
-    memberIds.forEach((id) =>
-      axiosInstance
-        .get(`/members/${id}`)
-        .then((res) => {
-          fetched.push(res.data);
+    const fetchMembers = async () => {
+      const fetched = await Promise.all(
+        memberIds.map(async (id) => {
+          try {
+            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+            if (resp.ok) {
+              return await resp.json();
+            } else {
+              alert("Error while fetching member id: " + id);
+              return null; // Return null or handle the error case
+            }
+          } catch (error) {
+            console.error("Error fetching member:", error);
+            return null; // Return null or handle the error case
+          }
         })
-        .finally(() => setMembers([...fetched]))
-    );
+      );
+
+      // Filter out any null values (from failed fetches)
+      const validMembers = fetched.filter((member) => member !== null);
+      setMembers(validMembers);
+    };
+
+    fetchMembers();
   }, [memberIds]);
 
   return (
@@ -247,38 +272,52 @@ export default function AddBlessing() {
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
-          onConfirm={() => {
+          onConfirm={async () => {
             console.log("Saving...");
             console.log(memberIds);
-            axiosInstance
-              .patch(`/blessings/${params.blessingID}`, formData)
-              .then((res) => {
-                axiosInstance
-                  .patch(`/blessings/${params.blessingID}/add-member`, {
-                    members: memberIds,
-                  })
-                  .then((res) => {
-                    alert("Sucessfully added members.");
-                  })
-                  .catch((err) => {
-                    alert("Error updating members");
-                  });
+            const res = await fetch(`/api/blessings/${params.blessingID}`, {
+              method: "PATCH",
+              body: JSON.stringify(formData),
+            });
+            if (res.ok) {
+              const memberRes = await fetch(
+                `/api/blessings/${params.blessingID}/add-member`,
+                {
+                  method: "PATCH",
+                  body: JSON.stringify({ members: memberIds }),
+                }
+              );
+              if (memberRes.ok) {
+                alert("Successfully added members");
+              } else {
+                alert("Failed to add members");
+              }
 
-                newGuests.forEach((guest) => {
-                  axiosInstance
-                    .post(`/blessings/${params.blessingID}/add-guest`, {
-                      name: guest.Name,
-                      email: guest.Email,
-                      invited_by: guest.invitedBy || null,
-                    })
-                    .then((res) => {
-                      console.log("added " + guest.Name);
-                    });
-                });
-              })
-              .catch((err) => {
-                alert("Error updating blessing: " + err);
-              });
+              await Promise.all(
+                newGuests.map(async (guest) => {
+                  const g = await fetch(
+                    `/api/blessings/${params.blessingID}/add-guest`,
+                    {
+                      method: "POST",
+                      body: JSON.stringify({
+                        name: guest.Name,
+                        email: guest.Email,
+                        invited_by: guest.invitedBy || null,
+                      }),
+                    }
+                  );
+                  if (g.ok) {
+                    alert("Successfully added guest " + guest.Name);
+                  } else {
+                    alert("Error while adding guest " + guest.Name);
+                  }
+                })
+              );
+
+              alert("Successfully added blessing");
+            } else {
+              alert("Error updating members");
+            }
             setShowModal(false);
           }}
           message="Are you sure you want to add the data?"
@@ -300,7 +339,7 @@ export default function AddBlessing() {
                   `Member ID ${formData.memberId} is already in the blessing.`
                 );
               } else {
-                setMemberIds([...memberIds, id]);
+                setMemberIds((prev) => [...prev, id]);
               }
             } else {
               setNewGuests([...newGuests, formData]);

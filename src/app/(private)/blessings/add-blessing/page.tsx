@@ -5,7 +5,6 @@ import { Calendar, PlusCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
-import { axiosInstance } from "@/app/axiosInstance";
 
 export default function AddBlessing() {
   const [members, setMembers] = useState([]);
@@ -51,18 +50,31 @@ export default function AddBlessing() {
   };
 
   useEffect(() => {
-    const fetched = [];
-
-    memberIds.forEach((id) =>
-      axiosInstance
-        .get(`/members/${id}`)
-        .then((res) => {
-          fetched.push(res.data);
+    const fetchMembers = async () => {
+      const fetched = await Promise.all(
+        memberIds.map(async (id) => {
+          try {
+            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+            if (resp.ok) {
+              return await resp.json();
+            } else {
+              alert("Error while fetching member id: " + id);
+              return null; // Return null or handle the error case
+            }
+          } catch (error) {
+            console.error("Error fetching member:", error);
+            return null; // Return null or handle the error case
+          }
         })
-        .finally(() => setMembers([...fetched]))
-    );
-  }, [memberIds]);
+      );
 
+      // Filter out any null values (from failed fetches)
+      const validMembers = fetched.filter((member) => member !== null);
+      setMembers(validMembers);
+    };
+
+    fetchMembers();
+  }, [memberIds]);
   return (
     <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7 mb-10">
       {/* Page Title */}
@@ -199,45 +211,58 @@ export default function AddBlessing() {
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
-          onConfirm={() => {
+          onConfirm={async () => {
             console.log("Saving...");
             console.log(blessingName);
             console.log(date);
             console.log(chaenbo);
-            axiosInstance
-              .post("/blessings/", {
+            const res = await fetch("/api/blessings", {
+              method: "POST",
+              body: JSON.stringify({
                 blessing_date: date,
                 name_of_blessing: blessingName,
                 chaenbo,
-              })
-              .then((res) => {
-                if (res.status >= 200 && res.status <= 299) {
-                  axiosInstance
-                    .patch(`/blessings/${res.data["Blessing ID"]}/add-member`, {
-                      members: memberIds,
-                    })
-                    .then((res) => {
-                      if (res.status >= 200 && res.status <= 299) {
-                      }
-                    })
-                    .catch((err) => {
-                      console.log(err);
-                    });
+              }),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              const memberRes = await fetch(
+                `/api/blessings/${data["Blessing ID"]}/add-member`,
+                {
+                  method: "PATCH",
+                  body: JSON.stringify({ members: memberIds }),
+                }
+              );
+              if (memberRes.ok) {
+                alert("Added members successfully");
+              } else {
+                alert(
+                  "An error occurred while adding members: " + res.statusText
+                );
+              }
 
-                  guests.forEach((guest) => {
-                    axiosInstance
-                      .post(`/blessings/${res.data["Blessing ID"]}/add-guest`, {
+              await Promise.all(
+                guests.map(async (guest) => {
+                  const g = await fetch(
+                    `/api/blessings/${data["Blessing ID"]}/add-guest`,
+                    {
+                      method: "POST",
+                      body: JSON.stringify({
                         name: guest.Name,
                         email: guest.Email,
                         invited_by: guest.invitedBy || null,
-                      })
-                      .then((res) => {
-                        console.log("added " + guest.Name);
-                      });
-                  });
-                  alert("Successfully added blessing!");
-                }
-              });
+                      }),
+                    }
+                  );
+                  if (g.ok) {
+                    alert("Successfully added guest " + guest.Name);
+                  } else {
+                    alert("Error while adding guest " + guest.Name);
+                  }
+                })
+              );
+            }
+
             setShowModal(false);
           }}
           message="Are you sure you want to add the data?"

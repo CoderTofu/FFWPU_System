@@ -5,7 +5,6 @@ import Table from "@/components/Table";
 import { useParams, useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import { Search, ChevronDown } from "lucide-react";
-import { axiosInstance } from "@/app/axiosInstance";
 export default function ViewBlessing() {
   const router = useRouter();
   const [selectedRow, setSelectedRow] = useState<{
@@ -23,9 +22,15 @@ export default function ViewBlessing() {
     sm: ["Blessing ID", "Blessing Date"],
   };
   useEffect(() => {
-    axiosInstance.get(`/blessings`).then((res) => {
-      setBlessings(res.data);
-    });
+    (async function () {
+      const res = await fetch("/api/blessings", { method: "GET" });
+      if (res.ok) {
+        const data = await res.json();
+        setBlessings(data);
+      } else {
+        alert("An error occurred while fetching blessings: " + res.statusText);
+      }
+    })();
   }, []);
 
   // const [blessing, setBlessing] = useState([
@@ -94,7 +99,7 @@ export default function ViewBlessing() {
   };
 
   const [isOpen, setIsOpen] = useState(false);
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     // if (selectedRow) {
     //   setBlessings(
     //     blessings.filter(
@@ -102,10 +107,15 @@ export default function ViewBlessing() {
     //     )
     //   );
     // }
-    axiosInstance
-      .delete(`/blessings/${rowToDelete["Blessing ID"]}`)
-      .then(() => location.reload());
 
+    const res = await fetch(`/api/blessings/${rowToDelete["Blessing ID"]}`, {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      location.reload();
+    } else {
+      alert("An error occurred while deleting blessing: " + res.statusText);
+    }
     setIsOpen(false);
   };
 
