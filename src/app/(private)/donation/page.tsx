@@ -6,6 +6,7 @@ import Modal from "@/components/Modal";
 import Table from "@/components/Table";
 import DonationModals from "@/components/DonationModals";
 import { axiosInstance } from "@/app/axiosInstance";
+import { Currency } from "lucide-react";
 interface DataItem {
   "Donation ID": number;
   "Member ID": number;
@@ -118,6 +119,7 @@ export default function Donation() {
           Date: donation.Date,
           Church: donation.Church["Name"],
           Amount: donation.Amount,
+          Currency: donation.Currency,
         };
       });
       setData(simplified);
@@ -127,7 +129,15 @@ export default function Donation() {
   }, []);
 
   const column = {
-    lg: ["Donation ID", "Member ID", "Full Name", "Date", "Church", "Amount"],
+    lg: [
+      "Donation ID",
+      "Member ID",
+      "Full Name",
+      "Date",
+      "Church",
+      "Amount",
+      "Currency",
+    ],
     md: ["Donation ID", "Name", "Date", "Amount"],
     sm: ["Name", "Amount"],
   };
