@@ -198,11 +198,19 @@ export default function EventInfo() {
         <Modal
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
-          onConfirm={() => {
+          onConfirm={async () => {
             console.log("Deleting event...");
-            axiosInstance
-              .delete(`/worship/${rowToDelete["Worship ID"]}`)
-              .then(() => location.reload());
+            const resp = await fetch(
+              `/api/event/${rowToDelete["Worship ID"]}`,
+              { method: "DELETE" }
+            );
+            if (resp.ok) {
+              location.reload();
+            } else {
+              alert(
+                "An error occurred while deleting worship: " + resp.statusText
+              );
+            }
             setShowDeleteModal(false);
           }}
           message="Are you sure you want to delete this worship event?"

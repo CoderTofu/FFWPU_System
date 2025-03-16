@@ -1,6 +1,5 @@
 "use client";
 
-import { axiosInstance } from "@/app/axiosInstance";
 import Table from "@/components/Table";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,14 +15,26 @@ export default function ViewWorship() {
   const [church, setChurch] = useState("");
 
   useEffect(() => {
-    axiosInstance.get(`worship/${params.eventID}`).then((res) => {
-      setAttendees(res.data.Attendees);
-      setWorshipInfo(res.data);
-      setGuests(res.data.Guests);
-    });
-    axiosInstance.get("/members/church").then((res) => {
-      setChurches(res.data);
-    });
+    (async function () {
+      const res = await fetch(`/api/event/${params.eventID}`, {
+        method: "GET",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAttendees(data.Attendees);
+        setWorshipInfo(data);
+        setGuests(data.Guests);
+      } else {
+        alert("An error occurred while fetching event: " + res.statusText);
+      }
+
+      const c = await fetch("/api/members/church", { method: "GET" });
+      if (c.ok) {
+        setChurches(await c.json());
+      } else {
+        alert("An error occurred while fetching churches: " + c.statusText);
+      }
+    })();
   }, []);
 
   useEffect(() => {

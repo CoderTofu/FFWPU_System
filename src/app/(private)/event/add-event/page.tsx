@@ -12,20 +12,13 @@ import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { axiosInstance } from "@/app/axiosInstance";
+import { useRouter } from "next/navigation";
 
 export default function AddWorshipEvent() {
   const [memberIds, setMemberIds] = useState([]);
   const [members, setMembers] = useState([]);
   const worshipTypes = { Onsite: 1, Online: 2 };
-  // const [members, setMembers] = useState([
-  //   { "Member ID": "M001", Name: "Binose" },
-  //   { "Member ID": "M002", Name: "Lans" },
-  //   { "Member ID": "M001", Name: "Ye Em" },
-  //   { "Member ID": "M002", Name: "Cess" },
-  //   { "Member ID": "M001", Name: "Dril" },
-  //   { "Member ID": "M002", Name: "Pao" },
-  // ]);
-
+  const router = useRouter();
   const [guests, setGuests] = useState([]);
 
   const [selectedMember, setSelectedMember] = useState(null);
@@ -57,7 +50,14 @@ export default function AddWorshipEvent() {
   const [church, setChurch] = useState(null);
 
   useEffect(() => {
-    axiosInstance.get("/members/church").then((res) => setChurches(res.data));
+    (async function () {
+      const resp = await fetch("/api/members/church", { method: "GET" });
+      if (resp.ok) {
+        setChurches(await resp.json());
+      } else {
+        alert("An error occurred while fetching churches: " + resp.statusText);
+      }
+    })();
   }, []);
   const handleDeleteImage = (index: number) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
@@ -81,17 +81,30 @@ export default function AddWorshipEvent() {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
   useEffect(() => {
-    const fetched = [];
-    memberIds.forEach((id) => {
-      axiosInstance
-        .get(`/members/${id}`)
-        .then((res) => {
-          fetched.push(res.data);
+    const fetchMembers = async () => {
+      const fetched = await Promise.all(
+        memberIds.map(async (id) => {
+          try {
+            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+            if (resp.ok) {
+              return await resp.json();
+            } else {
+              alert("Error while fetching member id: " + id);
+              return null; // Return null or handle the error case
+            }
+          } catch (error) {
+            console.error("Error fetching member:", error);
+            return null; // Return null or handle the error case
+          }
         })
-        .finally(() => {
-          setMembers(fetched);
-        });
-    });
+      );
+
+      // Filter out any null values (from failed fetches)
+      const validMembers = fetched.filter((member) => member !== null);
+      setMembers(validMembers);
+    };
+
+    fetchMembers();
   }, [memberIds]);
 
   useEffect(() => {
@@ -326,50 +339,56 @@ export default function AddWorshipEvent() {
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
-          onConfirm={() => {
+          onConfirm={async () => {
             console.log("Saving...");
-            axiosInstance
-              .post("/worship/", {
-                name: eventName,
-                date: date,
-                worship_type: worshipTypes[worshipType],
-                church: church.ID,
-              })
-              .then((res) => {
-                if (res.status === 201) {
-                  console.log(res.data);
-                  alert("Successfully added worship! " + res.data);
-                  console.log(res.data);
-
-                  const addedID = res.data["Worship ID"];
-                  memberIds.forEach((id) => {
-                    axiosInstance
-                      .post(`/worship/${addedID}/add-attendee`, {
-                        member_id: id,
-                      })
-                      .then((res) => {
-                        console.log("added " + id);
-                      });
-                  });
-                  guests.forEach((guest) => {
-                    axiosInstance
-                      .post(`/worship/${addedID}/add-guest`, {
-                        name: guest.Name,
-                        email: guest.Email,
-                        invited_by: guest.invitedBy || null,
-                      })
-                      .then((res) => {
-                        console.log("added " + guest.Name);
-                      });
-                  });
-                } else {
-                  alert(
-                    "An error occurred while adding worship: " + res.statusText
-                  );
-                }
+            try {
+              const resp = await fetch("/api/event/", {
+                method: "POST",
+                body: JSON.stringify({
+                  name: eventName,
+                  date: date,
+                  worship_type: worshipTypes[worshipType],
+                  church: church.ID,
+                }),
               });
 
+              const addedID = (await resp.json())["Worship ID"];
+              await Promise.all([
+                ...memberIds.map(async (id) => {
+                  const resp = await fetch(
+                    `/api/event/${addedID}/add-attendee`,
+                    {
+                      method: "POST",
+                      body: JSON.stringify({
+                        event_id: addedID,
+                        member_id: id,
+                      }),
+                    }
+                  );
+                  if (!resp.ok) {
+                    alert("Error adding member " + id);
+                  }
+                }),
+                ...guests.map(async (guest) => {
+                  const resp = await fetch(`/api/event/${addedID}/add-guest`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                      event_id: addedID,
+                      name: guest.Name,
+                      email: guest.Email,
+                      invited_by: guest.invitedBy || null,
+                    }),
+                  });
+                  if (!resp.ok) {
+                    alert("Error adding guest" + guest.Name);
+                  }
+                }),
+              ]);
+            } catch (err) {
+              alert("Error while adding event: " + err);
+            }
             setShowModal(false);
+            router.push("/event");
           }}
           message="Are you sure you want to add this worship event?"
           confirmText="Add"

@@ -23,6 +23,7 @@ export default function EditWorshipEvent() {
   const [attendees, setAttendees] = useState([]);
   const [guests, setGuests] = useState([]);
   const [churches, setChurches] = useState([]);
+
   const [memberIds, setMemberIds] = useState([]);
   const worshipTypes = { Onsite: 1, Online: 2 };
   const [worshipType, setWorshipType] = useState("");
@@ -83,19 +84,30 @@ export default function EditWorshipEvent() {
   }, [churches, worshipInfo]);
 
   useEffect(() => {
-    const fetched = [];
-    memberIds.forEach(async (id) => {
-      const resp = await fetch(`/api/members/${id}`, { method: "GET" });
-      if (resp.ok) {
-        const data = await resp.json();
-        fetched.push(data);
-      } else {
-        alert("Error while fetching member id: " + id);
-      }
-    });
-    if (fetched.length > 0) {
-      setAttendees([...fetched]);
-    }
+    const fetchMembers = async () => {
+      const fetched = await Promise.all(
+        memberIds.map(async (id) => {
+          try {
+            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+            if (resp.ok) {
+              return await resp.json();
+            } else {
+              alert("Error while fetching member id: " + id);
+              return null; // Return null or handle the error case
+            }
+          } catch (error) {
+            console.error("Error fetching member:", error);
+            return null; // Return null or handle the error case
+          }
+        })
+      );
+
+      // Filter out any null values (from failed fetches)
+      const validMembers = fetched.filter((member) => member !== null);
+      setAttendees(validMembers);
+    };
+
+    fetchMembers();
   }, [memberIds]);
 
   const toggleDropdown = (dropdown) => {
@@ -125,7 +137,10 @@ export default function EditWorshipEvent() {
     console.log("Deleting Guest: " + selectedGuest);
     const resp = await fetch(`/api/event/${params.eventID}/remove-guest`, {
       method: "POST",
-      body: JSON.stringify({ guest_id: selectedGuest["Guest ID"] }),
+      body: JSON.stringify({
+        event_id: params.eventID,
+        guest_id: selectedGuest["Guest ID"],
+      }),
     });
     if (resp.ok) {
       location.reload();
@@ -134,19 +149,21 @@ export default function EditWorshipEvent() {
     }
   };
 
-  const handleMemberDelete = () => {
+  const handleMemberDelete = async () => {
     // setMembers(members.filter((member) => member !== selectedMember));
     console.log(selectedMember);
-    axiosInstance
-      .post(`/worship/${params.eventID}/remove-attendee`, {
+    const resp = await fetch(`/api/event/${params.eventID}/remove-attendee`, {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: params.eventID,
         member_id: selectedMember["Member ID"],
-      })
-      .then((res) => {
-        console.log(res.status);
-      })
-      .finally(() => {
-        location.reload();
-      });
+      }),
+    });
+    if (resp.ok) {
+      location.reload();
+    } else {
+      alert("An error occurred while deleting attendee: " + resp.statusText);
+    }
   };
 
   return (
@@ -383,49 +400,56 @@ export default function EditWorshipEvent() {
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
-          onConfirm={() => {
+          onConfirm={async () => {
             console.log("Updating...");
-            axiosInstance
-              .patch(`/worship/${params.eventID}`, {
-                name: eventName,
-                date: date,
-                worship_type: worshipTypes[worshipType],
-                church: church.ID,
-              })
-              .then((res) => {
-                if (res.status === 200) {
-                  console.log(res.data);
-                  alert("Successfully edited worship! " + res.data);
-                  console.log(res.data);
-
-                  const addedID = res.data["Worship ID"];
-                  memberIds.forEach((id) => {
-                    axiosInstance
-                      .post(`/worship/${addedID}/add-attendee`, {
-                        member_id: id,
-                      })
-                      .then((res) => {
-                        console.log("added " + id);
-                      });
-                  });
-
-                  newGuests.forEach((guest) => {
-                    axiosInstance
-                      .post(`/worship/${addedID}/add-guest`, {
-                        name: guest.Name,
-                        email: guest.Email,
-                        invited_by: guest.invitedBy || null,
-                      })
-                      .then((res) => {
-                        console.log("added " + guest.Name);
-                      });
-                  });
-                } else {
-                  alert(
-                    "An error occurred while adding worship: " + res.statusText
-                  );
-                }
+            try {
+              const res = await fetch(`/api/event/${params.eventID}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                  name: eventName,
+                  date,
+                  worship_type: worshipTypes[worshipType],
+                  church: church.ID,
+                }),
               });
+              const data = await res.json();
+              const addedID = data["Worship ID"];
+              await Promise.all([
+                ...memberIds.map(async (id) => {
+                  const resp = await fetch(
+                    `/api/event/${addedID}/add-attendee`,
+                    {
+                      method: "POST",
+                      body: JSON.stringify({
+                        event_id: addedID,
+                        member_id: id,
+                      }),
+                    }
+                  );
+                  if (!resp.ok) {
+                    alert("Error adding member " + id);
+                  }
+                }),
+                ...newGuests.map(async (guest) => {
+                  const resp = await fetch(`/api/event/${addedID}/add-guest`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                      event_id: addedID,
+                      name: guest.Name,
+                      email: guest.Email,
+                      invited_by: guest.invitedBy || null,
+                    }),
+                  });
+                  if (!resp.ok) {
+                    alert("Error adding guest" + guest.Name);
+                  }
+                }),
+              ]);
+              location.reload();
+            } catch (err) {
+              alert("Error while editing worship: " + err);
+            }
+
             setShowModal(false);
           }}
           message="Are you sure you want to update this worship event?"
@@ -444,6 +468,7 @@ export default function EditWorshipEvent() {
               if (memberIds.includes(formData.memberId)) {
                 alert(`${formData.memberId} was already added to the event.`);
               } else {
+                console.log("adding");
                 setMemberIds((prev) => [...prev, formData.memberId]);
               }
             } else {

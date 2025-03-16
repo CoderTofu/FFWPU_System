@@ -1,12 +1,17 @@
 "use server";
 
 import { axiosInstance } from "@/app/axiosInstance";
-import { getAccessToken, getRefreshToken, setTokens } from "@/lib/auth";
+import {
+  fetchWithAuth,
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+} from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const response = await axiosInstance.get("/members", {
-    headers: { Authorization: `Bearer ${await getAccessToken()}` },
+  const response = await fetchWithAuth("/members", {
+    method: "GET",
   });
   if (response.status >= 200 && response.status <= 299)
     return NextResponse.json(response.data);

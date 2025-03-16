@@ -1,3 +1,4 @@
+import { axiosInstance } from "@/app/axiosInstance";
 import { cookies } from "next/headers";
 
 export async function getAccessToken() {
@@ -49,4 +50,28 @@ export async function refreshToken(refresh_token) {
     return access;
   }
   return null;
+}
+
+export async function fetchWithAuth(url, options = {}) {
+  let access_token = await getAccessToken();
+  let refresh_token = await getRefreshToken();
+
+  options.headers = {
+    ...options.headers,
+    Authorization: `Bearer ${access_token}`,
+  };
+  let response;
+  const final =
+    options.method !== "GET"
+      ? { ...options, url, data: options.body }
+      : { ...options, url };
+  try {
+    response = await axiosInstance.request(final);
+    return response;
+  } catch (err) {
+    access_token = await refreshToken(refresh_token);
+    options.headers.Authorization = `Bearer ${access_token}`;
+    response = await axiosInstance.request(final);
+    return response;
+  }
 }

@@ -1,10 +1,15 @@
 import { NextResponse, NextRequest } from "next/server";
 import isAuthenticated from "./isAuthenticated";
-import { getAccessToken, getRefreshToken, refreshToken } from "./lib/auth";
+import {
+  getAccessToken,
+  getRefreshToken,
+  refreshToken,
+  setTokens,
+} from "./lib/auth";
 
 export async function middleware(request: NextRequest) {
-  let access_token = await getAccessToken();
-  const refresh_token = await getRefreshToken();
+  let access_token = request.cookies.get("access_token")?.value;
+  const refresh_token = request.cookies.get("refresh_token")?.value;
   const pathname = request.nextUrl.pathname;
 
   if (!refresh_token) {
@@ -14,7 +19,6 @@ export async function middleware(request: NextRequest) {
   if (!access_token && refresh_token) {
     access_token = await refreshToken(refresh_token);
   }
-
   if (!pathname.startsWith("/api")) {
     if (access_token) {
       if (pathname.startsWith("/login"))
@@ -24,10 +28,8 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith("/login")) return NextResponse.next();
     return NextResponse.redirect(new URL("/login", request.url));
   }
-  console.log(request.headers);
-  return NextResponse.next({
-    headers: { Authorization: `Bearer ${access_token}` },
-  });
+
+  return NextResponse.next();
 }
 
 export const config = {
@@ -41,6 +43,5 @@ export const config = {
     "/event/:path*",
     "/blessings/:path*",
     "/api/:path*",
-    // "/logout",
   ],
 };

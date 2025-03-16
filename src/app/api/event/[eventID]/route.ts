@@ -1,6 +1,6 @@
 "use server";
 
-import { getAccessToken } from "@/lib/auth";
+import { fetchWithAuth, getAccessToken } from "@/lib/auth";
 import { NextApiRequest } from "next";
 import { headers } from "next/headers";
 import { axiosInstance } from "@/app/axiosInstance";
@@ -11,8 +11,8 @@ export async function GET(
   { params }: { params: { eventID: string } }
 ) {
   const { eventID } = params;
-  const resp = await axiosInstance.get(`/worship/${eventID}`, {
-    headers: { Authorization: `Bearer ${await getAccessToken()}` },
+  const resp = await fetchWithAuth(`/worship/${eventID}`, {
+    method: "GET",
   });
   if (resp.status >= 200 && resp.status <= 299) {
     return NextResponse.json(resp.data);
@@ -20,14 +20,30 @@ export async function GET(
   return NextResponse.json({});
 }
 
-export async function DELETE(request: NextApiRequest) {
-  const ref = await fetch("/api/refresh-token", {
-    method: "GET",
-  });
+export async function DELETE(request: NextApiRequest, { params }) {
+  const { eventID } = await params;
+  const resp = await fetchWithAuth(`/worship/${eventID}`, { method: "DELETE" });
+  if (resp.status >= 200 && resp.status <= 299) {
+    return NextResponse.json(resp.data);
+  }
+  return NextResponse.json({});
 }
 
-export async function PATCH(request: Request) {
-  const ref = await fetch("/api/refresh-token", {
-    method: "GET",
-  });
+export async function PATCH(
+  request: Request,
+  { params }: { params: { eventID: string } }
+) {
+  const body = await request.json();
+  const { eventID } = await params;
+  console.log(body);
+  try {
+    const resp = await fetchWithAuth(`/worship/${eventID}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+
+    return Response.json(resp.data);
+  } catch (err) {
+    return Response.json({});
+  }
 }
