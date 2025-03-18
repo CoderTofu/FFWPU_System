@@ -1,4 +1,14 @@
-export default function EditDonation() {
-    return <div>edit</div>;
-  }
-  
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+export default function Member() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/donation");
+  }, [router]);
+
+  return null;
+}
