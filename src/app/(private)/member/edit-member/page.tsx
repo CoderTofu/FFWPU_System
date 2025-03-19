@@ -2,43 +2,64 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ImageIcon } from "lucide-react"
 
-export default function AddMemberForm() {
-  const [formData, setFormData] = useState({
-    givenName: "",
-    middleName: "",
-    familyName: "",
-    gender: "",
-    birthdate: "",
-    age: "",
-    region: "",
-    subRegion: "",
-    maritalStatus: "",
-    nation: "",
+export default function EditMemberForm() {
+  // Dummy data for editing
+  const dummyMember = {
+    givenName: "Taylor Marie",
+    middleName: "Swift",
+    familyName: "Batumbakal",
+    gender: "Female",
+    birthdate: "1989-12-13",
+    age: "35",
+    region: "North America",
+    subRegion: "SR1",
+    maritalStatus: "Single",
+    nation: "Philippines",
     spouseName: "",
-    phone: "",
-    email: "",
-    address: "",
-    generation: "",
-    blessingStatus: "",
-    spiritualBirthday: "",
-    spiritualParent: "",
-    membershipCategory: "",
+    phone: "09999999999",
+    email: "taylormariebatumbakal@gmail.com",
+    address: "General Luna, corner Muralla St, Intramuros, Manila, 1002 Metro Manila",
+    generation: "1st",
+    blessingStatus: "Blessed",
+    spiritualBirthday: "2024-01-31",
+    spiritualParent: "Rafael Dionisio",
+    membershipCategory: "Member",
+    profileImage: "/placeholder.svg?height=200&width=200",
     missionHistory: [
       {
-        role: "",
-        organization: "",
-        country: "",
-        startDate: "",
-        endDate: "",
+        role: "Priest",
+        organization: "Main Branch",
+        country: "Philippines",
+        startDate: "2025-01-31",
+        endDate: "2030-02-14",
+      },
+      {
+        role: "Staff",
+        organization: "2nd Branch",
+        country: "Philippines",
+        startDate: "2024-06-19",
+        endDate: "2029-07-18",
       },
     ],
-  })
+  }
 
-  const [image, setImage] = useState<string | null>(null)
+  const [formData, setFormData] = useState(dummyMember)
+  const [image, setImage] = useState<string | null>(dummyMember.profileImage)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Simulate loading data
+  useEffect(() => {
+    // In a real app, you would fetch the member data here
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -103,7 +124,19 @@ export default function AddMemberForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Form validation and submission logic
-    console.log("Form submitted:", formData)
+    console.log("Member updated:", formData)
+    alert("Member updated successfully!")
+  }
+
+  if (isLoading) {
+    return (
+      <div className="p-4 md:p-8 bg-[#D9D9D9] min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-lg font-medium">Loading member data...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -298,7 +331,6 @@ export default function AddMemberForm() {
                       name="spouseName"
                       value={formData.spouseName}
                       onChange={handleChange}
-                      required
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -362,7 +394,7 @@ export default function AddMemberForm() {
                   {image ? (
                     <img
                       src={image || "/placeholder.svg"}
-                      alt="Uploaded preview"
+                      alt="Profile preview"
                       className="w-full h-full object-cover"
                     />
                   ) : (
