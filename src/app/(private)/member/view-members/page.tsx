@@ -75,12 +75,12 @@ export default function Member() {
 
   const handleEditClick = () => {
     if (selectedRow) {
-      router.push(`/member/edit-member/${selectedRow["Member ID"]}`);
+      router.push(`/member/edit-member/${selectedRow[dataID]}`);
     }
   };
 
   const handleAddClick = () => {
-    // Handle add click
+    router.push("/member/add-member");
   };
 
   const handleDeleteClick = () => {
@@ -108,14 +108,14 @@ export default function Member() {
   );
 
   return (
-    <div className="p-4 bg-[#D9D9D9] min-h-screen flex flex-col items-center">
-      {/* Title Section */}
-      <div className="w-full max-w-[1450px] mt-6 bg-white rounded-md drop-shadow-lg p-4">
-        <p className="text-center text-3xl font-bold">MEMBER INFORMATION</p>
+    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
+        <p className="text-3xl font-bold uppercase">MEMBER INFORMATION</p>
       </div>
 
       {/* Search & Filters Section */}
-      <div className="w-full max-w-[1450px] flex flex-col md:flex-row items-start gap-4 p-4 mt-6">
+      <div className="w-full flex flex-wrap items-center justify-between mt-[30px] gap-4">
         {/* Search Bar */}
         <div className="relative w-80">
           <Search
@@ -293,7 +293,7 @@ export default function Member() {
       </div>
 
       {/* Table Section */}
-      <div className="w-full max-w-[1450px] mt-1 overflow-hidden rounded-lg">
+      <div className="w-full mt-[25px]">
         {filteredData.length > 0 ? (
           <Table
             data={filteredData}
@@ -311,7 +311,7 @@ export default function Member() {
 
       {/* Button Section */}
       {filteredData.length > 0 && (
-        <div className="flex items-center justify-center h-32 gap-4">
+        <div className="w-full flex flex-wrap justify-center gap-[22px] mt-[28px] mb-[15px]">
           <button
             onClick={handleAddClick}
             className="w-20 h-10 flex items-center justify-center rounded mb-4 m-4 bg-[#01438F] text-[#FCC346] hover:bg-blue-600 font-bold text-base"
