@@ -12,10 +12,6 @@ export async function middleware(request: NextRequest) {
   const refresh_token = request.cookies.get("refresh_token")?.value;
   const pathname = request.nextUrl.pathname;
 
-  if (!refresh_token) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
   if (!access_token && refresh_token) {
     access_token = await refreshToken(refresh_token);
   }
