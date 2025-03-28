@@ -229,7 +229,7 @@ export default function EventInfo() {
       <div className="w-full flex flex-wrap justify-center gap-[22px] mt-[28px] mb-[15px]">
         <button
           onClick={() => router.push("/event/add-event")}
-          className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+          className="w-20 h-10 flex items-center justify-center rounded mb-4 m-4 bg-[#01438F] text-[#FCC346] hover:bg-blue-600 font-bold text-base"
         >
           ADD
         </button>
@@ -239,22 +239,22 @@ export default function EventInfo() {
             router.push(`/event/edit-event/${selectedRow[dataID]}`)
           }
           disabled={!selectedRow}
-          className={`px-6 py-2 rounded ${
+          className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
             selectedRow
-              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
-          }`}
+              ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          } font-bold text-base`}
         >
           EDIT
         </button>
         <button
           onClick={() => setShowDeleteModal(true)}
           disabled={!selectedRow}
-          className={`px-6 py-2 rounded ${
+          className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
             selectedRow
-              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
-          }`}
+              ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          } font-bold text-base`}
         >
           DELETE
         </button>

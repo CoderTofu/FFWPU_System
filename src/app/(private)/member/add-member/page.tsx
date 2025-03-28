@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { ImageIcon } from "lucide-react"
+import { useState } from "react";
+import { ImageIcon } from "lucide-react";
 
 export default function AddMemberForm() {
   const [formData, setFormData] = useState({
@@ -35,30 +35,32 @@ export default function AddMemberForm() {
         endDate: "",
       },
     ],
-  })
+  });
 
-  const [image, setImage] = useState<string | null>(null)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [image, setImage] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleHistoryChange = (index: number, field: string, value: string) => {
-    const updatedHistory = [...formData.missionHistory]
+    const updatedHistory = [...formData.missionHistory];
     updatedHistory[index] = {
       ...updatedHistory[index],
       [field]: value,
-    }
+    };
     setFormData((prev) => ({
       ...prev,
       missionHistory: updatedHistory,
-    }))
-  }
+    }));
+  };
 
   const addHistory = () => {
     setFormData((prev) => ({
@@ -73,51 +75,52 @@ export default function AddMemberForm() {
           endDate: "",
         },
       ],
-    }))
-  }
+    }));
+  };
 
   const removeHistory = (index: number) => {
-    const updatedHistory = [...formData.missionHistory]
-    updatedHistory.splice(index, 1)
+    const updatedHistory = [...formData.missionHistory];
+    updatedHistory.splice(index, 1);
     setFormData((prev) => ({
       ...prev,
       missionHistory: updatedHistory,
-    }))
-  }
+    }));
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      const reader = new FileReader()
+      const file = e.target.files[0];
+      const reader = new FileReader();
 
       reader.onload = (event) => {
         if (event.target && typeof event.target.result === "string") {
-          setImage(event.target.result)
+          setImage(event.target.result);
         }
-      }
+      };
 
-      reader.readAsDataURL(file)
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Form validation and submission logic
-    console.log("Form submitted:", formData)
-  }
+    console.log("Form submitted:", formData);
+  };
 
   return (
-    <div className="p-4 md:p-8 bg-[#D9D9D9] min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center mb-4 justify-center">
+        <p className="text-3xl font-bold uppercase">ADD MEMBER</p>
+      </div>
+      <div className="mx-auto">
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Banner */}
-          <div className="bg-white p-4 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] rounded-md">
-            <h1 className="my-4 text-center text-xl md:text-2xl lg:text-3xl font-semibold">ADD MEMBER</h1>
-          </div>
-
           {/* Personal Information Section */}
           <section className="bg-white p-6 rounded-md shadow-sm">
-            <h2 className="text-lg text-[#BE9231] font-bold mb-6">PERSONAL INFORMATION</h2>
+            <h2 className="text-lg text-[#BE9231] font-bold mb-6">
+              PERSONAL INFORMATION
+            </h2>
 
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Form Fields */}
@@ -137,7 +140,11 @@ export default function AddMemberForm() {
                       required
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    {errors.givenName && <p className="text-[#E00000] text-xs mt-1">Given Name is Required</p>}
+                    {errors.givenName && (
+                      <p className="text-[#E00000] text-xs mt-1">
+                        Given Name is Required
+                      </p>
+                    )}
                   </div>
 
                   {/* Middle Name */}
@@ -167,7 +174,11 @@ export default function AddMemberForm() {
                       required
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    {errors.familyName && <p className="text-[#E00000] text-xs mt-1">Family Name is Required</p>}
+                    {errors.familyName && (
+                      <p className="text-[#E00000] text-xs mt-1">
+                        Family Name is Required
+                      </p>
+                    )}
                   </div>
 
                   {/* Gender */}
@@ -336,7 +347,11 @@ export default function AddMemberForm() {
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="example@mail.com"
                     />
-                    {errors.email && <p className="text-[#E00000] text-xs mt-1">Please Enter a Valid Email</p>}
+                    {errors.email && (
+                      <p className="text-[#E00000] text-xs mt-1">
+                        Please Enter a Valid Email
+                      </p>
+                    )}
                   </div>
 
                   {/* Address */}
@@ -389,7 +404,9 @@ export default function AddMemberForm() {
 
           {/* Spiritual Information Section */}
           <section className="bg-white p-6 rounded-md shadow-sm">
-            <h2 className="text-lg text-[#BE9231] font-bold mb-6">SPIRITUAL INFORMATION</h2>
+            <h2 className="text-lg text-[#BE9231] font-bold mb-6">
+              SPIRITUAL INFORMATION
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {/* Generation */}
               <div>
@@ -470,39 +487,57 @@ export default function AddMemberForm() {
 
           {/* Mission History Section */}
           <section className="bg-white p-6 rounded-md shadow-sm">
-            <h2 className="text-lg text-[#BE9231] font-bold mb-6">MISSION HISTORY</h2>
+            <h2 className="text-lg text-[#BE9231] font-bold mb-6">
+              MISSION HISTORY
+            </h2>
 
             {formData.missionHistory.map((entry, index) => (
               <div key={index} className="flex flex-col lg:flex-row mb-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 flex-grow">
                   {/* Mission Title/Role */}
                   <div>
-                    <label className="block text-sm font-medium mb-1">Mission Title/Role</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Mission Title/Role
+                    </label>
                     <input
                       type="text"
                       value={entry.role}
-                      onChange={(e) => handleHistoryChange(index, "role", e.target.value)}
+                      onChange={(e) =>
+                        handleHistoryChange(index, "role", e.target.value)
+                      }
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
                   {/* Organization */}
                   <div>
-                    <label className="block text-sm font-medium mb-1">Organization</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Organization
+                    </label>
                     <input
                       type="text"
                       value={entry.organization}
-                      onChange={(e) => handleHistoryChange(index, "organization", e.target.value)}
+                      onChange={(e) =>
+                        handleHistoryChange(
+                          index,
+                          "organization",
+                          e.target.value
+                        )
+                      }
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
                   {/* Country */}
                   <div>
-                    <label className="block text-sm font-medium mb-1">Country</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Country
+                    </label>
                     <select
                       value={entry.country}
-                      onChange={(e) => handleHistoryChange(index, "country", e.target.value)}
+                      onChange={(e) =>
+                        handleHistoryChange(index, "country", e.target.value)
+                      }
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                     >
                       <option value="">SELECT</option>
@@ -513,22 +548,30 @@ export default function AddMemberForm() {
 
                   {/* Start Date */}
                   <div>
-                    <label className="block text-sm font-medium mb-1">Start Date</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Start Date
+                    </label>
                     <input
                       type="date"
                       value={entry.startDate}
-                      onChange={(e) => handleHistoryChange(index, "startDate", e.target.value)}
+                      onChange={(e) =>
+                        handleHistoryChange(index, "startDate", e.target.value)
+                      }
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
                   {/* End Date */}
                   <div>
-                    <label className="block text-sm font-medium mb-1">End Date</label>
+                    <label className="block text-sm font-medium mb-1">
+                      End Date
+                    </label>
                     <input
                       type="date"
                       value={entry.endDate}
-                      onChange={(e) => handleHistoryChange(index, "endDate", e.target.value)}
+                      onChange={(e) =>
+                        handleHistoryChange(index, "endDate", e.target.value)
+                      }
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -570,5 +613,5 @@ export default function AddMemberForm() {
         </form>
       </div>
     </div>
-  )
+  );
 }
