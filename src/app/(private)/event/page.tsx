@@ -5,105 +5,32 @@ import { useRouter } from "next/navigation";
 import Table from "@/components/Table";
 import { Search, ChevronDown } from "lucide-react";
 import Modal from "@/components/Modal";
+import { axiosInstance } from "@/app/axiosInstance";
 
 export default function EventInfo() {
   const router = useRouter();
+  const [data, setData] = useState([]);
 
-  // Sample event data for the table
-  const data = [
-    {
-      "Worship ID": 2001,
-      Name: "Sunday Service",
-      Date: "2024-02-01",
-      Church: "Manila Cathedral",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2002,
-      Name: "Bible Study",
-      Date: "2024-02-02",
-      Church: "San Agustin Church",
-      Type: "Online",
-    },
-    {
-      "Worship ID": 2003,
-      Name: "Youth Fellowship",
-      Date: "2024-02-03",
-      Church: "Sto. Nino de Pandacan Parish Church",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2001,
-      Name: "Sunday Service",
-      Date: "2024-02-01",
-      Church: "Manila Cathedral",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2002,
-      Name: "Bible Study",
-      Date: "2024-02-02",
-      Church: "San Agustin Church",
-      Type: "Online",
-    },
-    {
-      "Worship ID": 2003,
-      Name: "Youth Fellowship",
-      Date: "2024-02-03",
-      Church: "Sto. Nino de Pandacan Parish Church",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2001,
-      Name: "Sunday Service",
-      Date: "2024-02-01",
-      Church: "Manila Cathedral",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2002,
-      Name: "Bible Study",
-      Date: "2024-02-02",
-      Church: "San Agustin Church",
-      Type: "Online",
-    },
-    {
-      "Worship ID": 2003,
-      Name: "Youth Fellowship",
-      Date: "2024-02-03",
-      Church: "Sto. Nino de Pandacan Parish Church",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2001,
-      Name: "Sunday Service",
-      Date: "2024-02-01",
-      Church: "Manila Cathedral",
-      Type: "Onsite",
-    },
-    {
-      "Worship ID": 2002,
-      Name: "Bible Study",
-      Date: "2024-02-02",
-      Church: "San Agustin Church",
-      Type: "Online",
-    },
-    {
-      "Worship ID": 2003,
-      Name: "Youth Fellowship",
-      Date: "2024-02-03",
-      Church: "Sto. Nino de Pandacan Parish Church",
-      Type: "Onsite",
-    },
-  ];
+  useEffect(() => {
+    (async function () {
+      const resp = await fetch("/api/event", { method: "GET" });
+      if (resp.ok) {
+        const data = await resp.json();
+        console.log(data);
+        setData(data);
+      } else {
+        alert("Error while fetching events: " + resp.statusText);
+      }
+    })();
+  }, []);
 
   const dataID = "Worship ID";
 
   // Column configuration for responsive table
   const columnConfig = {
-    lg: ["Worship ID", "Name", "Date", "Church", "Type"],
-    md: ["Name", "Date", "Church", "Type"],
-    sm: ["Name", "Church"],
+    lg: ["Worship ID", "Name", "Date", "Church Name", "Worship Type"],
+    md: ["Name", "Date", "Church Name", "Worship Type"],
+    sm: ["Name", "Church Name"],
   };
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -113,6 +40,7 @@ export default function EventInfo() {
   const [selectedType, setSelectedType] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
+  const [rowToDelete, setRowToDelete] = useState(null);
 
   const toggleDropdown = (dropdown: string) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
@@ -221,7 +149,7 @@ export default function EventInfo() {
           columns={columnConfig}
           rowDoubleClickPath="/event"
           idName={dataID}
-          onRowSelect={(row) => setSelectedRow(row)}
+          onRowSelect={setSelectedRow}
         />
       </div>
 
@@ -248,7 +176,12 @@ export default function EventInfo() {
           EDIT
         </button>
         <button
-          onClick={() => setShowDeleteModal(true)}
+          onClick={() => {
+            if (selectedRow) {
+              setRowToDelete(selectedRow);
+              setShowDeleteModal(true);
+            }
+          }}
           disabled={!selectedRow}
           className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
             selectedRow
@@ -265,8 +198,19 @@ export default function EventInfo() {
         <Modal
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
-          onConfirm={() => {
+          onConfirm={async () => {
             console.log("Deleting event...");
+            const resp = await fetch(
+              `/api/event/${rowToDelete["Worship ID"]}`,
+              { method: "DELETE" }
+            );
+            if (resp.ok) {
+              location.reload();
+            } else {
+              alert(
+                "An error occurred while deleting worship: " + resp.statusText
+              );
+            }
             setShowDeleteModal(false);
           }}
           message="Are you sure you want to delete this worship event?"

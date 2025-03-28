@@ -2,11 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import Table from "@/components/Table";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import { Search, ChevronDown } from "lucide-react";
-
-export default function ViewBlessings() {
+export default function ViewBlessing() {
   const router = useRouter();
   const [selectedRow, setSelectedRow] = useState<{
     "Blessing ID": number;
@@ -15,119 +14,59 @@ export default function ViewBlessings() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const [blessings, setBlessings] = useState([]);
+  const [rowToDelete, setRowToDelete] = useState(null);
   const columns = {
-    lg: ["Blessing ID", "Date", "Name of Blessing", "Year"],
-    md: ["Blessing ID", "Date", "Name of Blessing"],
-    sm: ["Blessing ID", "Date"],
+    lg: ["Blessing ID", "Blessing Date", "Name Of Blessing", "Chaenbo"],
+    md: ["Blessing ID", "Blessing Date", "Name Of Blessing"],
+    sm: ["Blessing ID", "Blessing Date"],
   };
+  useEffect(() => {
+    (async function () {
+      const res = await fetch("/api/blessings", { method: "GET" });
+      if (res.ok) {
+        const data = await res.json();
+        setBlessings(data);
+      } else {
+        alert("An error occurred while fetching blessings: " + res.statusText);
+      }
+    })();
+  }, []);
 
-  const [blessing, setBlessing] = useState([
-    {
-      "Blessing ID": 102010,
-      Date: "02/19/2021",
-      "Name of Blessing": "Blessing 1",
-      Year: 2021,
-    },
-    {
-      "Blessing ID": 124495,
-      Date: "02/21/2025",
-      "Name of Blessing": "First Sunday Event",
-      Year: 2025,
-    },
-    {
-      "Blessing ID": 321345,
-      Date: "02/26/2025",
-      "Name of Blessing": "Blessing 3",
-      Year: 2025,
-    },
-    {
-      "Blessing ID": 124495,
-      Date: "02/21/2025",
-      "Name of Blessing": "Blessing 4",
-      Year: 2019,
-    },
-    {
-      "Blessing ID": 102010,
-      Date: "02/19/2021",
-      "Name of Blessing": "Blessing 1",
-      Year: 2021,
-    },
-    {
-      "Blessing ID": 124495,
-      Date: "02/21/2025",
-      "Name of Blessing": "First Sunday Event",
-      Year: 2025,
-    },
-    {
-      "Blessing ID": 321345,
-      Date: "02/26/2025",
-      "Name of Blessing": "Blessing 3",
-      Year: 2025,
-    },
-    {
-      "Blessing ID": 124495,
-      Date: "02/21/2025",
-      "Name of Blessing": "Blessing 4",
-      Year: 2019,
-    },
-    {
-      "Blessing ID": 102010,
-      Date: "02/19/2021",
-      "Name of Blessing": "Blessing 1",
-      Year: 2021,
-    },
-    {
-      "Blessing ID": 124495,
-      Date: "02/21/2025",
-      "Name of Blessing": "First Sunday Event",
-      Year: 2025,
-    },
-    {
-      "Blessing ID": 321345,
-      Date: "02/26/2025",
-      "Name of Blessing": "Blessing 3",
-      Year: 2025,
-    },
-    {
-      "Blessing ID": 124495,
-      Date: "02/21/2025",
-      "Name of Blessing": "Blessing 4",
-      Year: 2019,
-    },
-    {
-      "Blessing ID": 102010,
-      Date: "02/19/2021",
-      "Name of Blessing": "Blessing 1",
-      Year: 2021,
-    },
-    {
-      "Blessing ID": 124495,
-      Date: "02/21/2025",
-      "Name of Blessing": "First Sunday Event",
-      Year: 2025,
-    },
-    {
-      "Blessing ID": 321345,
-      Date: "02/26/2025",
-      "Name of Blessing": "Blessing 3",
-      Year: 2025,
-    },
-    {
-      "Blessing ID": 124495,
-      Date: "02/21/2025",
-      "Name of Blessing": "Blessing 4",
-      Year: 2019,
-    },
-  ]);
+  // const [blessing, setBlessing] = useState([
+  //   {
+  //     "Blessing ID": 102010,
+  //     Date: "02/19/2021",
+  //     "Name of Blessing": "Blessing 1",
+  //     Year: 2021,
+  //   },
+  //   {
+  //     "Blessing ID": 124495,
+  //     Date: "02/21/2025",
+  //     "Name of Blessing": "First Sunday Event",
+  //     Year: 2025,
+  //   },
+  //   {
+  //     "Blessing ID": 321345,
+  //     Date: "02/26/2025",
+  //     "Name of Blessing": "Blessing 3",
+  //     Year: 2025,
+  //   },
+  //   {
+  //     "Blessing ID": 124495,
+  //     Date: "02/21/2025",
+  //     "Name of Blessing": "Blessing 4",
+  //     Year: 2019,
+  //   },
+  // ]);
 
   // DATA ID
   const dataId = "Blessing ID";
 
-  const availableYears = [
-    "All Years",
-    ...Array.from(new Set(blessing.map((item) => item.Year.toString()))),
-  ];
+  // const availableYears = [
+  //   "All Years",
+  //   ...Array.from(new Set(blessings.map((item) => item.Year.toString()))),
+  // ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -142,15 +81,15 @@ export default function ViewBlessings() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredData = blessing.filter(
+  const filteredData = blessings.filter(
     (item) =>
       Object.values(item)
         .join(" ")
         .toLowerCase()
-        .includes(searchQuery.toLowerCase()) &&
-      (selectedYear && selectedYear !== "All Years"
-        ? item.Year.toString() === selectedYear
-        : true)
+        .includes(searchQuery.toLowerCase())
+    // (selectedYear && selectedYear !== "All Years"
+    //   ? item.Year.toString() === selectedYear
+    //   : true)
   );
 
   const handleEditClick = () => {
@@ -160,20 +99,28 @@ export default function ViewBlessings() {
   };
 
   const [isOpen, setIsOpen] = useState(false);
-  const handleConfirm = () => {
-    if (selectedRow) {
-      setBlessing(
-        blessing.filter(
-          (item) => item["Blessing ID"] !== selectedRow["Blessing ID"]
-        )
-      );
+  const handleConfirm = async () => {
+    // if (selectedRow) {
+    //   setBlessings(
+    //     blessings.filter(
+    //       (item) => item["Blessing ID"] !== selectedRow["Blessing ID"]
+    //     )
+    //   );
+    // }
+
+    const res = await fetch(`/api/blessings/${rowToDelete["Blessing ID"]}`, {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      location.reload();
+    } else {
+      alert("An error occurred while deleting blessing: " + res.statusText);
     }
-    console.log("Data deleted successfully!");
     setIsOpen(false);
   };
 
   return (
-    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
+    <div className="px-0 md:px-[150px] mt-8">
       {/* Header */}
       <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
         <p className="text-3xl font-bold uppercase">BLESSINGS INFORMATION</p>
@@ -257,7 +204,12 @@ export default function ViewBlessings() {
           EDIT
         </button>
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            if (selectedRow) {
+              setRowToDelete(selectedRow);
+              setIsOpen(true);
+            }
+          }}
           disabled={!selectedRow}
           className={`px-4 py-2 rounded ${
             selectedRow
@@ -274,9 +226,9 @@ export default function ViewBlessings() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={handleConfirm}
-        message="Are you sure you want to delete the blessing?"
+        message="Are you sure you want to delete the data?"
         confirmText="Yes"
-        cancelText="Cancel"
+        cancelText="No"
       />
     </div>
   );

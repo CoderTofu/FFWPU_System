@@ -2,25 +2,61 @@
 
 import Table from "@/components/Table";
 import { useParams } from "next/navigation";
-
+import { useEffect, useState } from "react";
 export default function ViewWorship() {
   const params = useParams();
 
   // This is the blessing ID from the URL
   console.log(params.eventID);
+  const [attendees, setAttendees] = useState([]);
+  const [guests, setGuests] = useState([]);
+  const [worshipInfo, setWorshipInfo] = useState({});
+  const [churches, setChurches] = useState([]);
+  const [church, setChurch] = useState("");
 
-  const data = [
-    { ID: 6001, Name: "Orton, Johan H." },
-    { ID: 6002, Name: "Reigns, Jeff T." },
-    { ID: 6003, Name: "Cena, John B." },
-    { ID: 6004, Name: "Hardy, Randy A." },
-    { ID: 6005, Name: "Ambrose, Matt R." },
-  ];
+  useEffect(() => {
+    (async function () {
+      const res = await fetch(`/api/event/${params.eventID}`, {
+        method: "GET",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAttendees(data.Attendees);
+        setWorshipInfo(data);
+        setGuests(data.Guests);
+      } else {
+        alert("An error occurred while fetching event: " + res.statusText);
+      }
+
+      const c = await fetch("/api/members/church", { method: "GET" });
+      if (c.ok) {
+        setChurches(await c.json());
+      } else {
+        alert("An error occurred while fetching churches: " + c.statusText);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    const selectedChurch = churches.filter((church) => {
+      return church.ID == worshipInfo.Church;
+    });
+    if (selectedChurch.length > 0) {
+      setChurch(selectedChurch[0]["Name"]);
+    }
+  }, [churches, worshipInfo]);
+  // const data = [
+  //   { ID: 6001, Name: "Orton, Johan H." },
+  //   { ID: 6002, Name: "Reigns, Jeff T." },
+  //   { ID: 6003, Name: "Cena, John B." },
+  //   { ID: 6004, Name: "Hardy, Randy A." },
+  //   { ID: 6005, Name: "Ambrose, Matt R." },
+  // ];
 
   const columnConfig = {
-    lg: ["ID", "Name"],
-    md: ["ID", "Name"],
-    sm: ["ID", "Name"],
+    lg: ["Member ID", "Full Name"],
+    md: ["Member ID", "Full Name"],
+    sm: ["Member ID", "Full Name"],
   };
 
   return (
@@ -77,7 +113,7 @@ export default function ViewWorship() {
                     <h2 className="text-lg font-semibold mb-2">
                       Members Attended
                     </h2>
-                    <Table data={data} columns={columnConfig} />
+                    <Table data={attendees} columns={columnConfig} />
                   </div>
 
                   {/* Second table */}
@@ -86,8 +122,12 @@ export default function ViewWorship() {
                       Guests Attended
                     </h2>
                     <Table
-                      data={data}
-                      columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+                      data={guests}
+                      columns={{
+                        lg: ["Name", "Email"],
+                        md: ["Name", "Email"],
+                        sm: ["Name"],
+                      }}
                     />
                   </div>
                 </div>
@@ -102,43 +142,43 @@ export default function ViewWorship() {
                 <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Worship ID:</label>
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">Placeholder</p>
+                    <p className="text-base">{worshipInfo["Worship ID"]}</p>
                   </div>
                 </div>
                 <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Event Name:</label>
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">Placeholder</p>
+                    <p className="text-base">{worshipInfo.Name}</p>
                   </div>
                 </div>
                 <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Date:</label>
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">Placeholder</p>
+                    <p className="text-base">{worshipInfo.Date}</p>
                   </div>
                 </div>
-                <div className="flex flex-col mb-1 w-full">
+                {/* <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Sub Region:</label>
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">Placeholder</p>
+                    <p className="text-base"></p>
                   </div>
                 </div>
                 <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Region:</label>
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">Placeholder</p>
+                    <p className="text-base"></p>
                   </div>
-                </div>
+                </div> */}
                 <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Church:</label>
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">Placeholder</p>
+                    <p className="text-base">{church}</p>
                   </div>
                 </div>
                 <div className="flex flex-col mb-1 w-full">
                   <label className="text-base font-bold">Worship Type:</label>
                   <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">Placeholder</p>
+                    <p className="text-base">{worshipInfo["Worship Type"]}</p>
                   </div>
                 </div>
               </form>

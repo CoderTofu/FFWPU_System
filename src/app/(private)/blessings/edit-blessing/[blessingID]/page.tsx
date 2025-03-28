@@ -1,43 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar, PlusCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
 
-export default function EditBlessing() {
+export default function AddBlessing() {
   const params = useParams();
-  const router = useRouter();
-
-  // This is the blessing ID from the URL
-  console.log(params.blessingID);
-
-  const [members, setMembers] = useState([
-    { "Member ID": "M001", Name: "Binose" },
-    { "Member ID": "M002", Name: "Lans" },
-    { "Member ID": "M001", Name: "Ye Em" },
-    { "Member ID": "M002", Name: "Cess" },
-    { "Member ID": "M001", Name: "Dril" },
-    { "Member ID": "M002", Name: "Pao" },
-  ]);
-
-  const [guests, setGuests] = useState([
-    { Name: "Blake" },
-    { Name: "Sloane" },
-    { Name: "Nisamon" },
-    { Name: "Chekwa" },
-    { Name: "Chiki" },
-    { Name: "Hiro" },
-  ]);
-
-  const [selectedMember, setSelectedMember] = useState(null);
-  const [selectedGuest, setSelectedGuest] = useState(null);
+  const [members, setMembers] = useState([]);
+  const [memberIds, setMemberIds] = useState([]);
+  const [guests, setGuests] = useState([]);
+  const [newGuests, setNewGuests] = useState([]);
+  const [formData, setFormData] = useState({
+    name_of_blessing: "",
+    blessing_date: "",
+    chaenbo: 1,
+  });
+  const chaenboMap = { Vertical: 1, Horizontal: 2 };
+  useEffect(() => {
+    (async function () {
+      const res = await fetch(`/api/blessings/${params.blessingID}`, {
+        method: "GET",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMembers(data.Members);
+        const ids = data.Members.map((member) => member["Member ID"]);
+        setMemberIds([...ids]);
+        setGuests(data.Guests);
+        setFormData({
+          name_of_blessing: data["Name Of Blessing"],
+          blessing_date: data["Blessing Date"],
+          chaenbo: chaenboMap[data.Chaenbo],
+        });
+      }
+    })();
+  }, []);
+  const [selectedMember, setSelectedMember] = useState<{
+    "Member ID": number;
+  } | null>(null);
+  const [selectedGuest, setSelectedGuest] = useState<{
+    "Guest ID": number;
+  } | null>(null);
 
   const [showModal, setShowModal] = useState(false);
-  const [date, setDate] = useState("");
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [registrationType, setRegistrationType] = useState<
     "member" | "guest" | null
@@ -47,32 +55,65 @@ export default function EditBlessing() {
     setIsRegistrationModalOpen(true);
   };
 
-  const handleConfirm = () => {
-    console.log("Saving...");
-    setShowModal(false);
-    router.push("/blessings");
+  const handleGuestDelete = async () => {
+    console.log("Deleting Guest: " + selectedGuest);
+    const res = await fetch(
+      `/api/blessings/${params.blessingID}/remove-guest`,
+      {
+        method: "POST",
+        body: JSON.stringify({ guest_id: selectedGuest["Guest ID"] }),
+      }
+    );
+    if (res.ok) {
+      alert("Successfully deleted guest" + selectedGuest.Name);
+      location.reload();
+    } else {
+      alert("An error occurred while removing guest");
+    }
   };
-
-  const handleSubmit = (formData: Record<string, string>) => {
-    if (registrationType === "member") {
-      setMembers([
-        ...members,
-        // Kung ano name associated with the ID
-        { "Member ID": formData.memberId, Name: "Placeholder" },
-      ]);
-    } else if (registrationType === "guest") {
-      setGuests([...guests, { Name: formData.fullName }]);
+  const handleMemberDelete = async () => {
+    console.log("Deleting Member: " + selectedMember);
+    const res = await fetch(
+      `/api/blessings/${params.blessingID}/remove-member`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ member_id: selectedMember["Member ID"] }),
+      }
+    );
+    if (res.ok) {
+      alert("Successfully deleted member");
+      location.reload();
+    } else {
+      alert("An error occurred while removing member: " + res.statusText);
     }
   };
 
-  const handleGuestDelete = () => {
-    setGuests(guests.filter((guest) => guest !== selectedGuest));
-    console.log("Deleting Guest: " + selectedGuest);
-  };
-  const handleMemberDelete = () => {
-    setMembers(members.filter((member) => member !== selectedMember));
-    console.log("Deleting Member: " + selectedMember);
-  };
+  useEffect(() => {
+    const fetchMembers = async () => {
+      const fetched = await Promise.all(
+        memberIds.map(async (id) => {
+          try {
+            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+            if (resp.ok) {
+              return await resp.json();
+            } else {
+              alert("Error while fetching member id: " + id);
+              return null; // Return null or handle the error case
+            }
+          } catch (error) {
+            console.error("Error fetching member:", error);
+            return null; // Return null or handle the error case
+          }
+        })
+      );
+
+      // Filter out any null values (from failed fetches)
+      const validMembers = fetched.filter((member) => member !== null);
+      setMembers(validMembers);
+    };
+
+    fetchMembers();
+  }, [memberIds]);
 
   return (
     <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7 mb-10">
@@ -95,17 +136,15 @@ export default function EditBlessing() {
               />
             </div>
           </h2>
-          <div className="max-h-[250px] overflow-y-auto">
-            <Table
-              data={members}
-              columns={{
-                lg: ["Member ID", "Name"],
-                md: ["Member ID", "Name"],
-                sm: ["Name"],
-              }}
-              onRowSelect={setSelectedMember}
-            />
-          </div>
+          <Table
+            data={members}
+            columns={{
+              lg: ["Member ID", "Full Name"],
+              md: ["Member ID", "Full Name"],
+              sm: ["Full Name"],
+            }}
+            onRowSelect={setSelectedMember}
+          />
 
           <button
             onClick={handleMemberDelete}
@@ -129,13 +168,15 @@ export default function EditBlessing() {
               />
             </div>
           </h2>
-          <div className="max-h-[250px] overflow-y-auto">
-            <Table
-              data={guests}
-              columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
-              onRowSelect={setSelectedGuest}
-            />
-          </div>
+          <Table
+            data={[...guests, ...newGuests]}
+            columns={{
+              lg: ["Name", "Email"],
+              md: ["Name", "Email"],
+              sm: ["Name"],
+            }}
+            onRowSelect={setSelectedGuest}
+          />
           <button
             onClick={handleGuestDelete}
             disabled={!selectedGuest}
@@ -156,6 +197,10 @@ export default function EditBlessing() {
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Name"
+            value={formData.name_of_blessing}
+            onChange={(e) =>
+              setFormData({ ...formData, name_of_blessing: e.target.value })
+            }
           />
           <label className="block font-medium mt-5">Date</label>
           <div className="relative w-full">
@@ -163,8 +208,10 @@ export default function EditBlessing() {
               className="w-full border border-[#01438F] p-2 rounded mt-2 pr-10"
               type="text"
               placeholder="MM/DD/YYYY"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={formData.blessing_date}
+              onChange={(e) =>
+                setFormData({ ...formData, blessing_date: e.target.value })
+              }
             />
             <Calendar
               className="absolute right-3 top-4 text-[#01438F] cursor-pointer"
@@ -173,15 +220,39 @@ export default function EditBlessing() {
           </div>
           {/*Checkbox*/}
           <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-2">Chaenbo/HTM</h2>
-            <div className="block mb-1">
-              <input type="checkbox" className="mr-2" />
-              <label>Vertical</label>
-            </div>
-            <div className="block">
-              <input type="checkbox" className="mr-2" />
-              <label>Horizontal</label>
-            </div>
+            <fieldset>
+              <h2 className="text-lg font-semibold mb-2">Chaenbo/HTM</h2>
+              <div className="block mb-1">
+                <input
+                  type="radio"
+                  className="mr-2"
+                  name="chaenbo"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      chaenbo: e.target.checked ? 1 : 2,
+                    })
+                  }
+                  checked={formData.chaenbo === 1}
+                />
+                <label>Vertical</label>
+              </div>
+              <div className="block">
+                <input
+                  type="radio"
+                  className="mr-2"
+                  name="chaenbo"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      chaenbo: e.target.checked ? 2 : 1,
+                    })
+                  }
+                  checked={formData.chaenbo === 2}
+                />
+                <label>Horizontal</label>
+              </div>
+            </fieldset>
           </div>
         </div>
       </div>
@@ -189,10 +260,10 @@ export default function EditBlessing() {
       {/* Save Button Below Container */}
       <div className="w-full max-w-[1420px] flex justify-center my-3">
         <button
-          className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
+          className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
           onClick={() => setShowModal(true)}
         >
-          SAVE CHANGES
+          EDIT BLESSING
         </button>
       </div>
 
@@ -201,13 +272,59 @@ export default function EditBlessing() {
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
-          onConfirm={handleConfirm}
-          message="Are you sure you want to edit the blessing?"
-          confirmText="Confirm"
+          onConfirm={async () => {
+            console.log("Saving...");
+            console.log(memberIds);
+            const res = await fetch(`/api/blessings/${params.blessingID}`, {
+              method: "PATCH",
+              body: JSON.stringify(formData),
+            });
+            if (res.ok) {
+              const memberRes = await fetch(
+                `/api/blessings/${params.blessingID}/add-member`,
+                {
+                  method: "PATCH",
+                  body: JSON.stringify({ members: memberIds }),
+                }
+              );
+              if (memberRes.ok) {
+                alert("Successfully added members");
+              } else {
+                alert("Failed to add members");
+              }
+
+              await Promise.all(
+                newGuests.map(async (guest) => {
+                  const g = await fetch(
+                    `/api/blessings/${params.blessingID}/add-guest`,
+                    {
+                      method: "POST",
+                      body: JSON.stringify({
+                        name: guest.Name,
+                        email: guest.Email,
+                        invited_by: guest.invitedBy || null,
+                      }),
+                    }
+                  );
+                  if (g.ok) {
+                    alert("Successfully added guest " + guest.Name);
+                  } else {
+                    alert("Error while adding guest " + guest.Name);
+                  }
+                })
+              );
+
+              alert("Successfully added blessing");
+            } else {
+              alert("Error updating members");
+            }
+            setShowModal(false);
+          }}
+          message="Are you sure you want to add the data?"
+          confirmText="Add"
           cancelText="Cancel"
         />
       )}
-      {/* Registration Modal */}
       {/* Registration Modal */}
       {isRegistrationModalOpen && (
         <RegistrationModal
@@ -215,7 +332,19 @@ export default function EditBlessing() {
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
             console.log("Registered:", formData);
-            handleSubmit(formData);
+            if (registrationType === "member") {
+              const id = parseInt(formData.memberId);
+              if (memberIds.includes(id)) {
+                alert(
+                  `Member ID ${formData.memberId} is already in the blessing.`
+                );
+              } else {
+                setMemberIds((prev) => [...prev, id]);
+              }
+            } else {
+              setNewGuests([...newGuests, formData]);
+            }
+            setIsRegistrationModalOpen(false);
           }}
           title={
             registrationType === "member"
@@ -224,28 +353,21 @@ export default function EditBlessing() {
           }
           fields={
             registrationType === "member"
-              ? [
-                  {
-                    name: "memberId",
-                    label: "Member ID:",
-                    type: "text",
-                    required: true,
-                  },
-                ]
+              ? [{ name: "memberId", label: "Member ID", type: "text" }]
               : [
                   {
-                    name: "fullName",
-                    label: "Full Name:",
+                    name: "Name",
+                    label: "Full Name",
                     type: "text",
                     required: true,
                   },
                   {
-                    name: "email",
-                    label: "Email:",
+                    name: "Email",
+                    label: "Email",
                     type: "email",
                     required: true,
                   },
-                  { name: "invitedBy", label: "Invited By:", type: "text" },
+                  { name: "invitedBy", label: "Invited By", type: "text" },
                 ]
           }
         />

@@ -2,16 +2,53 @@
 
 import { useState, useRef, useEffect } from "react";
 import Modal from "@/components/Modal";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-
 export default function EditDonation() {
   const params = useParams();
   const router = useRouter();
 
   // This is the donation ID from the URL
   console.log(params.donationID);
+  const [data, setData] = useState({});
+  const [member, setMember] = useState({});
+  const [church, setChurch] = useState({});
+  const [formData, setFormData] = useState({
+    member: null,
+    church: null,
+    date: null,
+    amount: null,
+    currency: null,
+  });
+  const [churches, setChurches] = useState([]);
+  useEffect(() => {
+    (async function () {
+      const res = await fetch(`/api/donations/${params.donationID}`, {
+        method: "GET",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setData(data);
+        setMember(data.Member);
+        setChurch(data.Church);
+        setFormData({
+          member: data.Member["Member ID"],
+          church: data.Church.ID,
+          amount: data.Amount,
+          date: data.Date,
+          currency: data.Currency,
+        });
+        setSelectedCurrency(data.Currency);
+      } else {
+        alert("An error occurred while fetching donation: " + res.statusText);
+      }
+      const c = await fetch("/api/members/church", { method: "GET" });
+      if (c.ok) {
+        setChurches(await c.json());
+      }
+    })();
+  }, []);
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -19,10 +56,19 @@ export default function EditDonation() {
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
   const dropdownButtonRef = useRef<HTMLButtonElement>(null);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     console.log("Confirmed!");
     setIsOpen(false);
-    router.push("/blessings");
+    console.log(formData);
+    const res = await fetch(`/api/donations/${params.donationID}`, {
+      method: "PATCH",
+      body: JSON.stringify(formData),
+    });
+    if (res.ok) {
+      location.reload();
+    } else {
+      alert("An error occurred while editing donation: " + res.statusText);
+    }
   };
 
   const toggleDropdown = (dropdown: string) => {
@@ -48,6 +94,7 @@ export default function EditDonation() {
   const handleCurrencySelect = (currency: string, event: React.MouseEvent) => {
     event.stopPropagation();
     setSelectedCurrency(currency);
+    setFormData({ ...formData, currency });
     setOpenDropdown(null);
   };
 
@@ -69,6 +116,11 @@ export default function EditDonation() {
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
               type="number"
+              onChange={(e) =>
+                setFormData({ ...formData, member: e.target.value })
+              }
+              value={member["Member ID"]}
+              disabled
               required
             />
           </div>
@@ -78,24 +130,70 @@ export default function EditDonation() {
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
               type="date"
+              onChange={(e) =>
+                setFormData({ ...formData, date: e.target.value })
+              }
+              value={formData.date || ""}
               required
             />
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          {/* <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
             <label className="text-[14px] mb-1">Church</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
               type="text"
+              value={church.ID}
               required
             />
+          </div> */}
+          <label className="block font-medium">Church</label>
+          <div
+            onClick={() => toggleDropdown("church")}
+            className="relative flex flex-col justify-start items-start bg-white border border-[#01438F] rounded p-2 hover:cursor-pointer "
+          >
+            <div className="flex w-full justify-between">
+              {!church ? (
+                <button>Select</button>
+              ) : (
+                <button> {`${church.Name} (${church.Country})`}</button>
+              )}
+              {openDropdown === "church" ? (
+                <ChevronUp style={{ color: "#01438F" }} />
+              ) : (
+                <ChevronDown style={{ color: "#01438F" }} />
+              )}
+            </div>
+            {openDropdown === "church" && (
+              <div className="absolute mt-10 flex flex-col w-full max-h-32 overflow-y-auto bg-white border border-[#01438F] rounded ">
+                {churches.map((val) => {
+                  return (
+                    <button
+                      key={val.ID}
+                      className="hover:bg-gray-200 w-full text-left rounded p-2"
+                      onClick={() => {
+                        setChurch(val);
+                        setFormData({ ...formData, church: val.ID });
+                        toggleDropdown("church");
+                      }}
+                    >
+                      {`${val.Name} (${val.Country})`}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4">
+          <div className="flex flex-col w-[394px] max-w-[100%] min-w-[50%] flex-shrink-1 mb-4 mt-4">
             <label className="text-[14px] mb-1">Amount</label>
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
               type="number"
+              value={formData.amount || 0}
+              onChange={(e) =>
+                setFormData({ ...formData, amount: e.target.value })
+              }
               required
             />
           </div>
@@ -119,13 +217,13 @@ export default function EditDonation() {
                 <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md">
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("$ USD", event)}
+                    onClick={(event) => handleCurrencySelect("USD", event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "$ USD"}
+                      checked={selectedCurrency === "USD"}
                       readOnly
                     />{" "}
                     $ USD
@@ -133,13 +231,13 @@ export default function EditDonation() {
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("₱ PHP", event)}
+                    onClick={(event) => handleCurrencySelect("PHP", event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "₱ PHP"}
+                      checked={selectedCurrency === "PHP"}
                       readOnly
                     />{" "}
                     ₱ PHP
@@ -147,13 +245,13 @@ export default function EditDonation() {
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("€ EUR", event)}
+                    onClick={(event) => handleCurrencySelect("EUR", event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "€ EUR"}
+                      checked={selectedCurrency === "EUR"}
                       readOnly
                     />{" "}
                     € EUR
@@ -161,13 +259,13 @@ export default function EditDonation() {
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("¥ JPY", event)}
+                    onClick={(event) => handleCurrencySelect("JPY", event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "¥ JPY"}
+                      checked={selectedCurrency === "JPY"}
                       readOnly
                     />{" "}
                     ¥ JPY
@@ -175,13 +273,13 @@ export default function EditDonation() {
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("₩ KRW", event)}
+                    onClick={(event) => handleCurrencySelect("KRW", event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "₩ KRW"}
+                      checked={selectedCurrency === "KRW"}
                       readOnly
                     />{" "}
                     ₩ KRW
@@ -189,13 +287,13 @@ export default function EditDonation() {
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("¥ CNY", event)}
+                    onClick={(event) => handleCurrencySelect("CNY", event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "¥ CNY"}
+                      checked={selectedCurrency === "CNY"}
                       readOnly
                     />{" "}
                     ¥ CNY

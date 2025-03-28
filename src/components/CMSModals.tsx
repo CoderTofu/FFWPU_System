@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/select";
 
 import { axiosInstance } from "@/app/axiosInstance";
-import Cookies from "js-cookie";
 
 // Helper function for button styles
 const buttonStyle =
@@ -402,15 +401,11 @@ export function AddNewAdminModal() {
   const handleAddAdmin = () => {
     // Add logic to handle adding a new admin
     axiosInstance
-      .post(
-        "/add-admin/",
-        {
-          username: adminName,
-          email: adminEmail,
-          password: adminPassword,
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("access_token")}` } }
-      )
+      .post("/add-admin/", {
+        username: adminName,
+        email: adminEmail,
+        password: adminPassword,
+      })
       .then((response) => {
         if (response.status == 201) {
           alert(`Successfully added admin ${adminName}!`);

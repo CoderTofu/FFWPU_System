@@ -1,35 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar, PlusCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
-import { useRouter } from "next/navigation";
 
 export default function AddBlessing() {
-  const router = useRouter();
+  const [members, setMembers] = useState([]);
+  const [memberIds, setMemberIds] = useState([]);
+  const [blessingName, setBlessingName] = useState("");
+  const [chaenbo, setChaenbo] = useState(1);
+  const [guests, setGuests] = useState([]);
 
-  const [members, setMembers] = useState([
-    { "Member ID": "M001", Name: "Binose" },
-    { "Member ID": "M002", Name: "Lans" },
-    { "Member ID": "M001", Name: "Ye Em" },
-    { "Member ID": "M002", Name: "Cess" },
-    { "Member ID": "M001", Name: "Dril" },
-    { "Member ID": "M002", Name: "Pao" },
-  ]);
-
-  const [guests, setGuests] = useState([
-    { Name: "Blake" },
-    { Name: "Sloane" },
-    { Name: "Nisamon" },
-    { Name: "Chekwa" },
-    { Name: "Chiki" },
-    { Name: "Hiro" },
-  ]);
-
-  const [selectedMember, setSelectedMember] = useState(null);
-  const [selectedGuest, setSelectedGuest] = useState(null);
+  const [selectedMember, setSelectedMember] = useState<{
+    "Member ID": number;
+  } | null>(null);
+  const [selectedGuest, setSelectedGuest] = useState<string[]>([]);
 
   const [showModal, setShowModal] = useState(false);
   const [date, setDate] = useState("");
@@ -42,34 +29,52 @@ export default function AddBlessing() {
     setIsRegistrationModalOpen(true);
   };
 
-  const handleConfirm = () => {
-    console.log("Saving...");
-    setShowModal(false);
-    router.push("/blessings");
-  };
-
   const handleSubmit = (formData: Record<string, string>) => {
-    if (registrationType === "member") {
-      setMembers([
-        ...members,
-        // Kung ano name associated with the ID
-        { "Member ID": formData.memberId, Name: "Placeholder" },
-      ]);
-    } else if (registrationType === "guest") {
-      setGuests([...guests, { Name: formData.fullName }]);
-    }
+    console.log("Form Data Submitted:", formData);
   };
 
   const handleGuestDelete = () => {
-    setGuests(guests.filter((guest) => guest !== selectedGuest));
     console.log("Deleting Guest: " + selectedGuest);
+    setGuests(
+      guests.filter((guest) => guest["Guest ID"] != selectedGuest["ID"])
+    );
   };
-
   const handleMemberDelete = () => {
-    setMembers(members.filter((member) => member !== selectedMember));
     console.log("Deleting Member: " + selectedMember);
+    setMemberIds(memberIds.filter((id) => id != selectedMember["Member ID"]));
+    setMembers(
+      members.filter(
+        (member) => member["Member ID"] != selectedMember["Member ID"]
+      )
+    );
   };
 
+  useEffect(() => {
+    const fetchMembers = async () => {
+      const fetched = await Promise.all(
+        memberIds.map(async (id) => {
+          try {
+            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+            if (resp.ok) {
+              return await resp.json();
+            } else {
+              alert("Error while fetching member id: " + id);
+              return null; // Return null or handle the error case
+            }
+          } catch (error) {
+            console.error("Error fetching member:", error);
+            return null; // Return null or handle the error case
+          }
+        })
+      );
+
+      // Filter out any null values (from failed fetches)
+      const validMembers = fetched.filter((member) => member !== null);
+      setMembers(validMembers);
+    };
+
+    fetchMembers();
+  }, [memberIds]);
   return (
     <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7 mb-10">
       {/* Page Title */}
@@ -91,17 +96,15 @@ export default function AddBlessing() {
               />
             </div>
           </h2>
-          <div className="max-h-[250px] overflow-y-auto">
-            <Table
-              data={members}
-              columns={{
-                lg: ["Member ID", "Name"],
-                md: ["Member ID", "Name"],
-                sm: ["Name"],
-              }}
-              onRowSelect={setSelectedMember}
-            />
-          </div>
+          <Table
+            data={members}
+            columns={{
+              lg: ["Member ID", "Full Name"],
+              md: ["Member ID", "Full Name"],
+              sm: ["Full Name"],
+            }}
+            onRowSelect={setSelectedMember}
+          />
           <button
             onClick={handleMemberDelete}
             disabled={!selectedMember}
@@ -124,13 +127,15 @@ export default function AddBlessing() {
               />
             </div>
           </h2>
-          <div className="max-h-[250px] overflow-y-auto">
-            <Table
-              data={guests}
-              columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
-              onRowSelect={setSelectedGuest}
-            />
-          </div>
+          <Table
+            data={guests}
+            columns={{
+              lg: ["Name", "Email"],
+              md: ["Name", "Email"],
+              sm: ["Name"],
+            }}
+            onRowSelect={setSelectedGuest}
+          />
           <button
             onClick={handleGuestDelete}
             disabled={!selectedGuest}
@@ -151,32 +156,42 @@ export default function AddBlessing() {
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Name"
+            type="text"
+            onChange={(e) => setBlessingName(e.target.value)}
           />
           <label className="block font-medium mt-5">Date:</label>
           <div className="relative w-full">
             <input
-              className="w-full border border-[#01438F] p-2 rounded mt-2 pr-10"
-              type="text"
+              className="w-full border border-[#01438F] p-2 rounded mt-2"
+              type="date"
               placeholder="MM/DD/YYYY"
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <Calendar
-              className="absolute right-3 top-4 text-[#01438F] cursor-pointer"
-              size={16}
-            />
           </div>
           {/*Checkbox*/}
           <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-2">Chaenbo/HTM</h2>
-            <div className="block mb-1">
-              <input type="checkbox" className="mr-2" />
-              <label>Vertical</label>
-            </div>
-            <div className="block">
-              <input type="checkbox" className="mr-2" />
-              <label>Horizontal</label>
-            </div>
+            <fieldset>
+              <h2 className="text-lg font-semibold mb-2">Chaenbo/HTM</h2>
+              <div className="block mb-1">
+                <input
+                  type="radio"
+                  className="mr-2"
+                  name="chaenbo"
+                  onChange={(e) => setChaenbo(e.target.checked ? 1 : 2)}
+                />
+                <label>Vertical</label>
+              </div>
+              <div className="block">
+                <input
+                  type="radio"
+                  className="mr-2"
+                  name="chaenbo"
+                  onChange={(e) => setChaenbo(e.target.checked ? 2 : 1)}
+                />
+                <label>Horizontal</label>
+              </div>
+            </fieldset>
           </div>
         </div>
       </div>
@@ -196,8 +211,61 @@ export default function AddBlessing() {
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
-          onConfirm={handleConfirm}
-          message="Are you sure you want to add the blessing?"
+          onConfirm={async () => {
+            console.log("Saving...");
+            console.log(blessingName);
+            console.log(date);
+            console.log(chaenbo);
+            const res = await fetch("/api/blessings", {
+              method: "POST",
+              body: JSON.stringify({
+                blessing_date: date,
+                name_of_blessing: blessingName,
+                chaenbo,
+              }),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              const memberRes = await fetch(
+                `/api/blessings/${data["Blessing ID"]}/add-member`,
+                {
+                  method: "PATCH",
+                  body: JSON.stringify({ members: memberIds }),
+                }
+              );
+              if (memberRes.ok) {
+                alert("Added members successfully");
+              } else {
+                alert(
+                  "An error occurred while adding members: " + res.statusText
+                );
+              }
+
+              await Promise.all(
+                guests.map(async (guest) => {
+                  const g = await fetch(
+                    `/api/blessings/${data["Blessing ID"]}/add-guest`,
+                    {
+                      method: "POST",
+                      body: JSON.stringify({
+                        name: guest.Name,
+                        email: guest.Email,
+                        invited_by: guest.invitedBy || null,
+                      }),
+                    }
+                  );
+                  if (g.ok) {
+                    alert("Successfully added guest " + guest.Name);
+                  } else {
+                    alert("Error while adding guest " + guest.Name);
+                  }
+                })
+              );
+            }
+
+            setShowModal(false);
+          }}
+          message="Are you sure you want to add the data?"
           confirmText="Add"
           cancelText="Cancel"
         />
@@ -208,8 +276,13 @@ export default function AddBlessing() {
           isOpen={isRegistrationModalOpen}
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
+            if (registrationType === "member") {
+              setMemberIds((prev) => [...prev, formData.memberId]);
+            } else {
+              setGuests((prev) => [...prev, formData]);
+            }
             console.log("Registered:", formData);
-            handleSubmit(formData);
+            // handleSubmit(formData);
           }}
           title={
             registrationType === "member"
@@ -228,13 +301,13 @@ export default function AddBlessing() {
                 ]
               : [
                   {
-                    name: "fullName",
+                    name: "Name",
                     label: "Full Name:",
                     type: "text",
                     required: true,
                   },
                   {
-                    name: "email",
+                    name: "Email",
                     label: "Email:",
                     type: "email",
                     required: true,

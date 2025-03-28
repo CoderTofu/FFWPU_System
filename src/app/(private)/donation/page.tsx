@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import Table from "@/components/Table";
 import DonationModals from "@/components/DonationModals";
-
+import { Currency } from "lucide-react";
 interface DataItem {
   "Donation ID": number;
   "Member ID": number;
@@ -26,75 +26,8 @@ export default function Donation() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortedData, setSortedData] = useState<DataItem[]>([]);
   const [originalData, setOriginalData] = useState<DataItem[]>([]);
-
-  const data: DataItem[] = [
-    {
-      "Donation ID": 1001,
-      "Member ID": 5001,
-      Name: "Gregorio, Princess Nicole L.",
-      Date: "2024-02-01",
-      Church: "Manila Cathedral",
-      Amount: "PHP 100.50",
-    },
-    {
-      "Donation ID": 1002,
-      "Member ID": 5122,
-      Name: "Bilan, Edrill F.",
-      Date: "2024-02-02",
-      Church: "San Agustin Church",
-      Amount: "USD 250.00",
-    },
-    {
-      "Donation ID": 1003,
-      "Member ID": 5563,
-      Name: "Jagonoy, Jhon Mar F.",
-      Date: "2024-08-02",
-      Church: "Sto. Nino de Pandacan Parish Church",
-      Amount: "PHP 75.25",
-    },
-    {
-      "Donation ID": 1004,
-      "Member ID": 5938,
-      Name: "Balba, Johan Paolo B.",
-      Date: "2010-03-06",
-      Church: "St. Jude Parish Church",
-      Amount: "USD 90.00",
-    },
-    {
-      "Donation ID": 1005,
-      "Member ID": 7009,
-      Name: "Sanchez, Princess Aira",
-      Date: "2015-07-12",
-      Church: "San Fernando De Dilao Parish Church",
-      Amount: "PHP 5.00",
-    },
-    {
-      "Donation ID": 1006,
-      "Member ID": 1039,
-      Name: "Lagumbay, Lantis Violet F.",
-      Date: "2003-02-02",
-      Church: "San Beda Church",
-      Amount: "USD 1000.00",
-    },
-    {
-      "Donation ID": 1007,
-      "Member ID": 1098,
-      Name: "Fulgencio, Sonaj A.",
-      Date: "2019-10-12",
-      Church: "Quiapo Church",
-      Amount: "PHP 1500.50",
-    },
-
-    {
-      "Donation ID": 1020,
-      "Member ID": 1100,
-      Name: "Fulgencio, Juan Paolo.",
-      Date: "2011-10-01",
-      Church: "Paco Church",
-      Amount: "KRW 1200.50",
-    },
-  ];
-
+  const [data, setData] = useState([]);
+  const [rowToDelete, setRowToDelete] = useState(null);
   const exchangeRates = {
     USD: 55,
     PHP: 1,
@@ -105,12 +38,38 @@ export default function Donation() {
   };
 
   useEffect(() => {
-    setOriginalData(data);
-    setSortedData(data);
+    (async function () {
+      const res = await fetch("/api/donations", { method: "GET" });
+      if (res.ok) {
+        const data = await res.json();
+        const simplified = data.map((donation) => {
+          return {
+            "Donation ID": donation["Donation ID"],
+            "Member ID": donation.Member["Member ID"],
+            "Full Name": donation.Member["Full Name"],
+            Date: donation.Date,
+            Church: donation.Church["Name"],
+            Amount: donation.Amount,
+            Currency: donation.Currency,
+          };
+        });
+        setData(simplified);
+        setOriginalData(simplified);
+        setSortedData(simplified);
+      }
+    })();
   }, []);
 
   const column = {
-    lg: ["Donation ID", "Member ID", "Name", "Date", "Church", "Amount"],
+    lg: [
+      "Donation ID",
+      "Member ID",
+      "Full Name",
+      "Date",
+      "Church",
+      "Amount",
+      "Currency",
+    ],
     md: ["Donation ID", "Name", "Date", "Amount"],
     sm: ["Name", "Amount"],
   };
@@ -209,7 +168,12 @@ export default function Donation() {
           </button>
 
           <button
-            onClick={() => setShowDeleteModal(true)}
+            onClick={() => {
+              if (selectedRow) {
+                setRowToDelete(selectedRow);
+                setShowDeleteModal(true);
+              }
+            }}
             disabled={!selectedRow}
             className={`px-6 py-2 rounded ${
               selectedRow
@@ -225,8 +189,16 @@ export default function Donation() {
           <Modal
             isOpen={showDeleteModal}
             onClose={() => setShowDeleteModal(false)}
-            onConfirm={() => {
-              console.log("");
+            onConfirm={async () => {
+              const res = await fetch(
+                `/api/donations/${rowToDelete["Donation ID"]}`,
+                { method: "DELETE" }
+              );
+              if (res.ok) {
+                location.reload();
+              } else {
+                alert("An error occurred while deleting: " + res.statusText);
+              }
               setShowDeleteModal(false);
             }}
           />

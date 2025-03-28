@@ -3,10 +3,11 @@
 
 import { useState, useEffect, MouseEvent } from "react";
 import { Menu, X, ArrowRight, CircleUserRound } from "lucide-react"; // Added more icons
-import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 export default function NavbarPrivate() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   // Prevent scrolling when sidebar is open
+  const router = useRouter();
   useEffect(() => {
     if (isSidebarOpen) {
       document.body.style.overflow = "hidden";
@@ -27,10 +28,11 @@ export default function NavbarPrivate() {
     { name: "CMS", href: "/cms" },
   ];
 
-  const logout = (e: MouseEvent) => {
-    Cookies.remove("access_token");
-    Cookies.remove("refresh_token");
-    window.location.href = "/";
+  const logout = async (e: MouseEvent) => {
+    const response = await fetch("/api/logout", { method: "POST" });
+    if (response.ok) {
+      router.push("/");
+    }
   };
 
   return (

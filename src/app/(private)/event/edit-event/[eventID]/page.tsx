@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PlusCircle, Calendar, XCircle } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
-
+import { axiosInstance } from "@/app/axiosInstance";
+import { ChevronDown, ChevronUp } from "lucide-react";
 interface Field {
   name: string;
   label: string;
@@ -18,28 +19,21 @@ export default function EditWorshipEvent() {
 
   // This is the blessing ID from the URL
   console.log(params.eventID);
+  const [worshipInfo, setWorshipInfo] = useState({});
+  const [attendees, setAttendees] = useState([]);
+  const [guests, setGuests] = useState([]);
+  const [churches, setChurches] = useState([]);
 
-  const [members, setMembers] = useState([
-    { "Member ID": "M001", Name: "Binose" },
-    { "Member ID": "M002", Name: "Lans" },
-    { "Member ID": "M001", Name: "Ye Em" },
-    { "Member ID": "M002", Name: "Cess" },
-    { "Member ID": "M001", Name: "Dril" },
-    { "Member ID": "M002", Name: "Pao" },
-  ]);
-
-  const [guests, setGuests] = useState([
-    { Name: "Blake" },
-    { Name: "Sloane" },
-    { Name: "Nisamon" },
-    { Name: "Chekwa" },
-    { Name: "Chiki" },
-    { Name: "Hiro" },
-  ]);
+  const [memberIds, setMemberIds] = useState([]);
+  const worshipTypes = { Onsite: 1, Online: 2 };
+  const [worshipType, setWorshipType] = useState("");
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [church, setChurch] = useState(null);
+  const [eventName, setEventName] = useState("");
 
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
-
+  const [newGuests, setNewGuests] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [date, setDate] = useState<string>("");
   const dateInputRef = useRef<HTMLInputElement | null>(null);
@@ -48,6 +42,77 @@ export default function EditWorshipEvent() {
   const [registrationType, setRegistrationType] = useState<
     "member" | "guest" | null
   >(null);
+
+  useEffect(() => {
+    const callback = async () => {
+      let ids = [];
+      const resp = await fetch(`/api/event/${params.eventID}`, {
+        method: "GET",
+      });
+
+      if (resp.ok) {
+        const data = await resp.json();
+        setWorshipInfo(data);
+        setWorshipType(data["Worship Type"]);
+        setEventName(data.Name);
+        setDate(data.Date);
+        setGuests([...data.Guests]);
+        const here = data.Attendees.map((attendee) => attendee["Member ID"]);
+        setMemberIds([...here]);
+        setAttendees([...data.Attendees]);
+      } else {
+        alert("Error while fetching events: " + resp.statusText);
+      }
+
+      const resp2 = await fetch("/api/members/church", { method: "GET" });
+      if (resp2.ok) {
+        const data = await resp2.json();
+        setChurches(data);
+      } else {
+        alert("Error while fetching churches: " + resp2.statusText);
+      }
+    };
+    callback();
+  }, []);
+
+  useEffect(() => {
+    const selectedChurch = churches.filter((church) => {
+      return church.ID == worshipInfo.Church;
+    });
+
+    if (selectedChurch.length > 0) setChurch(selectedChurch[0]);
+  }, [churches, worshipInfo]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      const fetched = await Promise.all(
+        memberIds.map(async (id) => {
+          try {
+            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+            if (resp.ok) {
+              return await resp.json();
+            } else {
+              alert("Error while fetching member id: " + id);
+              return null; // Return null or handle the error case
+            }
+          } catch (error) {
+            console.error("Error fetching member:", error);
+            return null; // Return null or handle the error case
+          }
+        })
+      );
+
+      // Filter out any null values (from failed fetches)
+      const validMembers = fetched.filter((member) => member !== null);
+      setAttendees(validMembers);
+    };
+
+    fetchMembers();
+  }, [memberIds]);
+
+  const toggleDropdown = (dropdown) => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -68,14 +133,37 @@ export default function EditWorshipEvent() {
     setIsRegistrationModalOpen(true);
   };
 
-  const handleGuestDelete = () => {
-    setGuests(guests.filter((guest) => guest !== selectedGuest));
+  const handleGuestDelete = async () => {
     console.log("Deleting Guest: " + selectedGuest);
+    const resp = await fetch(`/api/event/${params.eventID}/remove-guest`, {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: params.eventID,
+        guest_id: selectedGuest["Guest ID"],
+      }),
+    });
+    if (resp.ok) {
+      location.reload();
+    } else {
+      alert("An error occurred while deleting guest: " + resp.statusText);
+    }
   };
 
-  const handleMemberDelete = () => {
-    setMembers(members.filter((member) => member !== selectedMember));
-    console.log("Deleting Member: " + selectedMember);
+  const handleMemberDelete = async () => {
+    // setMembers(members.filter((member) => member !== selectedMember));
+    console.log(selectedMember);
+    const resp = await fetch(`/api/event/${params.eventID}/remove-attendee`, {
+      method: "POST",
+      body: JSON.stringify({
+        event_id: params.eventID,
+        member_id: selectedMember["Member ID"],
+      }),
+    });
+    if (resp.ok) {
+      location.reload();
+    } else {
+      alert("An error occurred while deleting attendee: " + resp.statusText);
+    }
   };
 
   return (
@@ -101,11 +189,11 @@ export default function EditWorshipEvent() {
           </h2>
           <div className="max-h-[250px] overflow-y-auto">
             <Table
-              data={members}
+              data={attendees}
               columns={{
-                lg: ["Member ID", "Name"],
-                md: ["Member ID", "Name"],
-                sm: ["Name"],
+                lg: ["Member ID", "Full Name"],
+                md: ["Member ID", "Full Name"],
+                sm: ["Full Name"],
               }}
               onRowSelect={setSelectedMember}
             />
@@ -134,8 +222,12 @@ export default function EditWorshipEvent() {
           </h2>
           <div className="max-h-[250px] overflow-y-auto">
             <Table
-              data={guests}
-              columns={{ lg: ["Name"], md: ["Name"], sm: ["Name"] }}
+              data={[...guests, ...newGuests]}
+              columns={{
+                lg: ["Name", "Email"],
+                md: ["Name", "Email"],
+                sm: ["Name"],
+              }}
               onRowSelect={setSelectedGuest}
             />
           </div>
@@ -160,12 +252,16 @@ export default function EditWorshipEvent() {
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Worship ID"
+            disabled
+            value={worshipInfo["Worship ID"] || ""}
           />
 
           <label className="block font-medium mt-5">Event Name</label>
           <input
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Event Name"
+            onChange={(e) => setEventName(e.target.value)}
+            value={eventName}
           />
 
           {/* Date Picker */}
@@ -181,22 +277,78 @@ export default function EditWorshipEvent() {
           </div>
 
           <label className="block font-medium mt-5">Worship Type</label>
-          <input
-            className="w-full border border-[#01438F] p-2 rounded mt-2"
-            placeholder="Enter Worship Type"
-          />
+          <div
+            onClick={() => toggleDropdown("type")}
+            className="relative flex flex-col justify-start items-start border border-[#01438F] rounded p-2 hover:cursor-pointer "
+          >
+            <div className="flex w-full justify-between">
+              {worshipType === "" ? (
+                <button className="opacity-50">Worship Type</button>
+              ) : (
+                <button>{worshipType}</button>
+              )}
+              {openDropdown === "type" ? (
+                <ChevronUp style={{ color: "#01438F" }} />
+              ) : (
+                <ChevronDown style={{ color: "#01438F" }} />
+              )}
+            </div>
+            {openDropdown === "type" && (
+              <div className="absolute z-50 mt-10 flex flex-col w-full bg-white border border-[#01438F] rounded">
+                {["Onsite", "Online"].map((val) => {
+                  return (
+                    <button
+                      key={val}
+                      className="hover:bg-gray-200 w-full text-left rounded p-2"
+                      onClick={() => {
+                        setWorshipType(val);
+                        toggleDropdown("type");
+                      }}
+                    >
+                      {val}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
-          <label className="block font-medium mt-5">Sub-region</label>
-          <input
-            className="w-full border border-[#01438F] p-2 rounded mt-2"
-            placeholder="Enter Sub-region"
-          />
-
-          <label className="block font-medium mt-5">Nation</label>
-          <input
-            className="w-full border border-[#01438F] p-2 rounded mt-2"
-            placeholder="Enter Nation"
-          />
+          <label className="block font-medium mt-5">Church</label>
+          <div
+            onClick={() => toggleDropdown("church")}
+            className="relative flex flex-col justify-start items-start border border-[#01438F] rounded p-2 hover:cursor-pointer "
+          >
+            <div className="flex w-full justify-between">
+              {!church ? (
+                <button className="opacity-50">Church</button>
+              ) : (
+                <button> {`${church.Name} (${church.Country})`}</button>
+              )}
+              {openDropdown === "church" ? (
+                <ChevronUp style={{ color: "#01438F" }} />
+              ) : (
+                <ChevronDown style={{ color: "#01438F" }} />
+              )}
+            </div>
+            {openDropdown === "church" && (
+              <div className="absolute mt-10 flex flex-col w-full bg-white border border-[#01438F] rounded">
+                {churches.map((val) => {
+                  return (
+                    <button
+                      key={val.ID}
+                      className="hover:bg-gray-200 w-full text-left rounded p-2"
+                      onClick={() => {
+                        setChurch(val);
+                        toggleDropdown("church");
+                      }}
+                    >
+                      {`${val.Name} (${val.Country})`}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Upload Multiple Photos */}
           <label className="block font-medium mt-5">Upload Photos</label>
@@ -237,7 +389,7 @@ export default function EditWorshipEvent() {
       <div className="w-full flex justify-center my-4">
         <button
           className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
-          onSubmit={() => setShowModal(true)}
+          onClick={() => setShowModal(true)}
         >
           SAVE CHANGES
         </button>
@@ -248,8 +400,56 @@ export default function EditWorshipEvent() {
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
-          onConfirm={() => {
+          onConfirm={async () => {
             console.log("Updating...");
+            try {
+              const res = await fetch(`/api/event/${params.eventID}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                  name: eventName,
+                  date,
+                  worship_type: worshipTypes[worshipType],
+                  church: church.ID,
+                }),
+              });
+              const data = await res.json();
+              const addedID = data["Worship ID"];
+              await Promise.all([
+                ...memberIds.map(async (id) => {
+                  const resp = await fetch(
+                    `/api/event/${addedID}/add-attendee`,
+                    {
+                      method: "POST",
+                      body: JSON.stringify({
+                        event_id: addedID,
+                        member_id: id,
+                      }),
+                    }
+                  );
+                  if (!resp.ok) {
+                    alert("Error adding member " + id);
+                  }
+                }),
+                ...newGuests.map(async (guest) => {
+                  const resp = await fetch(`/api/event/${addedID}/add-guest`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                      event_id: addedID,
+                      name: guest.Name,
+                      email: guest.Email,
+                      invited_by: guest.invitedBy || null,
+                    }),
+                  });
+                  if (!resp.ok) {
+                    alert("Error adding guest" + guest.Name);
+                  }
+                }),
+              ]);
+              location.reload();
+            } catch (err) {
+              alert("Error while editing worship: " + err);
+            }
+
             setShowModal(false);
           }}
           message="Are you sure you want to update this worship event?"
@@ -264,8 +464,18 @@ export default function EditWorshipEvent() {
           isOpen={isRegistrationModalOpen}
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
+            if (registrationType === "member") {
+              if (memberIds.includes(formData.memberId)) {
+                alert(`${formData.memberId} was already added to the event.`);
+              } else {
+                console.log("adding");
+                setMemberIds((prev) => [...prev, formData.memberId]);
+              }
+            } else {
+              console.log(formData);
+              setNewGuests((prev) => [...prev, formData]);
+            }
             console.log("Registered:", formData);
-            handleSubmit(formData);
           }}
           title={
             registrationType === "member"
@@ -284,13 +494,13 @@ export default function EditWorshipEvent() {
                 ]
               : [
                   {
-                    name: "fullName",
+                    name: "Name",
                     label: "Full Name:",
                     type: "text",
                     required: true,
                   },
                   {
-                    name: "email",
+                    name: "Email",
                     label: "Email:",
                     type: "email",
                     required: true,
