@@ -12,7 +12,6 @@ export default function AddMemberForm() {
     familyName: "",
     gender: "",
     birthdate: "",
-    age: "",
     region: "",
     subRegion: "",
     maritalStatus: "",
@@ -209,22 +208,6 @@ export default function AddMemberForm() {
                       name="birthdate"
                       value={formData.birthdate}
                       onChange={handleChange}
-                      required
-                      className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  {/* Age */}
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Age<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      name="age"
-                      value={formData.age}
-                      onChange={handleChange}
-                      min="0"
                       required
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />

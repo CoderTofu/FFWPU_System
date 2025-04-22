@@ -28,9 +28,18 @@ const buttonStyle =
 export function AddRegionModal() {
   const [regionName, setRegionName] = useState("");
 
-  const handleAddRegion = () => {
+  const handleAddRegion = async () => {
     // Add logic to handle adding a region
     console.log("Adding region:", regionName);
+    const res = await fetch("/api/cms/region", {
+      method: "POST",
+      body: JSON.stringify({ name: regionName }),
+    });
+    if (res.ok) {
+      alert("successfully added region");
+    } else {
+      alert("An error occurred: " + res.statusText);
+    }
     // Reset the input
     setRegionName("");
   };
@@ -74,11 +83,27 @@ export function DeleteRegionModal() {
   const [regionToDelete, setRegionToDelete] = useState("");
 
   // This is a placeholder. In a real application, you'd fetch this data from your backend.
-  const regions = ["Region 1", "Region 2", "Region 3"];
+  const [regions, setRegions] = useState([]);
 
-  const handleDeleteRegion = () => {
+  useEffect(() => {
+    const fetchRegions = async () => {
+      const res = await fetch("/api/cms/region", { method: "GET" });
+      if (res.ok) {
+        const data = await res.json();
+        setRegions(data);
+      } else {
+        alert("An error occurred while fetching regions");
+      }
+    };
+    fetchRegions();
+  }, []);
+
+  const handleDeleteRegion = async () => {
     // Add logic to handle deleting a region
     console.log("Deleting region:", regionToDelete);
+    const res = await fetch(`/api/cms/region/${regionToDelete}/`, {
+      method: "DELETE",
+    });
     // Reset the selection
     setRegionToDelete("");
   };
@@ -106,8 +131,8 @@ export function DeleteRegionModal() {
               </SelectTrigger>
               <SelectContent>
                 {regions.map((region, index) => (
-                  <SelectItem key={index} value={region}>
-                    {region}
+                  <SelectItem key={index} value={region.id}>
+                    {region.name}
                   </SelectItem>
                 ))}
               </SelectContent>

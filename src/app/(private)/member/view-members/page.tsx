@@ -310,38 +310,40 @@ export default function Member() {
       </div>
 
       {/* Button Section */}
-      {filteredData.length > 0 && (
-        <div className="w-full flex flex-wrap justify-center gap-[22px] mt-[28px] mb-[15px]">
-          <button
-            onClick={handleAddClick}
-            className="w-20 h-10 flex items-center justify-center rounded mb-4 m-4 bg-[#01438F] text-[#FCC346] hover:bg-blue-600 font-bold text-base"
-          >
-            ADD
-          </button>
-          <button
-            onClick={handleEditClick}
-            disabled={!selectedRow}
-            className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
-              selectedRow
-                ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            } font-bold text-base`}
-          >
-            EDIT
-          </button>
-          <button
-            onClick={handleDeleteClick}
-            disabled={!selectedRow}
-            className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
-              selectedRow
-                ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            } font-bold text-base`}
-          >
-            DELETE
-          </button>
-        </div>
-      )}
+      <div className="w-full flex flex-wrap justify-center gap-[22px] mt-[28px] mb-[15px]">
+        <button
+          onClick={handleAddClick}
+          className="w-20 h-10 flex items-center justify-center rounded mb-4 m-4 bg-[#01438F] text-[#FCC346] hover:bg-blue-600 font-bold text-base"
+        >
+          ADD
+        </button>
+        {filteredData.length > 0 && (
+          <>
+            <button
+              onClick={handleEditClick}
+              disabled={!selectedRow}
+              className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
+                selectedRow
+                  ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              } font-bold text-base`}
+            >
+              EDIT
+            </button>
+            <button
+              onClick={handleDeleteClick}
+              disabled={!selectedRow}
+              className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
+                selectedRow
+                  ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              } font-bold text-base`}
+            >
+              DELETE
+            </button>
+          </>
+        )}
+      </div>
 
       {/* Modal */}
       <Modal
