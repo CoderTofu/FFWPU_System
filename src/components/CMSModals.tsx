@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 
 import { axiosInstance } from "@/app/axiosInstance";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Helper function for button styles
 const buttonStyle =
@@ -27,7 +28,7 @@ const buttonStyle =
 
 export function AddRegionModal() {
   const [regionName, setRegionName] = useState("");
-
+  const queryClient = useQueryClient();
   const handleAddRegion = async () => {
     // Add logic to handle adding a region
     console.log("Adding region:", regionName);
@@ -37,6 +38,7 @@ export function AddRegionModal() {
     });
     if (res.ok) {
       alert("successfully added region");
+      queryClient.refetchQueries(["regions"]);
     } else {
       alert("An error occurred: " + res.statusText);
     }
@@ -157,22 +159,50 @@ export function AddSubregionModal() {
   const [selectedRegion, setSelectedRegion] = useState("");
   const [subRegion, setSubRegion] = useState("");
 
-  const regions = [
-    { id: "1", name: "North America" },
-    { id: "2", name: "Europe" },
-    { id: "3", name: "Asia" },
-    { id: "4", name: "Africa" },
-    { id: "5", name: "South America" },
-    { id: "6", name: "Oceania" },
-  ];
+  const [regions, setRegions] = useState([]);
+  const queryClient = useQueryClient();
 
+  const regionQuery = useQuery({
+    queryKey: ["regions"],
+    queryFn: async () => {
+      const res = await fetch("/api/cms/region", { method: "GET" });
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
+  });
+
+  const subregionMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await fetch("/api/cms/subregion", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Failed to fetch");
+    },
+    onSuccess: (data) => {
+      alert("Successfully added");
+      queryClient.refetchQueries(["subregions"]);
+    },
+    onError: (data) => {
+      alert("Error while adding");
+    },
+  });
   const handleAddSubregion = () => {
     // Add logic to handle adding a subregion
     console.log("Adding subregion:", subRegion, "to region:", selectedRegion);
+    subregionMutation.mutate({ region: selectedRegion, name: subRegion });
     // Reset the inputs
     setSelectedRegion("");
     setSubRegion("");
   };
+
+  useEffect(() => {
+    if (regionQuery.status === "success") {
+      setRegions(regionQuery.data);
+    } else if (regionQuery.status === "error") {
+      alert("An error occurred while fetching data");
+    }
+  }, [regionQuery.data, regionQuery.status]);
 
   return (
     <Dialog>

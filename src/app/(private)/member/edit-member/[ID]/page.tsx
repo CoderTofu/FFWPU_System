@@ -5,6 +5,7 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { ImageIcon } from "lucide-react";
 import { useParams } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function EditMemberForm() {
   const params = useParams();
@@ -53,19 +54,51 @@ export default function EditMemberForm() {
     ],
   };
 
-  const [formData, setFormData] = useState(dummyMember);
+  const [formData, setFormData] = useState({});
   const [image, setImage] = useState<string | null>(dummyMember.profileImage);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [regions, setRegions] = useState([]);
+  const [subregions, setSubregions] = useState([]);
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedSubregion, setSelectedSubregion] = useState("");
 
   // Simulate loading data
   useEffect(() => {
-    // In a real app, you would fetch the member data here
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
+    const fetchData = async () => {
+      const res = await fetch(`/api/members/${params.ID}`, { method: "GET" });
+      if (res.ok) {
+        const details = await res.json();
+        const data = {
+          givenName: details["Given Name"],
+          middleName: details["Middle Name"],
+          familyName: details["Family Name"],
+          gender: details["Gender"],
+          birthdate: details["Birthday"],
+          age: details["Age"],
+          region: details["Region"].id,
+          subRegion: details["Subregion"].id,
+          maritalStatus: details["Marital Status"],
+          nation: details["Nation"],
+          spouseName: details["Name Of Spouse"],
+          phone: details["Phone"],
+          email: details["Email"],
+          address: details["Address"],
+          generation: details["Generation"],
+          blessingStatus: details["Blessing Status"],
+          spiritualBirthday: details["Spiritual Birthday"],
+          spiritualParent: details["Spiritual Parent"],
+          membershipCategory: details["Membership Category"],
+          profileImage: null,
+          missionHistory: details["Missions"], // to do
+        };
+        setFormData(data);
+        setIsLoading(false);
+      } else {
+        alert("An error occurred");
+      }
+    };
+    fetchData();
   }, []);
 
   const handleChange = (
@@ -89,6 +122,22 @@ export default function EditMemberForm() {
       missionHistory: updatedHistory,
     }));
   };
+  const regionQuery = useQuery({
+    queryKey: ["regions"],
+    queryFn: async () => {
+      const res = await fetch("/api/cms/region", { method: "GET" });
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
+  });
+  const subregionQuery = useQuery({
+    queryKey: ["subregions"],
+    queryFn: async () => {
+      const res = await fetch("/api/cms/subregion", { method: "GET" });
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
+  });
 
   const addHistory = () => {
     setFormData((prev) => ({
@@ -105,9 +154,15 @@ export default function EditMemberForm() {
       ],
     }));
   };
+  const queryClient = useQueryClient();
+
+  const [toDelete, setToDelete] = useState([]);
 
   const removeHistory = (index: number) => {
     const updatedHistory = [...formData.missionHistory];
+    if (formData.missionHistory[index].id) {
+      setToDelete((prev) => [...prev, formData.missionHistory[index].id]);
+    }
     updatedHistory.splice(index, 1);
     setFormData((prev) => ({
       ...prev,
@@ -129,13 +184,120 @@ export default function EditMemberForm() {
       reader.readAsDataURL(file);
     }
   };
+  const missionMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await fetch(`/api/members/member-mission/${data.to_modify}`, {
+        method: "PATCH",
+        body: JSON.stringify(data.data),
+      });
+      if (!res.ok) throw new Error("Failed to fetch");
+      return await res.json();
+    },
+  });
+  const missionAddMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await fetch(`/api/members/member-mission`, {
+        method: "POST",
+        body: JSON.stringify(data.data),
+      });
+      if (!res.ok) throw new Error("Failed to fetch");
+      return await res.json();
+    },
+  });
+  const missionDeleteMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await fetch(`/api/members/member-mission/${data.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to fetch");
+      return await res.json();
+    },
+  });
+
+  const memberMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await fetch(`/api/members/${params.ID}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Failed to fetch");
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      formData.missionHistory.forEach((mission) => {
+        const missionData = {
+          to_modify: mission.id,
+          data: {
+            role: mission.role,
+            organization: mission.organization,
+            country: mission.country,
+            start_date: mission.startDate,
+            end_date: mission.endDate,
+          },
+        };
+        if (missionData.to_modify === undefined) {
+          missionData["data"]["member"] = params.ID;
+          missionAddMutation.mutate(missionData);
+        } else {
+          missionMutation.mutate(missionData);
+        }
+      });
+      toDelete.forEach((id) => {
+        missionDeleteMutation.mutate({ id });
+      });
+      queryClient.refetchQueries(["members"]);
+      alert("Successfully updated user");
+    },
+    onError: (error) => {
+      alert("An error occurred");
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Form validation and submission logic
-    console.log("Member updated:", formData);
+    const data = {
+      given_name: formData.givenName,
+      middle_name: formData.middleName,
+      family_name: formData.familyName,
+      gender: formData.gender,
+      birthday: formData.birthdate,
+      region: formData.region,
+      subregion: formData.subregion,
+      nation: formData.nation,
+      marital_status: formData.maritalStatus,
+      name_of_spouse: formData.spouseName,
+      phone: formData.phone,
+      email: formData.email,
+      address: formData.address,
+      // image: null, // todo
+      generation: formData.generation,
+      blessing_status: formData.blessingStatus,
+      spiritual_birthday: formData.spiritualBirthday,
+      spiritual_parent: formData.spiritualParent,
+      membership_category: formData.membershipCategory,
+    };
+    memberMutation.mutate(data);
     alert("Member updated successfully!");
   };
+
+  useEffect(() => {
+    if (regionQuery.status === "success") {
+      console.log(regionQuery.data);
+      setRegions(regionQuery.data);
+    } else if (regionQuery.status === "error") {
+      alert("An error occurred while fetching data.");
+    }
+  }, [regionQuery.data, regionQuery.status]);
+
+  useEffect(() => {
+    if (subregionQuery.status === "success") {
+      console.log(subregionQuery.data);
+      setSubregions(subregionQuery.data);
+    } else if (subregionQuery.status === "error") {
+      alert("An error occurred while fetching data.");
+    }
+  }, [subregionQuery.data, subregionQuery.status]);
 
   if (isLoading) {
     return (
@@ -274,18 +436,25 @@ export default function EditMemberForm() {
                 {/* Second Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   {/* Region */}
+                  {/* SubRegion */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       Region<span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="region"
                       value={formData.region}
                       onChange={handleChange}
+                      className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                       required
-                      className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                    >
+                      <option value="">SELECT </option>
+                      {regions.map((region) => (
+                        <option value={region.id} key={region.id}>
+                          {region.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* SubRegion */}
@@ -300,9 +469,12 @@ export default function EditMemberForm() {
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                       required
                     >
-                      <option value="">SELECT</option>
-                      <option value="SR1">Sub Region 1</option>
-                      <option value="SR2">Sub Region 2</option>
+                      <option value="">SELECT </option>
+                      {subregions.map((subregion) => (
+                        <option value={subregion.id} key={subregion.id}>
+                          {subregion.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -592,7 +764,7 @@ export default function EditMemberForm() {
                     </label>
                     <input
                       type="date"
-                      value={entry.startDate}
+                      value={entry.start_date}
                       onChange={(e) =>
                         handleHistoryChange(index, "startDate", e.target.value)
                       }
@@ -607,7 +779,7 @@ export default function EditMemberForm() {
                     </label>
                     <input
                       type="date"
-                      value={entry.endDate}
+                      value={entry.end_date}
                       onChange={(e) =>
                         handleHistoryChange(index, "endDate", e.target.value)
                       }

@@ -5,38 +5,33 @@ import { useRouter } from "next/navigation";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal"; // Assuming you have a Modal component
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function Member() {
   const [searchQuery, setSearchQuery] = useState("");
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    (async function () {
-      const response = await fetch("/api/members", {
-        method: "GET",
-      });
-      if (response.ok) {
-        const resp = await response.json();
-        setData(resp);
-      } else {
-        alert("An error occurred while fetching data: " + response.statusText);
-      }
-    })();
-  }, []);
+  const memberQuery = useQuery({
+    queryKey: ["members"],
+    queryFn: async () => {
+      const res = await fetch("/api/members", { method: "GET" });
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
+  });
 
-  const dataID = "Member ID";
+  const dataID = "ID";
 
   const columnConfig = {
     lg: [
-      "Member ID",
-      "Title",
+      "ID",
       "Full Name",
       "Gender",
-      "Date Of Birth",
+      "Birthday",
       "Age",
       "Marital Status",
       "Address",
-      "Country",
+      "Nation",
       "Region",
       "Membership Category",
       "Generation",
@@ -54,6 +49,7 @@ export default function Member() {
   const [rowToDelete, setRowToDelete] = useState<{ ID: number } | null>(null);
   const router = useRouter();
 
+  const queryClient = useQueryClient();
   // Toggle dropdown visibility
   const toggleDropdown = (dropdown: string) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
@@ -93,12 +89,16 @@ export default function Member() {
   const handleConfirm = async () => {
     console.log("Confirmed!", rowToDelete);
     // Add your deletion logic here
-    const response = await fetch(`/api/members/${rowToDelete["Member ID"]}`);
+    const response = await fetch(`/api/members/${rowToDelete["ID"]}`, {
+      method: "DELETE",
+    });
     if (response.ok) {
-      location.reload();
+      queryClient.refetchQueries(["members"]);
+      alert("Deleted successfully");
     } else {
       alert("An error occurred while deleting member: " + response.statusText);
     }
+    setIsOpen(false);
   };
 
   const filteredData = data.filter((member) =>
@@ -106,6 +106,20 @@ export default function Member() {
       value.toString().toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
+
+  useEffect(() => {
+    if (memberQuery.status === "success") {
+      console.log(memberQuery.data);
+      const data = memberQuery.data.map((member) => ({
+        ...member,
+        Region: member.Region.name,
+        Subregion: member.Subregion.name,
+      }));
+      setData(data);
+    } else if (memberQuery.status === "error") {
+      alert("An error occurred while fetching data.");
+    }
+  }, [memberQuery.data, memberQuery.status]);
 
   return (
     <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
