@@ -6,23 +6,29 @@ import Table from "@/components/Table";
 import { Search, ChevronDown } from "lucide-react";
 import Modal from "@/components/Modal";
 import { axiosInstance } from "@/app/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
 
 export default function EventInfo() {
   const router = useRouter();
   const [data, setData] = useState([]);
 
+  const eventQuery = useQuery({
+    queryKey: ["events"],
+    queryFn: async () => {
+      const res = await fetch("/api/worship", { method: "GET" });
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
+  });
+
   useEffect(() => {
-    (async function () {
-      const resp = await fetch("/api/event", { method: "GET" });
-      if (resp.ok) {
-        const data = await resp.json();
-        console.log(data);
-        setData(data);
-      } else {
-        alert("Error while fetching events: " + resp.statusText);
-      }
-    })();
-  }, []);
+    if (eventQuery.status === "success") {
+      console.log(eventQuery.data);
+      setData(eventQuery.data);
+    } else if (eventQuery.status === "error") {
+      alert("An error occurred while fetching data.");
+    }
+  }, [eventQuery.data, eventQuery.status]);
 
   const dataID = "Worship ID";
 
@@ -200,10 +206,9 @@ export default function EventInfo() {
           onClose={() => setShowDeleteModal(false)}
           onConfirm={async () => {
             console.log("Deleting event...");
-            const resp = await fetch(
-              `/api/event/${rowToDelete["Worship ID"]}`,
-              { method: "DELETE" }
-            );
+            const resp = await fetch(`/api/worship/${rowToDelete["ID"]}`, {
+              method: "DELETE",
+            });
             if (resp.ok) {
               location.reload();
             } else {

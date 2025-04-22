@@ -372,6 +372,149 @@ export function DeleteSubregionModal() {
   );
 }
 
+export function AddChurchModal() {
+  const [churchName, setChurchName] = useState("");
+  const [region, setRegion] = useState(null);
+  const [country, setCountry] = useState(null);
+
+  const queryClient = useQueryClient();
+  const handleAddRegion = async () => {
+    // Add logic to handle adding a region
+    console.log("Adding region:", churchName);
+    const res = await fetch("/api/church", {
+      method: "POST",
+      body: JSON.stringify({ name: churchName, region, country }),
+    });
+    if (res.ok) {
+      alert("successfully added region");
+      queryClient.refetchQueries(["churches"]);
+    } else {
+      alert("An error occurred: " + res.statusText);
+    }
+    // Reset the input
+    setChurchName("");
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button className={buttonStyle}>ADD</button>
+      </DialogTrigger>
+      <DialogContent className="bg-white border-4 border-[#FCC346]">
+        <DialogHeader>
+          <DialogTitle className="font-bold text-lg">Add Region</DialogTitle>
+          <DialogDescription className="text-[#B7B7B7] font-light text-sm">
+            Enter the name of the new region you want to add.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="region-name" className="text-right font-bold">
+              Church Name
+            </Label>
+            <input
+              id="region-name"
+              value={churchName}
+              onChange={(e) => setChurchName(e.target.value)}
+              className="col-span-3 border-2 border-black rounded-sm px-1 py-1"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="region-name" className="text-right font-bold">
+              Region
+            </Label>
+            <input
+              id="region-name"
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
+              className="col-span-3 border-2 border-black rounded-sm px-1 py-1"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <button className={buttonStyle} onClick={handleAddRegion}>
+            Add Region
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function DeleteChurchModal() {
+  const [regionToDelete, setRegionToDelete] = useState("");
+
+  // This is a placeholder. In a real application, you'd fetch this data from your backend.
+  const [regions, setRegions] = useState([]);
+
+  useEffect(() => {
+    const fetchRegions = async () => {
+      const res = await fetch("/api/cms/region", { method: "GET" });
+      if (res.ok) {
+        const data = await res.json();
+        setRegions(data);
+      } else {
+        alert("An error occurred while fetching regions");
+      }
+    };
+    fetchRegions();
+  }, []);
+
+  const handleDeleteRegion = async () => {
+    // Add logic to handle deleting a region
+    console.log("Deleting region:", regionToDelete);
+    const res = await fetch(`/api/cms/region/${regionToDelete}/`, {
+      method: "DELETE",
+    });
+    // Reset the selection
+    setRegionToDelete("");
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button className={buttonStyle}>DELETE</button>
+      </DialogTrigger>
+      <DialogContent className="bg-white border-4 border-[#FCC346]">
+        <DialogHeader>
+          <DialogTitle className="font-bold text-lg">Delete Region</DialogTitle>
+          <DialogDescription className="text-[#B7B7B7] font-light text-sm">
+            Select the region you want to delete.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="region-delete" className="text-right font-bold">
+              Region
+            </Label>
+            <Select value={regionToDelete} onValueChange={setRegionToDelete}>
+              <SelectTrigger className="col-span-3 border-2 border-black rounded-sm">
+                <SelectValue placeholder="Select a Region" />
+              </SelectTrigger>
+              <SelectContent>
+                {regions.map((region, index) => (
+                  <SelectItem key={index} value={region.id}>
+                    {region.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <DialogFooter>
+          <button
+            className={buttonStyle}
+            onClick={handleDeleteRegion}
+            disabled={!regionToDelete}
+          >
+            Delete Region
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function ChangePasswordModal() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
