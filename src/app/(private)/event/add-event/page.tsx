@@ -95,8 +95,11 @@ export default function AddWorshipEvent() {
       const m = await Promise.all(
         memberIds.map(async (id) => {
           const res = await fetch(`/api/members/${id}`, { method: "GET" });
-          if (!res.ok) throw new Error("Failed to fetch");
-          return await res.json();
+          if (!res.ok) {
+            alert(`Member with ID ${id} does not exist`);
+          } else {
+            return await res.json();
+          }
         })
       );
       setMembers(m);
@@ -268,7 +271,7 @@ export default function AddWorshipEvent() {
                       key={val.ID}
                       className="hover:bg-gray-200 w-full text-left rounded p-2"
                       onClick={() => {
-                        setChurch(val.ID);
+                        setChurch(val);
                         toggleDropdown("church");
                       }}
                     >
@@ -341,15 +344,15 @@ export default function AddWorshipEvent() {
                 body: JSON.stringify({
                   event_name: eventName,
                   date: date,
-                  worship_type: worshipTypes[worshipType],
-                  church,
+                  worship_type: worshipType,
+                  church: church.ID,
                 }),
               });
 
-              const addedID = (await resp.json())["Worship ID"];
+              const addedID = (await resp.json())["ID"];
               await Promise.all([
                 ...memberIds.map(async (id) => {
-                  const resp = await fetch(`/api/worship/attendee/${addedID}`, {
+                  const resp = await fetch(`/api/worship/attendee`, {
                     method: "POST",
                     body: JSON.stringify({
                       worship: addedID,
@@ -362,7 +365,7 @@ export default function AddWorshipEvent() {
                   }
                 }),
                 ...guests.map(async (guest) => {
-                  const resp = await fetch(`/api/worship/attendee/${addedID}`, {
+                  const resp = await fetch(`/api/worship/attendee`, {
                     method: "POST",
                     body: JSON.stringify({
                       worship: addedID,

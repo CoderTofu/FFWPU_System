@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const resp = await fetchWithAuth("/chuch/", {
+  const resp = await fetchWithAuth("/church/", {
     method: "POST",
     body: JSON.stringify(body),
   });

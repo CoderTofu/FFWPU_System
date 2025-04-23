@@ -23,20 +23,23 @@ export default function EventInfo() {
 
   useEffect(() => {
     if (eventQuery.status === "success") {
-      console.log(eventQuery.data);
-      setData(eventQuery.data);
+      const data = eventQuery.data.map((event) => ({
+        ...event,
+        Church: event.Church.Name,
+      }));
+      setData(data);
     } else if (eventQuery.status === "error") {
       alert("An error occurred while fetching data.");
     }
   }, [eventQuery.data, eventQuery.status]);
 
-  const dataID = "Worship ID";
+  const dataID = "ID";
 
   // Column configuration for responsive table
   const columnConfig = {
-    lg: ["Worship ID", "Name", "Date", "Church Name", "Worship Type"],
-    md: ["Name", "Date", "Church Name", "Worship Type"],
-    sm: ["Name", "Church Name"],
+    lg: ["ID", "Event Name", "Date", "Church", "Worship Type"],
+    md: ["Event Name", "Date", "Church Name", "Worship Type"],
+    sm: ["Event Name", "Church Name"],
   };
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);

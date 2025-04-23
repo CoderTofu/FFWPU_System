@@ -8,6 +8,7 @@ import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
 import { axiosInstance } from "@/app/axiosInstance";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 interface Field {
   name: string;
   label: string;
@@ -26,6 +27,7 @@ export default function EditWorshipEvent() {
 
   const [memberIds, setMemberIds] = useState([]);
   const worshipTypes = { Onsite: 1, Online: 2 };
+  const [worshipID, setWorshipID] = useState("");
   const [worshipType, setWorshipType] = useState("");
   const [openDropdown, setOpenDropdown] = useState(null);
   const [church, setChurch] = useState(null);
@@ -44,35 +46,34 @@ export default function EditWorshipEvent() {
   >(null);
 
   useEffect(() => {
-    const callback = async () => {
-      let ids = [];
-      const resp = await fetch(`/api/event/${params.eventID}`, {
+    const fetchData = async () => {
+      const res = await fetch(`/api/worship/${params.eventID}`, {
         method: "GET",
       });
-
-      if (resp.ok) {
-        const data = await resp.json();
-        setWorshipInfo(data);
-        setWorshipType(data["Worship Type"]);
-        setEventName(data.Name);
+      if (res.ok) {
+        const data = await res.json();
+        setGuests(
+          data.Attendees.filter((attendee) => attendee.Type === "Guest")
+        );
+        const members = data.Attendees.filter(
+          (attendee) => attendee.Type === "Member"
+        );
+        setAttendees(
+          members.map((attendee) => ({
+            ...attendee,
+            ID: attendee.Member.ID,
+            "Full Name": attendee.Member["Full Name"],
+          }))
+        );
+        setWorshipID(data.ID);
+        setEventName(data["Event Name"]);
         setDate(data.Date);
-        setGuests([...data.Guests]);
-        const here = data.Attendees.map((attendee) => attendee["Member ID"]);
-        setMemberIds([...here]);
-        setAttendees([...data.Attendees]);
-      } else {
-        alert("Error while fetching events: " + resp.statusText);
-      }
-
-      const resp2 = await fetch("/api/members/church", { method: "GET" });
-      if (resp2.ok) {
-        const data = await resp2.json();
-        setChurches(data);
-      } else {
-        alert("Error while fetching churches: " + resp2.statusText);
+        setWorshipType(data["Worship Type"]);
+        setChurch(data.Church);
+        // set images
       }
     };
-    callback();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -85,8 +86,9 @@ export default function EditWorshipEvent() {
 
   useEffect(() => {
     const fetchMembers = async () => {
-      const fetched = await Promise.all(
-        memberIds.map(async (id) => {
+      const fetched = await Promise.all([
+        ...attendees,
+        ...memberIds.map(async (id) => {
           try {
             const resp = await fetch(`/api/members/${id}`, { method: "GET" });
             if (resp.ok) {
@@ -99,8 +101,8 @@ export default function EditWorshipEvent() {
             console.error("Error fetching member:", error);
             return null; // Return null or handle the error case
           }
-        })
-      );
+        }),
+      ]);
 
       // Filter out any null values (from failed fetches)
       const validMembers = fetched.filter((member) => member !== null);
@@ -133,37 +135,18 @@ export default function EditWorshipEvent() {
     setIsRegistrationModalOpen(true);
   };
 
-  const handleGuestDelete = async () => {
-    console.log("Deleting Guest: " + selectedGuest);
-    const resp = await fetch(`/api/event/${params.eventID}/remove-guest`, {
-      method: "POST",
-      body: JSON.stringify({
-        event_id: params.eventID,
-        guest_id: selectedGuest["Guest ID"],
-      }),
-    });
-    if (resp.ok) {
-      location.reload();
-    } else {
-      alert("An error occurred while deleting guest: " + resp.statusText);
-    }
-  };
+  const [attendeesToDelete, setAttendeesToDelete] = useState([]);
 
   const handleMemberDelete = async () => {
-    // setMembers(members.filter((member) => member !== selectedMember));
+    setAttendees(attendees.filter((member) => member !== selectedMember));
     console.log(selectedMember);
-    const resp = await fetch(`/api/event/${params.eventID}/remove-attendee`, {
-      method: "POST",
-      body: JSON.stringify({
-        event_id: params.eventID,
-        member_id: selectedMember["Member ID"],
-      }),
-    });
-    if (resp.ok) {
-      location.reload();
-    } else {
-      alert("An error occurred while deleting attendee: " + resp.statusText);
-    }
+    setAttendeesToDelete((prev) => [...prev, selectedMember.ID]);
+  };
+  const handleGuestDelete = async () => {
+    setGuests(guests.filter((member) => member !== selectedGuest));
+    setNewGuests(newGuests.filter((guest) => guest !== selectedGuest));
+    console.log(selectedGuest);
+    setAttendeesToDelete((prev) => [...prev, selectedGuest.ID]);
   };
 
   return (
@@ -191,8 +174,8 @@ export default function EditWorshipEvent() {
             <Table
               data={attendees}
               columns={{
-                lg: ["Member ID", "Full Name"],
-                md: ["Member ID", "Full Name"],
+                lg: ["ID", "Full Name"],
+                md: ["ID", "Full Name"],
                 sm: ["Full Name"],
               }}
               onRowSelect={setSelectedMember}
@@ -224,9 +207,9 @@ export default function EditWorshipEvent() {
             <Table
               data={[...guests, ...newGuests]}
               columns={{
-                lg: ["Name", "Email"],
-                md: ["Name", "Email"],
-                sm: ["Name"],
+                lg: ["Full Name", "Email"],
+                md: ["Full Name", "Email"],
+                sm: ["Full Name"],
               }}
               onRowSelect={setSelectedGuest}
             />
@@ -253,7 +236,7 @@ export default function EditWorshipEvent() {
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Worship ID"
             disabled
-            value={worshipInfo["Worship ID"] || ""}
+            value={worshipID || ""}
           />
 
           <label className="block font-medium mt-5">Event Name</label>
@@ -403,45 +386,55 @@ export default function EditWorshipEvent() {
           onConfirm={async () => {
             console.log("Updating...");
             try {
-              const res = await fetch(`/api/event/${params.eventID}`, {
+              const res = await fetch(`/api/worship/${params.eventID}`, {
                 method: "PATCH",
                 body: JSON.stringify({
                   name: eventName,
                   date,
-                  worship_type: worshipTypes[worshipType],
+                  worship_type: worshipType,
                   church: church.ID,
                 }),
               });
               const data = await res.json();
-              const addedID = data["Worship ID"];
+              const addedID = params.eventID;
               await Promise.all([
                 ...memberIds.map(async (id) => {
-                  const resp = await fetch(
-                    `/api/event/${addedID}/add-attendee`,
-                    {
-                      method: "POST",
-                      body: JSON.stringify({
-                        event_id: addedID,
-                        member_id: id,
-                      }),
-                    }
-                  );
+                  const resp = await fetch(`/api/worship/attendee`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                      worship: addedID,
+                      member: id,
+                      type: "Member",
+                    }),
+                  });
                   if (!resp.ok) {
                     alert("Error adding member " + id);
                   }
                 }),
                 ...newGuests.map(async (guest) => {
-                  const resp = await fetch(`/api/event/${addedID}/add-guest`, {
+                  const resp = await fetch(`/api/worship/attendee`, {
                     method: "POST",
                     body: JSON.stringify({
-                      event_id: addedID,
-                      name: guest.Name,
+                      worship: addedID,
+                      type: "Guest",
+                      full_name: guest["Full Name"],
                       email: guest.Email,
                       invited_by: guest.invitedBy || null,
                     }),
                   });
                   if (!resp.ok) {
                     alert("Error adding guest" + guest.Name);
+                  }
+                }),
+                ...attendeesToDelete.map(async (attendee) => {
+                  const resp = await fetch(
+                    `/api/worship/attendee/${attendee}`,
+                    {
+                      method: "DELETE",
+                    }
+                  );
+                  if (!resp.ok) {
+                    alert("Error deleting attendee" + attendee);
                   }
                 }),
               ]);
@@ -494,7 +487,7 @@ export default function EditWorshipEvent() {
                 ]
               : [
                   {
-                    name: "Name",
+                    name: "Full Name",
                     label: "Full Name:",
                     type: "text",
                     required: true,
