@@ -5,6 +5,7 @@ import Modal from "@/components/Modal";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 export default function EditDonation() {
   const params = useParams();
   const router = useRouter();
@@ -15,8 +16,8 @@ export default function EditDonation() {
   const [member, setMember] = useState({});
   const [church, setChurch] = useState({});
   const [formData, setFormData] = useState({
-    member: null,
-    church: null,
+    member: "",
+    church: "",
     date: null,
     amount: null,
     currency: null,
@@ -33,7 +34,7 @@ export default function EditDonation() {
         setMember(data.Member);
         setChurch(data.Church);
         setFormData({
-          member: data.Member["Member ID"],
+          member: data.Member["ID"],
           church: data.Church.ID,
           amount: data.Amount,
           date: data.Date,
@@ -43,12 +44,27 @@ export default function EditDonation() {
       } else {
         alert("An error occurred while fetching donation: " + res.statusText);
       }
-      const c = await fetch("/api/members/church", { method: "GET" });
-      if (c.ok) {
-        setChurches(await c.json());
-      }
     })();
   }, []);
+
+  const churchQuery = useQuery({
+    queryKey: ["churches"],
+    queryFn: async () => {
+      const res = await fetch("/api/church", { method: "GET" });
+      if (!res.ok) {
+        throw new Error("Error while fetching churches");
+      }
+      return await res.json();
+    },
+  });
+
+  useEffect(() => {
+    if (churchQuery.status === "success") {
+      setChurches(churchQuery.data);
+    } else if (churchQuery.status === "error") {
+      alert(churchQuery.error.message);
+    }
+  }, [churchQuery.data, churchQuery.status]);
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -119,7 +135,7 @@ export default function EditDonation() {
               onChange={(e) =>
                 setFormData({ ...formData, member: e.target.value })
               }
-              value={member["Member ID"]}
+              value={member["ID"] || ""}
               disabled
               required
             />

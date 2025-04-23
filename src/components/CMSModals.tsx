@@ -694,28 +694,21 @@ export function AddNewAdminModal() {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
 
-  const handleAddAdmin = () => {
+  const handleAddAdmin = async () => {
     // Add logic to handle adding a new admin
-    axiosInstance
-      .post("/add-admin/", {
+    const res = await fetch("/api/cms/add-admin", {
+      method: "POST",
+      body: JSON.stringify({
         username: adminName,
         email: adminEmail,
         password: adminPassword,
-      })
-      .then((response) => {
-        if (response.status == 201) {
-          alert(`Successfully added admin ${adminName}!`);
-        }
-      })
-      .catch((err) => {
-        if (err.response) {
-          alert(err.response.data.error);
-        } else {
-          alert(err.status);
-        }
-      });
-    // console.log("Adding new admin:", adminName, adminEmail);
-    // Reset the inputs
+      }),
+    });
+    if (res.ok) {
+      alert("Successfully created admin");
+    } else {
+      alert("Error while creating admin");
+    }
     setAdminName("");
     setAdminEmail("");
     setAdminPassword("");
