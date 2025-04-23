@@ -10,7 +10,7 @@ export default function AddBlessing() {
   const [members, setMembers] = useState([]);
   const [memberIds, setMemberIds] = useState([]);
   const [blessingName, setBlessingName] = useState("");
-  const [chaenbo, setChaenbo] = useState(1);
+  const [chaenbo, setChaenbo] = useState("");
   const [guests, setGuests] = useState([]);
 
   const [selectedMember, setSelectedMember] = useState<{
@@ -35,46 +35,31 @@ export default function AddBlessing() {
 
   const handleGuestDelete = () => {
     console.log("Deleting Guest: " + selectedGuest);
-    setGuests(
-      guests.filter((guest) => guest["Guest ID"] != selectedGuest["ID"])
-    );
+    setGuests(guests.filter((guest) => guest != selectedGuest));
   };
   const handleMemberDelete = () => {
     console.log("Deleting Member: " + selectedMember);
-    setMemberIds(memberIds.filter((id) => id != selectedMember["Member ID"]));
-    setMembers(
-      members.filter(
-        (member) => member["Member ID"] != selectedMember["Member ID"]
-      )
-    );
+    setMemberIds(memberIds.filter((id) => id != selectedMember["ID"]));
+    setMembers(members.filter((member) => member != selectedMember));
   };
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      const fetched = await Promise.all(
+    const getMember = async () => {
+      const m = await Promise.all(
         memberIds.map(async (id) => {
-          try {
-            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
-            if (resp.ok) {
-              return await resp.json();
-            } else {
-              alert("Error while fetching member id: " + id);
-              return null; // Return null or handle the error case
-            }
-          } catch (error) {
-            console.error("Error fetching member:", error);
-            return null; // Return null or handle the error case
+          const res = await fetch(`/api/members/${id}`, { method: "GET" });
+          if (!res.ok) {
+            alert(`Member with ID ${id} does not exist`);
+          } else {
+            return await res.json();
           }
         })
       );
-
-      // Filter out any null values (from failed fetches)
-      const validMembers = fetched.filter((member) => member !== null);
-      setMembers(validMembers);
+      setMembers(m);
     };
-
-    fetchMembers();
+    getMember();
   }, [memberIds]);
+
   return (
     <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7 mb-10">
       {/* Page Title */}
@@ -99,8 +84,8 @@ export default function AddBlessing() {
           <Table
             data={members}
             columns={{
-              lg: ["Member ID", "Full Name"],
-              md: ["Member ID", "Full Name"],
+              lg: ["ID", "Full Name"],
+              md: ["ID", "Full Name"],
               sm: ["Full Name"],
             }}
             onRowSelect={setSelectedMember}
@@ -178,7 +163,9 @@ export default function AddBlessing() {
                   type="radio"
                   className="mr-2"
                   name="chaenbo"
-                  onChange={(e) => setChaenbo(e.target.checked ? 1 : 2)}
+                  onChange={(e) =>
+                    setChaenbo(e.target.checked ? "Vertical" : "Horizontal")
+                  }
                 />
                 <label>Vertical</label>
               </div>
@@ -187,7 +174,9 @@ export default function AddBlessing() {
                   type="radio"
                   className="mr-2"
                   name="chaenbo"
-                  onChange={(e) => setChaenbo(e.target.checked ? 2 : 1)}
+                  onChange={(e) =>
+                    setChaenbo(e.target.checked ? "Horizontal" : "Vertical")
+                  }
                 />
                 <label>Horizontal</label>
               </div>
@@ -219,49 +208,43 @@ export default function AddBlessing() {
             const res = await fetch("/api/blessings", {
               method: "POST",
               body: JSON.stringify({
-                blessing_date: date,
-                name_of_blessing: blessingName,
+                date,
+                name: blessingName,
                 chaenbo,
               }),
             });
-            if (res.ok) {
-              const data = await res.json();
-              const memberRes = await fetch(
-                `/api/blessings/${data["Blessing ID"]}/add-member`,
-                {
-                  method: "PATCH",
-                  body: JSON.stringify({ members: memberIds }),
-                }
-              );
-              if (memberRes.ok) {
-                alert("Added members successfully");
-              } else {
-                alert(
-                  "An error occurred while adding members: " + res.statusText
-                );
-              }
 
-              await Promise.all(
-                guests.map(async (guest) => {
-                  const g = await fetch(
-                    `/api/blessings/${data["Blessing ID"]}/add-guest`,
-                    {
-                      method: "POST",
-                      body: JSON.stringify({
-                        name: guest.Name,
-                        email: guest.Email,
-                        invited_by: guest.invitedBy || null,
-                      }),
-                    }
-                  );
-                  if (g.ok) {
-                    alert("Successfully added guest " + guest.Name);
-                  } else {
-                    alert("Error while adding guest " + guest.Name);
-                  }
-                })
-              );
-            }
+            const addedID = (await res.json())["ID"];
+            await Promise.all([
+              ...memberIds.map(async (id) => {
+                const resp = await fetch(`/api/blessings/recipient`, {
+                  method: "POST",
+                  body: JSON.stringify({
+                    blessing: addedID,
+                    type: "Member",
+                    member: id,
+                  }),
+                });
+                if (!resp.ok) {
+                  alert("Error adding member " + id);
+                }
+              }),
+              ...guests.map(async (guest) => {
+                const resp = await fetch(`/api/blessings/recipient`, {
+                  method: "POST",
+                  body: JSON.stringify({
+                    blessing: addedID,
+                    type: "Guest",
+                    full_name: guest.Name,
+                    email: guest.Email,
+                    invited_by: guest.invitedBy || null,
+                  }),
+                });
+                if (!resp.ok) {
+                  alert("Error adding guest" + guest.Name);
+                }
+              }),
+            ]);
 
             setShowModal(false);
           }}

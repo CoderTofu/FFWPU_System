@@ -33,13 +33,13 @@ export async function DELETE(request: NextApiRequest, { params }) {
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { eventID: string } }
+  { params }: { params: { id: string } }
 ) {
   const body = await request.json();
-  const { eventID } = await params;
+  const { id } = await params;
   console.log(body);
   try {
-    const resp = await fetchWithAuth(`/worship-attendee/${eventID}/`, {
+    const resp = await fetchWithAuth(`/worship-attendee/${id}/`, {
       method: "PATCH",
       body: JSON.stringify(body),
     });
