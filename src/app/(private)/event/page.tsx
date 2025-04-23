@@ -6,14 +6,14 @@ import Table from "@/components/Table";
 import { Search, ChevronDown } from "lucide-react";
 import Modal from "@/components/Modal";
 import { axiosInstance } from "@/app/axiosInstance";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function EventInfo() {
   const router = useRouter();
   const [data, setData] = useState([]);
 
   const eventQuery = useQuery({
-    queryKey: ["events"],
+    queryKey: ["worships"],
     queryFn: async () => {
       const res = await fetch("/api/worship", { method: "GET" });
       if (!res.ok) throw new Error("Failed to fetch");
@@ -41,6 +41,7 @@ export default function EventInfo() {
     md: ["Event Name", "Date", "Church Name", "Worship Type"],
     sm: ["Event Name", "Church Name"],
   };
+  const queryClient = useQueryClient();
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -213,7 +214,7 @@ export default function EventInfo() {
               method: "DELETE",
             });
             if (resp.ok) {
-              location.reload();
+              queryClient.refetchQueries(["worships"]);
             } else {
               alert(
                 "An error occurred while deleting worship: " + resp.statusText

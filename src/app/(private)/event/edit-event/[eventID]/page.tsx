@@ -61,6 +61,7 @@ export default function EditWorshipEvent() {
         setAttendees(
           members.map((attendee) => ({
             ...attendee,
+            attendee_id: attendee.ID,
             ID: attendee.Member.ID,
             "Full Name": attendee.Member["Full Name"],
           }))
@@ -140,7 +141,7 @@ export default function EditWorshipEvent() {
   const handleMemberDelete = async () => {
     setAttendees(attendees.filter((member) => member !== selectedMember));
     console.log(selectedMember);
-    setAttendeesToDelete((prev) => [...prev, selectedMember.ID]);
+    setAttendeesToDelete((prev) => [...prev, selectedMember.attendee_id]);
   };
   const handleGuestDelete = async () => {
     setGuests(guests.filter((member) => member !== selectedGuest));
@@ -434,7 +435,7 @@ export default function EditWorshipEvent() {
                     }
                   );
                   if (!resp.ok) {
-                    alert("Error deleting attendee" + attendee);
+                    alert("Error deleting attendee " + attendee);
                   }
                 }),
               ]);
