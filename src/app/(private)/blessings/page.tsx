@@ -42,40 +42,8 @@ export default function ViewBlessing() {
     sm: ["ID", "Date"],
   };
 
-  // const [blessing, setBlessing] = useState([
-  //   {
-  //     "Blessing ID": 102010,
-  //     Date: "02/19/2021",
-  //     "Name of Blessing": "Blessing 1",
-  //     Year: 2021,
-  //   },
-  //   {
-  //     "Blessing ID": 124495,
-  //     Date: "02/21/2025",
-  //     "Name of Blessing": "First Sunday Event",
-  //     Year: 2025,
-  //   },
-  //   {
-  //     "Blessing ID": 321345,
-  //     Date: "02/26/2025",
-  //     "Name of Blessing": "Blessing 3",
-  //     Year: 2025,
-  //   },
-  //   {
-  //     "Blessing ID": 124495,
-  //     Date: "02/21/2025",
-  //     "Name of Blessing": "Blessing 4",
-  //     Year: 2019,
-  //   },
-  // ]);
-
   // DATA ID
   const dataId = "ID";
-
-  // const availableYears = [
-  //   "All Years",
-  //   ...Array.from(new Set(blessings.map((item) => item.Year.toString()))),
-  // ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,9 +64,6 @@ export default function ViewBlessing() {
         .join(" ")
         .toLowerCase()
         .includes(searchQuery.toLowerCase())
-    // (selectedYear && selectedYear !== "All Years"
-    //   ? item.Year.toString() === selectedYear
-    //   : true)
   );
 
   const handleEditClick = () => {
@@ -129,6 +94,17 @@ export default function ViewBlessing() {
     setIsOpen(false);
   };
 
+  const handleAddClick = () => {
+    router.push("/blessings/add-blessing")
+  }
+
+  const handleDeleteClick = () => {
+    if (selectedRow) {
+      setRowToDelete(selectedRow);
+      setIsOpen(true);
+    }
+  }
+
   return (
     <div className="px-0 md:px-[150px] mt-8">
       {/* Header */}
@@ -150,37 +126,8 @@ export default function ViewBlessing() {
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
         </div>
 
-        {/* Filter Dropdown */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() =>
-              setOpenDropdown(openDropdown === "Year" ? null : "Year")
-            }
-            className="w-30 md:w-36 lg:w-40 h-7 border border-[#01438F] rounded-md px-3 outline-none bg-white text-sm text-gray-500 flex justify-between items-center"
-          >
-            Year
-            <ChevronDown className="w-4 h-4 text-gray-500" />
-          </button>
-          {openDropdown === "Year" && (
-            <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md z-10">
-              {availableYears.map((year) => (
-                <label
-                  key={year}
-                  className="flex items-center px-3 py-2 hover:bg-gray-200 text-[14px]"
-                >
-                  <input
-                    type="radio"
-                    name="year"
-                    className="mr-2"
-                    checked={selectedYear === year}
-                    onChange={() => setSelectedYear(year)}
-                  />
-                  {year}
-                </label>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* INSERT FILTER DROPDOWN HERE */}
+        
       </div>
 
       {/* Table */}
@@ -198,7 +145,7 @@ export default function ViewBlessing() {
       <div className="flex justify-center items-center m-7 gap-5">
         <button
           className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-          onClick={() => router.push("/blessings/add-blessing")}
+          onClick={handleAddClick}
         >
           ADD
         </button>
@@ -214,12 +161,7 @@ export default function ViewBlessing() {
           EDIT
         </button>
         <button
-          onClick={() => {
-            if (selectedRow) {
-              setRowToDelete(selectedRow);
-              setIsOpen(true);
-            }
-          }}
+          onClick={handleDeleteClick}
           disabled={!selectedRow}
           className={`px-4 py-2 rounded ${
             selectedRow

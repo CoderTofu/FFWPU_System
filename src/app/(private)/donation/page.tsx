@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import Table from "@/components/Table";
-import DonationModals from "@/components/DonationModals";
-import { Currency } from "lucide-react";
+import { Search } from "lucide-react";
+
 import { useQuery } from "@tanstack/react-query";
 interface DataItem {
   ID: number;
@@ -17,6 +17,8 @@ interface DataItem {
 }
 
 export default function Donation() {
+    const [searchQuery, setSearchQuery] = useState("");
+  
   const [selectedRow, setSelectedRow] = useState(null);
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
@@ -134,13 +136,23 @@ export default function Donation() {
         <p className="text-[28px] font-bold">DONATIONS</p>
       </div>
 
-      <div className="w-full flex flex-col mt-4">
-        <DonationModals
-          openSortDropdown={openSortDropdown}
-          toggleSortDropdown={setOpenSortDropdown}
-          handleSort={handleSort}
-        />
-      </div>
+            {/* Search and Filters */}
+            <div className="flex flex-wrap items-center gap-4 mt-4 justify-between ">
+              {/* Search */}
+              <div className="relative w-full sm:max-w-xs">
+                <input
+                  className="w-full h-7 pl-8 border border-[#01438F] rounded outline-none text-sm"
+                  type="text"
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
+              </div>
+      
+              {/* INSERT FILTER DROPDOWN HERE */}
+              
+            </div>
 
       <div className="rounded-lg items-center justify-center mt-4">
         <div className="bg-white">

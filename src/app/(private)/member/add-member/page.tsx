@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { ImageIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { middleware } from "@/middleware";
+
 export default function AddMemberForm() {
   const [formData, setFormData] = useState({
     givenName: "",
@@ -54,6 +55,7 @@ export default function AddMemberForm() {
       return res.json();
     },
   });
+  
   const subregionQuery = useQuery({
     queryKey: ["subregions"],
     queryFn: async () => {
@@ -102,6 +104,7 @@ export default function AddMemberForm() {
       alert("An error occurred");
     },
   });
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {

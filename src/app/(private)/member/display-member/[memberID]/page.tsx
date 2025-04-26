@@ -209,23 +209,29 @@ export default function DisplayMember() {
                     Blessings
                   </h4>
                   <div className="space-y-3">
-                    {userBlessings.map((blessing, index) => (
+                    {userBlessings != undefined ? (
+                      userBlessings.map((blessing, index) => (
                       <div
                         key={index}
                         className="flex items-center gap-4 p-3 rounded-md bg-muted/50"
                       >
                         <Award className="h-5 w-5 text-primary" />
                         <div>
-                          <div className="font-medium">
-                            {blessing["Name Of Blessing"]}
-                          </div>
-                          <div className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {blessing["Blessing Date"]}
-                          </div>
+                        <div className="font-medium">
+                          {blessing["Name Of Blessing"]}
+                        </div>
+                        <div className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {blessing["Blessing Date"]}
+                        </div>
                         </div>
                       </div>
-                    ))}
+                      ))
+                    ) : (
+                      <div className="text-sm text-muted-foreground">
+                      No blessings available.
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
