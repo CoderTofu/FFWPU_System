@@ -9,8 +9,6 @@ import {
   DeleteSubregionModal,
   ChangePasswordModal,
   AddNewAdminModal,
-  AddChurchModal,
-  DeleteChurchModal,
 } from "@/components/CMSModals";
 
 export default function CMS() {
@@ -111,25 +109,6 @@ export default function CMS() {
           <div className="flex gap-2 justify-center px-8">
             <AddSubregionModal />
             <DeleteSubregionModal />
-          </div>
-        </div>
-        <div className="w-[350px] h-[200px] rounded-xl flex flex-col justify-center bg-white py-4 shadow-[0px_0px_6.584px_0px_rgba(0,0,0,0.25)]">
-          <div className="flex gap-4 mb-5 justify-center">
-            <img
-              src="/icons/location_icon.svg"
-              className="w-8"
-              alt="location icon"
-            />
-            <div>
-              <h2 className="font-bold text-lg">ADD & DELETE CHURCH</h2>
-              <p className="text-[#B7B7B7] font-light text-sm">
-                Edit churches here
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2 justify-center px-8">
-            <AddChurchModal />
-            <DeleteChurchModal />
           </div>
         </div>
 

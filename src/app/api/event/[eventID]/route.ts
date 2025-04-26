@@ -8,10 +8,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { eventID: string } }
 ) {
-  const { id } = params;
-  const resp = await fetchWithAuth(`/worship/${id}`, {
+  const { eventID } = params;
+  const resp = await fetchWithAuth(`/worship/${eventID}`, {
     method: "GET",
   });
   if (resp.status >= 200 && resp.status <= 299) {
@@ -21,8 +21,8 @@ export async function GET(
 }
 
 export async function DELETE(request: NextApiRequest, { params }) {
-  const { id } = await params;
-  const resp = await fetchWithAuth(`/worship/${id}/`, { method: "DELETE" });
+  const { eventID } = await params;
+  const resp = await fetchWithAuth(`/worship/${eventID}`, { method: "DELETE" });
   if (resp.status >= 200 && resp.status <= 299) {
     return NextResponse.json(resp.data);
   }
@@ -37,7 +37,7 @@ export async function PATCH(
   const { eventID } = await params;
   console.log(body);
   try {
-    const resp = await fetchWithAuth(`/worship/${eventID}/`, {
+    const resp = await fetchWithAuth(`/worship/${eventID}`, {
       method: "PATCH",
       body: JSON.stringify(body),
     });

@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, use } from "react";
 import Modal from "@/components/Modal";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 
 export default function AddDonation() {
   const router = useRouter();
@@ -22,25 +21,6 @@ export default function AddDonation() {
   });
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
   const dropdownButtonRef = useRef<HTMLButtonElement>(null);
-
-  const churchQuery = useQuery({
-    queryKey: ["churches"],
-    queryFn: async () => {
-      const res = await fetch("/api/church", { method: "GET" });
-      if (!res.ok) {
-        throw new Error("Error while fetching churches");
-      }
-      return await res.json();
-    },
-  });
-
-  useEffect(() => {
-    if (churchQuery.status === "success") {
-      setChurches(churchQuery.data);
-    } else if (churchQuery.status === "error") {
-      alert(churchQuery.error.message);
-    }
-  }, [churchQuery.data, churchQuery.status]);
 
   const handleConfirm = async () => {
     console.log("Confirmed!");
@@ -85,6 +65,17 @@ export default function AddDonation() {
     setFormData({ ...formData, currency });
     setOpenDropdown(null);
   };
+
+  useEffect(() => {
+    (async function () {
+      const res = await fetch("/api/members/church", { method: "GET" });
+      if (res.ok) {
+        setChurches(await res.json());
+      } else {
+        alert("An error occurred while fetching churches: " + res.statusText);
+      }
+    })();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7">

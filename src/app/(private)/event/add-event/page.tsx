@@ -7,14 +7,12 @@ import {
   XCircle,
   ChevronDown,
   ChevronUp,
-  Fullscreen,
 } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { axiosInstance } from "@/app/axiosInstance";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 
 export default function AddWorshipEvent() {
   const [memberIds, setMemberIds] = useState([]);
@@ -47,19 +45,20 @@ export default function AddWorshipEvent() {
     }
   };
 
-  const churchQuery = useQuery({
-    queryKey: ["churches"],
-    queryFn: async () => {
-      const res = await fetch("/api/church", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
-    },
-  });
-
   const [openDropdown, setOpenDropdown] = useState("");
   const [churches, setChurches] = useState([]);
   const [church, setChurch] = useState(null);
 
+  useEffect(() => {
+    (async function () {
+      const resp = await fetch("/api/members/church", { method: "GET" });
+      if (resp.ok) {
+        setChurches(await resp.json());
+      } else {
+        alert("An error occurred while fetching churches: " + resp.statusText);
+      }
+    })();
+  }, []);
   const handleDeleteImage = (index: number) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
@@ -75,38 +74,42 @@ export default function AddWorshipEvent() {
 
   const handleMemberDelete = () => {
     setMembers(members.filter((member) => member !== selectedMember));
-    setMemberIds(memberIds.filter((id) => id != selectedMember["ID"]));
+    setMemberIds(memberIds.filter((id) => id != selectedMember["Member ID"]));
   };
 
   const toggleDropdown = (dropdown) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
-
   useEffect(() => {
-    if (churchQuery.status === "success") {
-      setChurches(churchQuery.data);
-    } else if (churchQuery.status === "error") {
-      alert("An error occurred while fetching data.");
-    }
-  }, [churchQuery.data, churchQuery.status]);
-
-  useEffect(() => {
-    const getMember = async () => {
-      const m = await Promise.all(
+    const fetchMembers = async () => {
+      const fetched = await Promise.all(
         memberIds.map(async (id) => {
-          const res = await fetch(`/api/members/${id}`, { method: "GET" });
-          if (!res.ok) {
-            alert(`Member with ID ${id} does not exist`);
-          } else {
-            return await res.json();
+          try {
+            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+            if (resp.ok) {
+              return await resp.json();
+            } else {
+              alert("Error while fetching member id: " + id);
+              return null; // Return null or handle the error case
+            }
+          } catch (error) {
+            console.error("Error fetching member:", error);
+            return null; // Return null or handle the error case
           }
         })
       );
-      setMembers(m);
+
+      // Filter out any null values (from failed fetches)
+      const validMembers = fetched.filter((member) => member !== null);
+      setMembers(validMembers);
     };
-    getMember();
+
+    fetchMembers();
   }, [memberIds]);
 
+  useEffect(() => {
+    console.log(guests);
+  }, [guests]);
   return (
     <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
       {/* Header */}
@@ -132,8 +135,8 @@ export default function AddWorshipEvent() {
             <Table
               data={members}
               columns={{
-                lg: ["ID", "Full Name"],
-                md: ["ID", "Full Name"],
+                lg: ["Member ID", "Full Name"],
+                md: ["Member ID", "Full Name"],
                 sm: ["Full Name"],
               }}
               onRowSelect={setSelectedMember}
@@ -339,38 +342,39 @@ export default function AddWorshipEvent() {
           onConfirm={async () => {
             console.log("Saving...");
             try {
-              const resp = await fetch("/api/worship/", {
+              const resp = await fetch("/api/event/", {
                 method: "POST",
                 body: JSON.stringify({
-                  event_name: eventName,
+                  name: eventName,
                   date: date,
-                  worship_type: worshipType,
+                  worship_type: worshipTypes[worshipType],
                   church: church.ID,
                 }),
               });
 
-              const addedID = (await resp.json())["ID"];
+              const addedID = (await resp.json())["Worship ID"];
               await Promise.all([
                 ...memberIds.map(async (id) => {
-                  const resp = await fetch(`/api/worship/attendee`, {
-                    method: "POST",
-                    body: JSON.stringify({
-                      worship: addedID,
-                      type: "Member",
-                      member: id,
-                    }),
-                  });
+                  const resp = await fetch(
+                    `/api/event/${addedID}/add-attendee`,
+                    {
+                      method: "POST",
+                      body: JSON.stringify({
+                        event_id: addedID,
+                        member_id: id,
+                      }),
+                    }
+                  );
                   if (!resp.ok) {
                     alert("Error adding member " + id);
                   }
                 }),
                 ...guests.map(async (guest) => {
-                  const resp = await fetch(`/api/worship/attendee`, {
+                  const resp = await fetch(`/api/event/${addedID}/add-guest`, {
                     method: "POST",
                     body: JSON.stringify({
-                      worship: addedID,
-                      type: "Guest",
-                      full_name: guest.Name,
+                      event_id: addedID,
+                      name: guest.Name,
                       email: guest.Email,
                       invited_by: guest.invitedBy || null,
                     }),
@@ -379,8 +383,6 @@ export default function AddWorshipEvent() {
                     alert("Error adding guest" + guest.Name);
                   }
                 }),
-
-                // images
               ]);
             } catch (err) {
               alert("Error while adding event: " + err);

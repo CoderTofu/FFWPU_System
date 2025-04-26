@@ -5,33 +5,38 @@ import { useRouter } from "next/navigation";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal"; // Assuming you have a Modal component
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function Member() {
   const [searchQuery, setSearchQuery] = useState("");
   const [data, setData] = useState([]);
 
-  const memberQuery = useQuery({
-    queryKey: ["members"],
-    queryFn: async () => {
-      const res = await fetch("/api/members", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
-    },
-  });
+  useEffect(() => {
+    (async function () {
+      const response = await fetch("/api/members", {
+        method: "GET",
+      });
+      if (response.ok) {
+        const resp = await response.json();
+        setData(resp);
+      } else {
+        alert("An error occurred while fetching data: " + response.statusText);
+      }
+    })();
+  }, []);
 
-  const dataID = "ID";
+  const dataID = "Member ID";
 
   const columnConfig = {
     lg: [
-      "ID",
+      "Member ID",
+      "Title",
       "Full Name",
       "Gender",
-      "Birthday",
+      "Date Of Birth",
       "Age",
       "Marital Status",
       "Address",
-      "Nation",
+      "Country",
       "Region",
       "Membership Category",
       "Generation",
@@ -49,7 +54,6 @@ export default function Member() {
   const [rowToDelete, setRowToDelete] = useState<{ ID: number } | null>(null);
   const router = useRouter();
 
-  const queryClient = useQueryClient();
   // Toggle dropdown visibility
   const toggleDropdown = (dropdown: string) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
@@ -89,16 +93,12 @@ export default function Member() {
   const handleConfirm = async () => {
     console.log("Confirmed!", rowToDelete);
     // Add your deletion logic here
-    const response = await fetch(`/api/members/${rowToDelete["ID"]}`, {
-      method: "DELETE",
-    });
+    const response = await fetch(`/api/members/${rowToDelete["Member ID"]}`);
     if (response.ok) {
-      queryClient.refetchQueries(["members"]);
-      alert("Deleted successfully");
+      location.reload();
     } else {
       alert("An error occurred while deleting member: " + response.statusText);
     }
-    setIsOpen(false);
   };
 
   const filteredData = data.filter((member) =>
@@ -106,20 +106,6 @@ export default function Member() {
       value.toString().toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
-
-  useEffect(() => {
-    if (memberQuery.status === "success") {
-      console.log(memberQuery.data);
-      const data = memberQuery.data.map((member) => ({
-        ...member,
-        Region: member.Region.name,
-        Subregion: member.Subregion.name,
-      }));
-      setData(data);
-    } else if (memberQuery.status === "error") {
-      alert("An error occurred while fetching data.");
-    }
-  }, [memberQuery.data, memberQuery.status]);
 
   return (
     <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
@@ -307,7 +293,8 @@ export default function Member() {
       </div>
 
       {/* Table Section */}
-      <div className="overflow-hidden rounded-lg bg-white mt-6">
+      <div className="w-full mt-[25px]">
+        {filteredData.length > 0 ? (
           <Table
             data={filteredData}
             columns={columnConfig}
@@ -315,43 +302,46 @@ export default function Member() {
             idName={dataID}
             onRowSelect={setSelectedRow}
           />
+        ) : (
+          <p className="text-left text-base mt-4" style={{ marginTop: "20px" }}>
+            No result found.
+          </p>
+        )}
       </div>
 
       {/* Button Section */}
-      <div className="w-full flex flex-wrap justify-center gap-[22px] mt-[28px] mb-[15px]">
-        <button
-          onClick={handleAddClick}
-          className="w-20 h-10 flex items-center justify-center rounded mb-4 m-4 bg-[#01438F] text-[#FCC346] hover:bg-blue-600 font-bold text-base"
-        >
-          ADD
-        </button>
-        {filteredData.length > 0 && (
-          <>
-            <button
-              onClick={handleEditClick}
-              disabled={!selectedRow}
-              className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
-                selectedRow
-                  ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              } font-bold text-base`}
-            >
-              EDIT
-            </button>
-            <button
-              onClick={handleDeleteClick}
-              disabled={!selectedRow}
-              className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
-                selectedRow
-                  ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              } font-bold text-base`}
-            >
-              DELETE
-            </button>
-          </>
-        )}
-      </div>
+      {filteredData.length > 0 && (
+        <div className="w-full flex flex-wrap justify-center gap-[22px] mt-[28px] mb-[15px]">
+          <button
+            onClick={handleAddClick}
+            className="w-20 h-10 flex items-center justify-center rounded mb-4 m-4 bg-[#01438F] text-[#FCC346] hover:bg-blue-600 font-bold text-base"
+          >
+            ADD
+          </button>
+          <button
+            onClick={handleEditClick}
+            disabled={!selectedRow}
+            className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
+              selectedRow
+                ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            } font-bold text-base`}
+          >
+            EDIT
+          </button>
+          <button
+            onClick={handleDeleteClick}
+            disabled={!selectedRow}
+            className={`w-20 h-10 flex items-center justify-center rounded mb-4 m-4 ${
+              selectedRow
+                ? "bg-[#01438F] text-[#FCC346] hover:bg-blue-600"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            } font-bold text-base`}
+          >
+            DELETE
+          </button>
+        </div>
+      )}
 
       {/* Modal */}
       <Modal

@@ -27,7 +27,7 @@ export default function NavbarPublic() {
   ];
 
   return (
-    <div className="bg-[#0176B2] text-white p-4 px-[100px] min-h-[100px] flex justify-between items-center">
+    <div className="bg-[#01438F] text-white p-4 px-[100px] min-h-[100px] flex justify-between items-center">
       {/* Logo */}
       <div className="flex gap-4 items-center">
         <a href={"/"}>
@@ -37,10 +37,6 @@ export default function NavbarPublic() {
             alt="Site Icon"
           />
         </a>
-        {/* <div className="">
-        <h2 className="font-bold">FAMILY FEDERATION</h2>
-        <h4 className="font-semibold">FOR WORLD PEACE AND UNIFICATION</h4>
-        </div> */}
       </div>
 
       {/* Desktop Links */}

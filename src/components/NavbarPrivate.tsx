@@ -36,7 +36,7 @@ export default function NavbarPrivate() {
   };
 
   return (
-    <div className="bg-[#0176B2] border-b-4 border-[#FCC346] text-white p-4 px-[100px] min-h-[100px] flex justify-between items-center">
+    <div className="bg-[#01438F] border-b-4 border-[#FCC346] text-white p-4 px-[100px] min-h-[100px] flex justify-between items-center">
       {/* Logo */}
       <div className="flex gap-4 items-center">
         <a href={"/"}>

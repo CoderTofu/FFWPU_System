@@ -6,42 +6,32 @@ import Table from "@/components/Table";
 import { Search, ChevronDown } from "lucide-react";
 import Modal from "@/components/Modal";
 import { axiosInstance } from "@/app/axiosInstance";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function EventInfo() {
   const router = useRouter();
   const [data, setData] = useState([]);
 
-  const eventQuery = useQuery({
-    queryKey: ["worships"],
-    queryFn: async () => {
-      const res = await fetch("/api/worship", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
-    },
-  });
-
   useEffect(() => {
-    if (eventQuery.status === "success") {
-      const data = eventQuery.data.map((event) => ({
-        ...event,
-        Church: event.Church.Name,
-      }));
-      setData(data);
-    } else if (eventQuery.status === "error") {
-      alert("An error occurred while fetching data.");
-    }
-  }, [eventQuery.data, eventQuery.status]);
+    (async function () {
+      const resp = await fetch("/api/event", { method: "GET" });
+      if (resp.ok) {
+        const data = await resp.json();
+        console.log(data);
+        setData(data);
+      } else {
+        alert("Error while fetching events: " + resp.statusText);
+      }
+    })();
+  }, []);
 
-  const dataID = "ID";
+  const dataID = "Worship ID";
 
   // Column configuration for responsive table
   const columnConfig = {
-    lg: ["ID", "Event Name", "Date", "Church", "Worship Type"],
-    md: ["Event Name", "Date", "Church Name", "Worship Type"],
-    sm: ["Event Name", "Church Name"],
+    lg: ["Worship ID", "Name", "Date", "Church Name", "Worship Type"],
+    md: ["Name", "Date", "Church Name", "Worship Type"],
+    sm: ["Name", "Church Name"],
   };
-  const queryClient = useQueryClient();
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -153,7 +143,7 @@ export default function EventInfo() {
       </div>
 
       {/* Table Section */}
-      <div className="overflow-hidden rounded-lg bg-white mt-6">
+      <div className="w-full mt-[25px]">
         <Table
           data={filteredData}
           columns={columnConfig}
@@ -210,11 +200,12 @@ export default function EventInfo() {
           onClose={() => setShowDeleteModal(false)}
           onConfirm={async () => {
             console.log("Deleting event...");
-            const resp = await fetch(`/api/worship/${rowToDelete["ID"]}`, {
-              method: "DELETE",
-            });
+            const resp = await fetch(
+              `/api/event/${rowToDelete["Worship ID"]}`,
+              { method: "DELETE" }
+            );
             if (resp.ok) {
-              queryClient.refetchQueries(["worships"]);
+              location.reload();
             } else {
               alert(
                 "An error occurred while deleting worship: " + resp.statusText

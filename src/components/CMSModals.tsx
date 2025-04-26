@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/select";
 
 import { axiosInstance } from "@/app/axiosInstance";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Helper function for button styles
 const buttonStyle =
@@ -28,20 +27,10 @@ const buttonStyle =
 
 export function AddRegionModal() {
   const [regionName, setRegionName] = useState("");
-  const queryClient = useQueryClient();
-  const handleAddRegion = async () => {
+
+  const handleAddRegion = () => {
     // Add logic to handle adding a region
     console.log("Adding region:", regionName);
-    const res = await fetch("/api/cms/region", {
-      method: "POST",
-      body: JSON.stringify({ name: regionName }),
-    });
-    if (res.ok) {
-      alert("successfully added region");
-      queryClient.refetchQueries(["regions"]);
-    } else {
-      alert("An error occurred: " + res.statusText);
-    }
     // Reset the input
     setRegionName("");
   };
@@ -85,27 +74,11 @@ export function DeleteRegionModal() {
   const [regionToDelete, setRegionToDelete] = useState("");
 
   // This is a placeholder. In a real application, you'd fetch this data from your backend.
-  const [regions, setRegions] = useState([]);
+  const regions = ["Region 1", "Region 2", "Region 3"];
 
-  useEffect(() => {
-    const fetchRegions = async () => {
-      const res = await fetch("/api/cms/region", { method: "GET" });
-      if (res.ok) {
-        const data = await res.json();
-        setRegions(data);
-      } else {
-        alert("An error occurred while fetching regions");
-      }
-    };
-    fetchRegions();
-  }, []);
-
-  const handleDeleteRegion = async () => {
+  const handleDeleteRegion = () => {
     // Add logic to handle deleting a region
     console.log("Deleting region:", regionToDelete);
-    const res = await fetch(`/api/cms/region/${regionToDelete}/`, {
-      method: "DELETE",
-    });
     // Reset the selection
     setRegionToDelete("");
   };
@@ -133,8 +106,8 @@ export function DeleteRegionModal() {
               </SelectTrigger>
               <SelectContent>
                 {regions.map((region, index) => (
-                  <SelectItem key={index} value={region.id}>
-                    {region.name}
+                  <SelectItem key={index} value={region}>
+                    {region}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -159,50 +132,22 @@ export function AddSubregionModal() {
   const [selectedRegion, setSelectedRegion] = useState("");
   const [subRegion, setSubRegion] = useState("");
 
-  const [regions, setRegions] = useState([]);
-  const queryClient = useQueryClient();
+  const regions = [
+    { id: "1", name: "North America" },
+    { id: "2", name: "Europe" },
+    { id: "3", name: "Asia" },
+    { id: "4", name: "Africa" },
+    { id: "5", name: "South America" },
+    { id: "6", name: "Oceania" },
+  ];
 
-  const regionQuery = useQuery({
-    queryKey: ["regions"],
-    queryFn: async () => {
-      const res = await fetch("/api/cms/region", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
-    },
-  });
-
-  const subregionMutation = useMutation({
-    mutationFn: async (data) => {
-      const res = await fetch("/api/cms/subregion", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error("Failed to fetch");
-    },
-    onSuccess: (data) => {
-      alert("Successfully added");
-      queryClient.refetchQueries(["subregions"]);
-    },
-    onError: (data) => {
-      alert("Error while adding");
-    },
-  });
   const handleAddSubregion = () => {
     // Add logic to handle adding a subregion
     console.log("Adding subregion:", subRegion, "to region:", selectedRegion);
-    subregionMutation.mutate({ region: selectedRegion, name: subRegion });
     // Reset the inputs
     setSelectedRegion("");
     setSubRegion("");
   };
-
-  useEffect(() => {
-    if (regionQuery.status === "success") {
-      setRegions(regionQuery.data);
-    } else if (regionQuery.status === "error") {
-      alert("An error occurred while fetching data");
-    }
-  }, [regionQuery.data, regionQuery.status]);
 
   return (
     <Dialog>
@@ -372,247 +317,6 @@ export function DeleteSubregionModal() {
   );
 }
 
-export function AddChurchModal() {
-  const [churchName, setChurchName] = useState("");
-  const [regions, setRegions] = useState([]);
-  const [subregions, setSubregions] = useState([]);
-  const [region, setRegion] = useState("");
-  const [subregion, setSubregion] = useState("");
-  const [country, setCountry] = useState("");
-
-  const queryClient = useQueryClient();
-
-  const regionQuery = useQuery({
-    queryKey: ["regions"],
-    queryFn: async () => {
-      const res = await fetch("/api/cms/region", { method: "GET" });
-      if (!res.ok) {
-        throw new Error("An error occurred while fetching regions");
-      }
-      return await res.json();
-    },
-  });
-  const subregionQuery = useQuery({
-    queryKey: ["subregions"],
-    queryFn: async () => {
-      const res = await fetch("/api/cms/subregion", { method: "GET" });
-      if (!res.ok) {
-        throw new Error("An error occurred while fetching subregions");
-      }
-      return await res.json();
-    },
-  });
-  const handleAddChurch = async () => {
-    // Add logic to handle adding a region
-    console.log("Adding region:", churchName);
-    const res = await fetch("/api/church", {
-      method: "POST",
-      body: JSON.stringify({ name: churchName, region, subregion, country }),
-    });
-    if (res.ok) {
-      queryClient.invalidateQueries(["churches"]);
-      queryClient.refetchQueries(["churches"]);
-      alert("successfully added church");
-    } else {
-      alert("An error occurred: " + res.statusText);
-    }
-    // // Reset the input
-    setChurchName("");
-    setRegion("");
-    setSubregion("");
-    setCountry("");
-  };
-
-  useEffect(() => {
-    if (regionQuery.status === "success") {
-      setRegions(regionQuery.data);
-    } else if (regionQuery.status === "error") {
-      alert(regionQuery.error.message);
-    }
-  }, [regionQuery.data, regionQuery.status]);
-
-  useEffect(() => {
-    if (subregionQuery.status === "success") {
-      setSubregions(subregionQuery.data);
-    } else if (subregionQuery.status === "error") {
-      alert(subregionQuery.error.message);
-    }
-  }, [subregionQuery.data, subregionQuery.status]);
-
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button className={buttonStyle}>ADD</button>
-      </DialogTrigger>
-      <DialogContent className="bg-white border-4 border-[#FCC346]">
-        <DialogHeader>
-          <DialogTitle className="font-bold text-lg">Add Church</DialogTitle>
-          <DialogDescription className="text-[#B7B7B7] font-light text-sm">
-            Enter the name of the new church you want to add.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          {/* Family Name */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Church Name<span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="churchName"
-              value={churchName}
-              onChange={(e) => setChurchName(e.target.value)}
-              required
-              className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Region */}
-          {/* SubRegion */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Region<span className="text-red-500">*</span>
-            </label>
-            <select
-              name="region"
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              required
-            >
-              <option value="">SELECT </option>
-              {regions.map((region) => (
-                <option value={region.id} key={region.id}>
-                  {region.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Sub Region<span className="text-red-500">*</span>
-            </label>
-            <select
-              name="subRegion"
-              value={subregion}
-              onChange={(e) => setSubregion(e.target.value)}
-              className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              required
-            >
-              <option value="">SELECT </option>
-              {subregions.map((subregion) => (
-                <option value={subregion.id} key={subregion.id}>
-                  {subregion.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Country<span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="country"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              required
-              className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-        <DialogFooter>
-          <button className={buttonStyle} onClick={handleAddChurch}>
-            Add Church
-          </button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-export function DeleteChurchModal() {
-  const [regionToDelete, setRegionToDelete] = useState("");
-  const [churches, setChurches] = useState([]);
-  const queryClient = useQueryClient();
-  const churchQuery = useQuery({
-    queryKey: ["churches"],
-    queryFn: async () => {
-      const res = await fetch("/api/church", { method: "GET" });
-      if (!res.ok) {
-        throw new Error("An error occurred while fetching churches");
-      }
-      return await res.json();
-    },
-  });
-  useEffect(() => {
-    if (churchQuery.status === "success") {
-      setChurches(churchQuery.data);
-    } else if (churchQuery.status === "error") {
-      alert(churchQuery.error.message);
-    }
-  }, [churchQuery.data, churchQuery.status]);
-
-  // This is a placeholder. In a real application, you'd fetch this data from your backend.
-  const handleDeleteChurch = async () => {
-    // Add logic to handle deleting a region
-    console.log("Deleting church:", regionToDelete);
-    const res = await fetch(`/api/church/${regionToDelete}/`, {
-      method: "DELETE",
-    });
-    if (res.ok) {
-      queryClient.refetchQueries(["churches"]);
-      alert("Successfully deleted church");
-    }
-    // Reset the selection
-    setRegionToDelete("");
-  };
-
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button className={buttonStyle}>DELETE</button>
-      </DialogTrigger>
-      <DialogContent className="bg-white border-4 border-[#FCC346]">
-        <DialogHeader>
-          <DialogTitle className="font-bold text-lg">Delete Church</DialogTitle>
-          <DialogDescription className="text-[#B7B7B7] font-light text-sm">
-            Select the church you want to delete.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="region-delete" className="text-right font-bold">
-              Church
-            </Label>
-            <Select value={regionToDelete} onValueChange={setRegionToDelete}>
-              <SelectTrigger className="col-span-3 border-2 border-black rounded-sm">
-                <SelectValue placeholder="Select a Church" />
-              </SelectTrigger>
-              <SelectContent>
-                {churches.map((region, index) => (
-                  <SelectItem key={index} value={region.ID}>
-                    {region.Name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <DialogFooter>
-          <button
-            className={buttonStyle}
-            onClick={handleDeleteChurch}
-            disabled={!regionToDelete}
-          >
-            Delete Church
-          </button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 export function ChangePasswordModal() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -694,21 +398,28 @@ export function AddNewAdminModal() {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
 
-  const handleAddAdmin = async () => {
+  const handleAddAdmin = () => {
     // Add logic to handle adding a new admin
-    const res = await fetch("/api/cms/add-admin", {
-      method: "POST",
-      body: JSON.stringify({
+    axiosInstance
+      .post("/add-admin/", {
         username: adminName,
         email: adminEmail,
         password: adminPassword,
-      }),
-    });
-    if (res.ok) {
-      alert("Successfully created admin");
-    } else {
-      alert("Error while creating admin");
-    }
+      })
+      .then((response) => {
+        if (response.status == 201) {
+          alert(`Successfully added admin ${adminName}!`);
+        }
+      })
+      .catch((err) => {
+        if (err.response) {
+          alert(err.response.data.error);
+        } else {
+          alert(err.status);
+        }
+      });
+    // console.log("Adding new admin:", adminName, adminEmail);
+    // Reset the inputs
     setAdminName("");
     setAdminEmail("");
     setAdminPassword("");

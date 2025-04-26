@@ -18,7 +18,7 @@ export async function setTokens(access, refresh) {
     httpOnly: true,
     sameSite: "strict",
     secure: false,
-    maxAge: 5 * 60,
+    maxAge: 5,
   });
   return (await cookies()).set({
     name: "refresh_token",

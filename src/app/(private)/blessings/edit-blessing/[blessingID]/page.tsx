@@ -16,7 +16,7 @@ export default function AddBlessing() {
   const [formData, setFormData] = useState({
     name_of_blessing: "",
     blessing_date: "",
-    chaenbo: "",
+    chaenbo: 1,
   });
   const chaenboMap = { Vertical: 1, Horizontal: 2 };
   useEffect(() => {
@@ -26,24 +26,14 @@ export default function AddBlessing() {
       });
       if (res.ok) {
         const data = await res.json();
-        setGuests(
-          data.Recipients.filter((attendee) => attendee.Type === "Guest")
-        );
-        const members = data.Recipients.filter(
-          (attendee) => attendee.Type === "Member"
-        );
-        setMembers(
-          members.map((attendee) => ({
-            ...attendee,
-            attendee_id: attendee.ID,
-            ID: attendee.Member.ID,
-            "Full Name": attendee.Member["Full Name"],
-          }))
-        );
+        setMembers(data.Members);
+        const ids = data.Members.map((member) => member["Member ID"]);
+        setMemberIds([...ids]);
+        setGuests(data.Guests);
         setFormData({
-          name_of_blessing: data["Name"],
-          blessing_date: data["Date"],
-          chaenbo: data.Chaenbo,
+          name_of_blessing: data["Name Of Blessing"],
+          blessing_date: data["Blessing Date"],
+          chaenbo: chaenboMap[data.Chaenbo],
         });
       }
     })();
@@ -64,25 +54,44 @@ export default function AddBlessing() {
     setRegistrationType(type);
     setIsRegistrationModalOpen(true);
   };
-  const [attendeesToDelete, setAttendeesToDelete] = useState([]);
 
-  const handleMemberDelete = async () => {
-    setMembers(members.filter((member) => member !== selectedMember));
-    console.log(selectedMember);
-    setAttendeesToDelete((prev) => [...prev, selectedMember.attendee_id]);
-  };
   const handleGuestDelete = async () => {
-    setGuests(guests.filter((member) => member !== selectedGuest));
-    setNewGuests(newGuests.filter((guest) => guest !== selectedGuest));
-    console.log(selectedGuest);
-    setAttendeesToDelete((prev) => [...prev, selectedGuest.ID]);
+    console.log("Deleting Guest: " + selectedGuest);
+    const res = await fetch(
+      `/api/blessings/${params.blessingID}/remove-guest`,
+      {
+        method: "POST",
+        body: JSON.stringify({ guest_id: selectedGuest["Guest ID"] }),
+      }
+    );
+    if (res.ok) {
+      alert("Successfully deleted guest" + selectedGuest.Name);
+      location.reload();
+    } else {
+      alert("An error occurred while removing guest");
+    }
+  };
+  const handleMemberDelete = async () => {
+    console.log("Deleting Member: " + selectedMember);
+    const res = await fetch(
+      `/api/blessings/${params.blessingID}/remove-member`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ member_id: selectedMember["Member ID"] }),
+      }
+    );
+    if (res.ok) {
+      alert("Successfully deleted member");
+      location.reload();
+    } else {
+      alert("An error occurred while removing member: " + res.statusText);
+    }
   };
 
   useEffect(() => {
     const fetchMembers = async () => {
-      const fetched = await Promise.all([
-        ...members,
-        ...memberIds.map(async (id) => {
+      const fetched = await Promise.all(
+        memberIds.map(async (id) => {
           try {
             const resp = await fetch(`/api/members/${id}`, { method: "GET" });
             if (resp.ok) {
@@ -95,8 +104,8 @@ export default function AddBlessing() {
             console.error("Error fetching member:", error);
             return null; // Return null or handle the error case
           }
-        }),
-      ]);
+        })
+      );
 
       // Filter out any null values (from failed fetches)
       const validMembers = fetched.filter((member) => member !== null);
@@ -130,8 +139,8 @@ export default function AddBlessing() {
           <Table
             data={members}
             columns={{
-              lg: ["ID", "Full Name"],
-              md: ["ID", "Full Name"],
+              lg: ["Member ID", "Full Name"],
+              md: ["Member ID", "Full Name"],
               sm: ["Full Name"],
             }}
             onRowSelect={setSelectedMember}
@@ -162,9 +171,9 @@ export default function AddBlessing() {
           <Table
             data={[...guests, ...newGuests]}
             columns={{
-              lg: ["Full Name", "Email"],
-              md: ["Full Name", "Email"],
-              sm: ["Full Name"],
+              lg: ["Name", "Email"],
+              md: ["Name", "Email"],
+              sm: ["Name"],
             }}
             onRowSelect={setSelectedGuest}
           />
@@ -221,10 +230,10 @@ export default function AddBlessing() {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      chaenbo: e.target.checked ? "Vertical" : "Horizontal",
+                      chaenbo: e.target.checked ? 1 : 2,
                     })
                   }
-                  checked={formData.chaenbo === "Vertical"}
+                  checked={formData.chaenbo === 1}
                 />
                 <label>Vertical</label>
               </div>
@@ -236,10 +245,10 @@ export default function AddBlessing() {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      chaenbo: e.target.checked ? "Horizontal" : "Vertical",
+                      chaenbo: e.target.checked ? 2 : 1,
                     })
                   }
-                  checked={formData.chaenbo === "Horizontal"}
+                  checked={formData.chaenbo === 2}
                 />
                 <label>Horizontal</label>
               </div>
@@ -268,55 +277,47 @@ export default function AddBlessing() {
             console.log(memberIds);
             const res = await fetch(`/api/blessings/${params.blessingID}`, {
               method: "PATCH",
-              body: JSON.stringify({
-                name: formData.name_of_blessing,
-                date: formData.blessing_date,
-                chaenbo: formData.chaenbo,
-              }),
+              body: JSON.stringify(formData),
             });
-            const addedID = params.blessingID;
-            await Promise.all([
-              ...memberIds.map(async (id) => {
-                const resp = await fetch(`/api/blessings/recipient`, {
-                  method: "POST",
-                  body: JSON.stringify({
-                    blessing: addedID,
-                    member: id,
-                    type: "Member",
-                  }),
-                });
-                if (!resp.ok) {
-                  alert("Error adding member " + id);
+            if (res.ok) {
+              const memberRes = await fetch(
+                `/api/blessings/${params.blessingID}/add-member`,
+                {
+                  method: "PATCH",
+                  body: JSON.stringify({ members: memberIds }),
                 }
-              }),
-              ...newGuests.map(async (guest) => {
-                const resp = await fetch(`/api/blessings/recipient`, {
-                  method: "POST",
-                  body: JSON.stringify({
-                    blessing: addedID,
-                    type: "Guest",
-                    full_name: guest["Full Name"],
-                    email: guest.Email,
-                    invited_by: guest.invitedBy || null,
-                  }),
-                });
-                if (!resp.ok) {
-                  alert("Error adding guest" + guest.Name);
-                }
-              }),
-              ...attendeesToDelete.map(async (attendee) => {
-                const resp = await fetch(
-                  `/api/blessings/recipient/${attendee}`,
-                  {
-                    method: "DELETE",
+              );
+              if (memberRes.ok) {
+                alert("Successfully added members");
+              } else {
+                alert("Failed to add members");
+              }
+
+              await Promise.all(
+                newGuests.map(async (guest) => {
+                  const g = await fetch(
+                    `/api/blessings/${params.blessingID}/add-guest`,
+                    {
+                      method: "POST",
+                      body: JSON.stringify({
+                        name: guest.Name,
+                        email: guest.Email,
+                        invited_by: guest.invitedBy || null,
+                      }),
+                    }
+                  );
+                  if (g.ok) {
+                    alert("Successfully added guest " + guest.Name);
+                  } else {
+                    alert("Error while adding guest " + guest.Name);
                   }
-                );
-                if (!resp.ok) {
-                  alert("Error deleting attendee " + attendee);
-                }
-              }),
-            ]);
-            location.reload();
+                })
+              );
+
+              alert("Successfully added blessing");
+            } else {
+              alert("Error updating members");
+            }
             setShowModal(false);
           }}
           message="Are you sure you want to add the data?"
@@ -355,7 +356,7 @@ export default function AddBlessing() {
               ? [{ name: "memberId", label: "Member ID", type: "text" }]
               : [
                   {
-                    name: "Full Name",
+                    name: "Name",
                     label: "Full Name",
                     type: "text",
                     required: true,

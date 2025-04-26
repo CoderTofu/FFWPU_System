@@ -2,10 +2,9 @@
 
 import type React from "react";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ImageIcon } from "lucide-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { middleware } from "@/middleware";
+
 export default function AddMemberForm() {
   const [formData, setFormData] = useState({
     givenName: "",
@@ -13,6 +12,7 @@ export default function AddMemberForm() {
     familyName: "",
     gender: "",
     birthdate: "",
+    age: "",
     region: "",
     subRegion: "",
     maritalStatus: "",
@@ -38,70 +38,8 @@ export default function AddMemberForm() {
   });
 
   const [image, setImage] = useState<string | null>(null);
-  const [regions, setRegions] = useState([]);
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-  const [subregions, setSubregions] = useState([]);
-  const [selectedSubregion, setSelectedSubregion] = useState<string | null>(
-    null
-  );
-  const queryClient = useQueryClient();
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const regionQuery = useQuery({
-    queryKey: ["regions"],
-    queryFn: async () => {
-      const res = await fetch("/api/cms/region", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
-    },
-  });
-  const subregionQuery = useQuery({
-    queryKey: ["subregions"],
-    queryFn: async () => {
-      const res = await fetch("/api/cms/subregion", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
-    },
-  });
 
-  const missionMutation = useMutation({
-    mutationFn: async (data) => {
-      const res = await fetch("/api/members/member-mission", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return await res.json();
-    },
-  });
-
-  const memberMutation = useMutation({
-    mutationFn: async (data) => {
-      const res = await fetch("/api/members/", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return await res.json();
-    },
-    onSuccess: (data) => {
-      formData.missionHistory.forEach((mission) => {
-        const missionData = {
-          member: data["ID"],
-          role: mission.role,
-          organization: mission.organization,
-          country: mission.country,
-          start_date: mission.startDate,
-          end_date: mission.endDate,
-        };
-        missionMutation.mutate(missionData);
-      });
-      queryClient.refetchQueries(["members"]);
-      alert("Successfully created user");
-    },
-    onError: (error) => {
-      alert("An error occurred");
-    },
-  });
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -168,49 +106,10 @@ export default function AddMemberForm() {
     e.preventDefault();
     // Form validation and submission logic
     console.log("Form submitted:", formData);
-    const data = {
-      given_name: formData.givenName,
-      middle_name: formData.middleName,
-      family_name: formData.familyName,
-      gender: formData.gender,
-      birthday: formData.birthdate,
-      region: formData.region,
-      nation: formData.nation,
-      marital_status: formData.maritalStatus,
-      name_of_spouse: formData.spouseName,
-      phone: formData.phone,
-      email: formData.email,
-      address: formData.address,
-      image,
-      generation: formData.generation,
-      blessing_status: formData.blessingStatus,
-      spiritual_birthday: formData.spiritualBirthday,
-      spiritual_parent: formData.spiritualParent,
-      membership_category: formData.membershipCategory,
-    };
-    memberMutation.mutate(data);
   };
 
-  useEffect(() => {
-    if (regionQuery.status === "success") {
-      console.log(regionQuery.data);
-      setRegions(regionQuery.data);
-    } else if (regionQuery.status === "error") {
-      alert("An error occurred while fetching data.");
-    }
-  }, [regionQuery.data, regionQuery.status]);
-
-  useEffect(() => {
-    if (subregionQuery.status === "success") {
-      console.log(subregionQuery.data);
-      setSubregions(subregionQuery.data);
-    } else if (subregionQuery.status === "error") {
-      alert("An error occurred while fetching data.");
-    }
-  }, [subregionQuery.data, subregionQuery.status]);
-
   return (
-    <div className="px-0 md:px-[60px] lg:px-[150px] my-8">
+    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
       {/* Header */}
       <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center mb-4 justify-center">
         <p className="text-3xl font-bold uppercase">ADD MEMBER</p>
@@ -251,7 +150,7 @@ export default function AddMemberForm() {
                   {/* Middle Name */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
-                      Middle Name
+                      Middle Name<span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -314,30 +213,39 @@ export default function AddMemberForm() {
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
+
+                  {/* Age */}
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Age<span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="age"
+                      value={formData.age}
+                      onChange={handleChange}
+                      min="0"
+                      required
+                      className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
 
                 {/* Second Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   {/* Region */}
-                  {/* SubRegion */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       Region<span className="text-red-500">*</span>
                     </label>
-                    <select
+                    <input
+                      type="text"
                       name="region"
                       value={formData.region}
                       onChange={handleChange}
-                      className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                       required
-                    >
-                      <option value="">SELECT </option>
-                      {regions.map((region) => (
-                        <option value={region.id} key={region.id}>
-                          {region.name}
-                        </option>
-                      ))}
-                    </select>
+                      className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
 
                   {/* SubRegion */}
@@ -352,12 +260,9 @@ export default function AddMemberForm() {
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                       required
                     >
-                      <option value="">SELECT </option>
-                      {subregions.map((subregion) => (
-                        <option value={subregion.id} key={subregion.id}>
-                          {subregion.name}
-                        </option>
-                      ))}
+                      <option value="">SELECT</option>
+                      <option value="SR1">Sub Region 1</option>
+                      <option value="SR2">Sub Region 2</option>
                     </select>
                   </div>
 
@@ -397,13 +302,14 @@ export default function AddMemberForm() {
                   {/* Name of Spouse */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
-                      Name of Spouse
+                      Name of Spouse<span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="spouseName"
                       value={formData.spouseName}
                       onChange={handleChange}
+                      required
                       className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -567,19 +473,14 @@ export default function AddMemberForm() {
                 <label className="block text-sm font-medium mb-1">
                   Membership Category<span className="text-red-500">*</span>
                 </label>
-
-                <select
+                <input
+                  type="text"
                   name="membershipCategory"
                   value={formData.membershipCategory}
                   onChange={handleChange}
-                  className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">SELECT</option>
-                  <option value="Regular">Regular</option>
-                  <option value="Associate">Associate</option>
-                  <option value="Registered">Registered</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
+                  required
+                  className="border-[#01438F] border rounded-[5px] w-full h-10 text-base px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
             </div>
           </section>

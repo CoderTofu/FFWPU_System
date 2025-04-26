@@ -1,6 +1,6 @@
 export default function FooterPublic() {
   return (
-    <div className="bg-[#0176B2] text-white p-8 px-[100px] flex justify-center md:justify-between items-center">
+    <div className="bg-[#01438F] text-white p-8 px-[100px] flex justify-center md:justify-between items-center">
       <div className="flex gap-4 items-center">
         <img
           src="/icons/ffwpu_icon.svg"

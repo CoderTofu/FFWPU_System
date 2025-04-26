@@ -5,11 +5,10 @@ import Table from "@/components/Table";
 import { useParams, useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import { Search, ChevronDown } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 export default function ViewBlessing() {
   const router = useRouter();
   const [selectedRow, setSelectedRow] = useState<{
-    ID: number;
+    "Blessing ID": number;
   } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -17,30 +16,22 @@ export default function ViewBlessing() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [blessings, setBlessings] = useState([]);
   const [rowToDelete, setRowToDelete] = useState(null);
-  const blessingQuery = useQuery({
-    queryKey: ["blessings"],
-    queryFn: async () => {
-      const res = await fetch("/api/blessings/", { method: "GET" });
-      if (!res.ok) {
-        throw new Error("An error occurred while fetching blessings");
-      }
-      return await res.json();
-    },
-  });
-
-  useEffect(() => {
-    if (blessingQuery.status === "success") {
-      setBlessings(blessingQuery.data);
-    } else if (blessingQuery.status === "error") {
-      alert(blessingQuery.error.message);
-    }
-  }, [blessingQuery.data, blessingQuery.status]);
-
   const columns = {
-    lg: ["ID", "Date", "Name", "Chaenbo"],
-    md: ["ID", "Date", "Name"],
-    sm: ["ID", "Date"],
+    lg: ["Blessing ID", "Blessing Date", "Name Of Blessing", "Chaenbo"],
+    md: ["Blessing ID", "Blessing Date", "Name Of Blessing"],
+    sm: ["Blessing ID", "Blessing Date"],
   };
+  useEffect(() => {
+    (async function () {
+      const res = await fetch("/api/blessings", { method: "GET" });
+      if (res.ok) {
+        const data = await res.json();
+        setBlessings(data);
+      } else {
+        alert("An error occurred while fetching blessings: " + res.statusText);
+      }
+    })();
+  }, []);
 
   // const [blessing, setBlessing] = useState([
   //   {
@@ -70,7 +61,7 @@ export default function ViewBlessing() {
   // ]);
 
   // DATA ID
-  const dataId = "ID";
+  const dataId = "Blessing ID";
 
   // const availableYears = [
   //   "All Years",
@@ -108,7 +99,6 @@ export default function ViewBlessing() {
   };
 
   const [isOpen, setIsOpen] = useState(false);
-  const queryClient = useQueryClient();
   const handleConfirm = async () => {
     // if (selectedRow) {
     //   setBlessings(
@@ -118,11 +108,11 @@ export default function ViewBlessing() {
     //   );
     // }
 
-    const res = await fetch(`/api/blessings/${rowToDelete["ID"]}`, {
+    const res = await fetch(`/api/blessings/${rowToDelete["Blessing ID"]}`, {
       method: "DELETE",
     });
     if (res.ok) {
-      queryClient.refetchQueries(["blessings"]);
+      location.reload();
     } else {
       alert("An error occurred while deleting blessing: " + res.statusText);
     }

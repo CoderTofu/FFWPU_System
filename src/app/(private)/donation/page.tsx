@@ -6,10 +6,9 @@ import Modal from "@/components/Modal";
 import Table from "@/components/Table";
 import DonationModals from "@/components/DonationModals";
 import { Currency } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 interface DataItem {
-  ID: number;
-  Member: number;
+  "Donation ID": number;
+  "Member ID": number;
   Name: string;
   Date: string;
   Church: string;
@@ -38,35 +37,32 @@ export default function Donation() {
     JPY: 0.38,
   };
 
-  const donationQuery = useQuery({
-    queryKey: ["donations"],
-    queryFn: async () => {
-      const res = await fetch("/api/donations", { method: "GET" });
-      if (!res.ok) {
-        throw new Error("Error while fetching donations");
-      }
-      return await res.json();
-    },
-  });
-
   useEffect(() => {
-    if (donationQuery.status === "success") {
-      const data = donationQuery.data.map((donation) => ({
-        ...donation,
-        "Member ID": donation.Member.ID,
-        "Full Name": donation.Member["Full Name"],
-        Church: donation.Church.Name,
-      }));
-      setData(data);
-      setSortedData(data);
-    } else if (donationQuery.status === "error") {
-      alert(donationQuery.error.message);
-    }
-  }, [donationQuery.data, donationQuery.status]);
+    (async function () {
+      const res = await fetch("/api/donations", { method: "GET" });
+      if (res.ok) {
+        const data = await res.json();
+        const simplified = data.map((donation) => {
+          return {
+            "Donation ID": donation["Donation ID"],
+            "Member ID": donation.Member["Member ID"],
+            "Full Name": donation.Member["Full Name"],
+            Date: donation.Date,
+            Church: donation.Church["Name"],
+            Amount: donation.Amount,
+            Currency: donation.Currency,
+          };
+        });
+        setData(simplified);
+        setOriginalData(simplified);
+        setSortedData(simplified);
+      }
+    })();
+  }, []);
 
   const column = {
     lg: [
-      "ID",
+      "Donation ID",
       "Member ID",
       "Full Name",
       "Date",
@@ -74,8 +70,8 @@ export default function Donation() {
       "Amount",
       "Currency",
     ],
-    md: ["ID", "Full Name", "Date", "Amount"],
-    sm: ["Full Name", "Amount"],
+    md: ["Donation ID", "Name", "Date", "Amount"],
+    sm: ["Name", "Amount"],
   };
 
   const getAmountInPHP = (amount: string): number => {
@@ -120,7 +116,7 @@ export default function Donation() {
     });
   };
 
-  const dataId = "ID";
+  const dataId = "Donation ID";
 
   const handleEditClick = () => {
     if (selectedRow) {
@@ -194,9 +190,10 @@ export default function Donation() {
             isOpen={showDeleteModal}
             onClose={() => setShowDeleteModal(false)}
             onConfirm={async () => {
-              const res = await fetch(`/api/donations/${rowToDelete["ID"]}`, {
-                method: "DELETE",
-              });
+              const res = await fetch(
+                `/api/donations/${rowToDelete["Donation ID"]}`,
+                { method: "DELETE" }
+              );
               if (res.ok) {
                 location.reload();
               } else {
