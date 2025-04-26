@@ -210,7 +210,7 @@ export default function AddMemberForm() {
   }, [subregionQuery.data, subregionQuery.status]);
 
   return (
-    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
+    <div className="px-0 md:px-[60px] lg:px-[150px] my-8">
       {/* Header */}
       <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center mb-4 justify-center">
         <p className="text-3xl font-bold uppercase">ADD MEMBER</p>

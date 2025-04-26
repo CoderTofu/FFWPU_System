@@ -153,7 +153,7 @@ export default function EventInfo() {
       </div>
 
       {/* Table Section */}
-      <div className="w-full mt-[25px]">
+      <div className="overflow-hidden rounded-lg bg-white mt-6">
         <Table
           data={filteredData}
           columns={columnConfig}

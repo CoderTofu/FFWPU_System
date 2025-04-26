@@ -307,8 +307,7 @@ export default function Member() {
       </div>
 
       {/* Table Section */}
-      <div className="w-full mt-[25px]">
-        {filteredData.length > 0 ? (
+      <div className="overflow-hidden rounded-lg bg-white mt-6">
           <Table
             data={filteredData}
             columns={columnConfig}
@@ -316,11 +315,6 @@ export default function Member() {
             idName={dataID}
             onRowSelect={setSelectedRow}
           />
-        ) : (
-          <p className="text-left text-base mt-4" style={{ marginTop: "20px" }}>
-            No result found.
-          </p>
-        )}
       </div>
 
       {/* Button Section */}
