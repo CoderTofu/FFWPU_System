@@ -6,8 +6,6 @@ import ContactInfoSection from "./ContactInfoSection";
 import SpiritualInfoSection from "./SpiritualInfoSection";
 import MissionHistorySection from "./MissionHistorySection";
 import ImageUploadSection from "./ImageUploadSection";
-import ReviewSubmitSection from "./ReviewSubmitSection";
-
 import { useAlert } from "@/components/context/AlertContext";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,6 +15,7 @@ export default function AddMemberForm() {
   const queryClient = useQueryClient();
   const { showAlert } = useAlert();
 
+  const [image, setImage] = useState<string | null>(null);
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     givenName: "",
@@ -37,7 +36,15 @@ export default function AddMemberForm() {
     spiritualBirthday: "",
     spiritualParent: "",
     membershipCategory: "",
-    missionHistory: [],
+    missionHistory: [
+      {
+        role: "",
+        organization: "",
+        country: "",
+        startDate: "",
+        endDate: "",
+      },
+    ],
     image: "",
   });
 
@@ -47,7 +54,6 @@ export default function AddMemberForm() {
     "Spiritual Info",
     "Mission History",
     "Upload Photo",
-    "Review & Submit",
   ];
 
   const missionMutation = useMutation({
@@ -83,10 +89,18 @@ export default function AddMemberForm() {
         missionMutation.mutate(missionData);
       });
       queryClient.refetchQueries(["members"]);
-      alert("Successfully created user");
+      
+      showAlert({
+        type: "success",
+        title: "Member Added!",
+      });
     },
     onError: (error) => {
-      alert("An error occurred");
+      console.log(error)
+      showAlert({
+        type: "error",
+        title: "Mutation Error: " + error.message,
+      });
     },
   });
 
@@ -132,34 +146,29 @@ export default function AddMemberForm() {
       // All fields OK, create payload
       const payload = {
         given_name: formData.givenName,
-        middle_name: formData.middleName || null,
+        middle_name: formData.middleName,
         family_name: formData.familyName,
         gender: formData.gender,
         birthday: formData.birthdate,
         region: formData.region,
-        sub_region: formData.subRegion,
         nation: formData.nation,
         marital_status: formData.maritalStatus,
-        name_of_spouse: formData.spouseName || null,
+        name_of_spouse: formData.spouseName,
         phone: formData.phone,
         email: formData.email,
         address: formData.address,
+        image,
         generation: formData.generation,
-        blessing_status: formData.blessingStatus || null,
+        blessing_status: "aaaaaaaaaaaaa",
         spiritual_birthday: formData.spiritualBirthday,
         spiritual_parent: formData.spiritualParent,
         membership_category: formData.membershipCategory,
-        mission_history: formData.missionHistory,
-        image: formData.image || null,
       };
   
       // Submit to API
       memberMutation.mutate(payload);
-  
-      showAlert({
-        type: "success",
-        title: "Member Added!",
-      });
+      console.log("Member added:", payload);
+
   
     } catch (error) {
       console.error(error);
@@ -169,6 +178,21 @@ export default function AddMemberForm() {
       });
     }
   };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+  
+        reader.onload = (event) => {
+          if (event.target && typeof event.target.result === "string") {
+            setImage(event.target.result);
+          }
+        };
+  
+        reader.readAsDataURL(file);
+      }
+    };
   
   
   return (
@@ -183,7 +207,6 @@ export default function AddMemberForm() {
         {step === 2 && <SpiritualInfoSection formData={formData} setFormData={setFormData} />}
         {step === 3 && <MissionHistorySection formData={formData} setFormData={setFormData} />}
         {step === 4 && <ImageUploadSection formData={formData} setFormData={setFormData} />}
-        {step === 5 && <ReviewSubmitSection formData={formData} />}
       </div>
 
       <div className="flex justify-between mt-8">

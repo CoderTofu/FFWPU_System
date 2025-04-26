@@ -1,10 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
-
-
+import { useState } from "react";
 import PersonalInfoSection from "./PersonalInfoSection";
 import ContactInfoSection from "./ContactInfoSection";
 import SpiritualInfoSection from "./SpiritualInfoSection";
@@ -16,21 +12,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 export default function AddMemberForm() {
-  const params = useParams();
-
-  const router = useRouter();
+  const queryClient = useQueryClient();
   const { showAlert } = useAlert();
 
-    const steps = [
-        "Personal Info",
-        "Contact Info",
-        "Spiritual Info",
-        "Mission History",
-        "Upload Photo",
-    ];
-
-    const [step, setStep] = useState(0);
-
+  const [image, setImage] = useState<string | null>(null);
+  const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     givenName: "",
     middleName: "",
@@ -50,48 +36,25 @@ export default function AddMemberForm() {
     spiritualBirthday: "",
     spiritualParent: "",
     membershipCategory: "",
-    missionHistory: [],
+    missionHistory: [
+      {
+        role: "",
+        organization: "",
+        country: "",
+        startDate: "",
+        endDate: "",
+      },
+    ],
+    image: "",
   });
 
-  const [image, setImage] = useState<string | null>(null);
-  const queryClient = useQueryClient();
-
-    useEffect(() => {
-      const fetchData = async () => {
-        const res = await fetch(`/api/members/${params.ID}`, { method: "GET" });
-        if (res.ok) {
-          const details = await res.json();
-          const data = {
-            givenName: details["Given Name"],
-            middleName: details["Middle Name"],
-            familyName: details["Family Name"],
-            gender: details["Gender"],
-            birthdate: details["Birthday"],
-            age: details["Age"],
-            region: details["Region"].id,
-            subRegion: details["Subregion"].id,
-            maritalStatus: details["Marital Status"],
-            nation: details["Nation"],
-            spouseName: details["Name Of Spouse"],
-            phone: details["Phone"],
-            email: details["Email"],
-            address: details["Address"],
-            generation: details["Generation"],
-            blessingStatus: details["Blessing Status"],
-            spiritualBirthday: details["Spiritual Birthday"],
-            spiritualParent: details["Spiritual Parent"],
-            membershipCategory: details["Membership Category"],
-            profileImage: null,
-            missionHistory: details["Missions"], // to do
-          };
-          setFormData(data);
-        //   setIsLoading(false);
-        } else {
-          alert("An error occurred");
-        }
-      };
-      fetchData();
-    }, []);
+  const steps = [
+    "Personal Info",
+    "Contact Info",
+    "Spiritual Info",
+    "Mission History",
+    "Upload Photo",
+  ];
 
   const missionMutation = useMutation({
     mutationFn: async (data) => {
@@ -126,26 +89,27 @@ export default function AddMemberForm() {
         missionMutation.mutate(missionData);
       });
       queryClient.refetchQueries(["members"]);
+      
       showAlert({
         type: "success",
         title: "Member Added!",
       });
-      router.push("/member")
     },
     onError: (error) => {
+      console.log(error)
       showAlert({
         type: "error",
         title: "Mutation Error: " + error.message,
       });
     },
   });
-  
+
   const nextStep = () => setStep((s) => Math.min(s + 1, steps.length - 1));
   const prevStep = () => setStep((s) => Math.max(s - 1, 0));
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
+    try {
+      // Define required fields and their corresponding page step
       const requiredFields = [
         { key: "givenName", label: "Given Name", step: 0 },
         { key: "familyName", label: "Family Name", step: 0 },
@@ -162,7 +126,7 @@ export default function AddMemberForm() {
         { key: "spiritualParent", label: "Spiritual Parent", step: 2 },
         { key: "membershipCategory", label: "Membership Category", step: 2 },
       ];
-
+  
       // Check each required field
       for (const field of requiredFields) {
         if (!formData[field.key] || formData[field.key].toString().trim() === "") {
@@ -170,39 +134,66 @@ export default function AddMemberForm() {
             type: "error",
             title: `Please fill out the ${field.label} field.`,
           });
-
+  
           // Set page/step where that field is located
           setStep(field.step);
-
+  
           // STOP submitting
           return;
         }
       }
-    
-    const data = {
-      given_name: formData.givenName,
-      middle_name: formData.middleName,
-      family_name: formData.familyName,
-      gender: formData.gender,
-      birthday: formData.birthdate,
-      region: formData.region,
-      nation: formData.nation,
-      marital_status: formData.maritalStatus,
-      name_of_spouse: formData.spouseName,
-      phone: formData.phone,
-      email: formData.email,
-      address: formData.address,
-      image,
-      generation: formData.generation,
-      blessing_status: formData.blessingStatus,
-      spiritual_birthday: formData.spiritualBirthday,
-      spiritual_parent: formData.spiritualParent,
-      membership_category: formData.membershipCategory,
-    };
-    memberMutation.mutate(data);
-    
-    console.log("Member added:", data);
+  
+      // All fields OK, create payload
+      const payload = {
+        given_name: formData.givenName,
+        middle_name: formData.middleName,
+        family_name: formData.familyName,
+        gender: formData.gender,
+        birthday: formData.birthdate,
+        region: formData.region,
+        nation: formData.nation,
+        marital_status: formData.maritalStatus,
+        name_of_spouse: formData.spouseName,
+        phone: formData.phone,
+        email: formData.email,
+        address: formData.address,
+        image,
+        generation: formData.generation,
+        blessing_status: "aaaaaaaaaaaaa",
+        spiritual_birthday: formData.spiritualBirthday,
+        spiritual_parent: formData.spiritualParent,
+        membership_category: formData.membershipCategory,
+      };
+  
+      // Submit to API
+      memberMutation.mutate(payload);
+      console.log("Member added:", payload);
+
+  
+    } catch (error) {
+      console.error(error);
+      showAlert({
+        type: "error",
+        title: "Something went wrong while submitting.",
+      });
+    }
   };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+  
+        reader.onload = (event) => {
+          if (event.target && typeof event.target.result === "string") {
+            setImage(event.target.result);
+          }
+        };
+  
+        reader.readAsDataURL(file);
+      }
+    };
+  
   
   return (
     <div className="max-w-6xl mx-auto p-8">

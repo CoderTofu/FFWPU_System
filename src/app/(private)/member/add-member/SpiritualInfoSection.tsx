@@ -42,6 +42,24 @@ export default function SpiritualInfoSection({ formData, setFormData }: Props) {
           </select>
         </div>
 
+        {/* Blessing Status (Dropdown) */}
+        <div className="flex flex-col">
+          <label htmlFor="blessingStatus" className="text-sm font-semibold text-gray-700 mb-1">
+            Blessing Status<span className="text-red-500 ml-1">*</span>
+          </label>
+          <select
+            id="blessingStatus"
+            name="blessingStatus"
+            value={formData.blessingStatus}
+            onChange={handleChange}
+            className="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="" disabled hidden>Select Blessing Status</option>
+            <option value="Blessed">Blessed</option>
+            <option value="Not Blessed">Not Blessed</option>
+          </select>
+        </div>
+
         {/* Spiritual Birthday */}
         <div className="flex flex-col">
           <label htmlFor="spiritualBirthday" className="text-sm font-semibold text-gray-700 mb-1">

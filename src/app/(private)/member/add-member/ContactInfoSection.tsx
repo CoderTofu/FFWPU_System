@@ -10,6 +10,8 @@ export default function ContactInfoSection({ formData, setFormData }: Props) {
   const [regions, setRegions] = useState([]);
   const [allSubregions, setAllSubregions] = useState([]);
   const [filteredSubregions, setFilteredSubregions] = useState([]);
+  
+  const nations = ["Philippines", "USA", "Korea", "Japan", "Other"];
 
   const regionQuery = useQuery({
     queryKey: ["regions"],
@@ -59,7 +61,7 @@ export default function ContactInfoSection({ formData, setFormData }: Props) {
       setFormData((prev: any) => ({
         ...prev,
         region: value,
-        subRegion: "", // reset subregion when region changes
+        subRegion: "", // Reset subregion when region changes
       }));
     } else {
       setFormData((prev: any) => ({
@@ -81,6 +83,27 @@ export default function ContactInfoSection({ formData, setFormData }: Props) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Nation Dropdown */}
+        <div className="flex flex-col">
+          <label htmlFor="nation" className="text-sm font-semibold text-gray-700 mb-1">
+            Nation<span className="text-red-500 ml-1">*</span>
+          </label>
+          <select
+            id="nation"
+            name="nation"
+            value={formData.nation}
+            onChange={handleChange}
+            className="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="" disabled hidden>Select Nation</option>
+            {nations.map((nation) => (
+              <option key={nation} value={nation}>
+                {nation}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Region Dropdown */}
         <div className="flex flex-col">
           <label htmlFor="region" className="text-sm font-semibold text-gray-700 mb-1">
