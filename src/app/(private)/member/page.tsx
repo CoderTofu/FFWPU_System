@@ -42,32 +42,12 @@ export default function Member() {
     sm: ["Member ID", "Full Name"],
   };
 
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const [selectedRow, setSelectedRow] = useState<{ ID: number } | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<{ ID: number } | null>(null);
   const router = useRouter();
 
   const queryClient = useQueryClient();
-  // Toggle dropdown visibility
-  const toggleDropdown = (dropdown: string) => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
-  };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setOpenDropdown(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const handleEditClick = () => {
     if (selectedRow) {
@@ -143,17 +123,16 @@ export default function Member() {
         </div>
 
         {/* INSERT FILTER DROPDOWN HERE */}
-        
       </div>
 
       {/* Table */}
       <div className="overflow-hidden rounded-lg bg-white mt-6">
         <Table
-            data={filteredData}
-            columns={columnConfig}
-            rowDoubleClickPath={`/member/display-member`}
-            idName={dataID}
-            onRowSelect={setSelectedRow}
+          data={filteredData}
+          columns={columnConfig}
+          rowDoubleClickPath={`/member/display-member`}
+          idName={dataID}
+          onRowSelect={setSelectedRow}
         />
       </div>
 
