@@ -10,6 +10,7 @@ import { useAlert } from "@/components/context/AlertContext.jsx";
 import loading from "@/components/assets/kinetiq-loading.gif";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { type } from "os";
 
 const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
   const { showAlert } = useAlert();
@@ -43,9 +44,16 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
   const handleConfirm = () => {
     if (selectedCustomer) {
       if (memberIds.includes(selectedCustomer.ID)) {
-        alert(`${selectedCustomer.ID} was already added to the event.`);
+        showAlert({
+          type: "error",
+          message: "Member already selected",
+        });
       } else {
         setMemberIds((prev) => [...prev, selectedCustomer.ID]);
+        showAlert({
+          type: "success",
+          title: "Member selected.",
+        });
       }
     }
     onClose();
