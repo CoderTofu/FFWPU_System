@@ -16,7 +16,12 @@ import { axiosInstance } from "@/app/axiosInstance";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
+import MemberListModal from "@/components/MemberListModal";
+import { useAlert } from "@/components/context/AlertContext.jsx";
+
 export default function AddWorshipEvent() {
+  const { showAlert } = useAlert();
+
   const [memberIds, setMemberIds] = useState([]);
   const [members, setMembers] = useState([]);
   const worshipTypes = { Onsite: 1, Online: 2 };
@@ -36,6 +41,8 @@ export default function AddWorshipEvent() {
     "member" | "guest" | null
   >(null);
   const [worshipType, setWorshipType] = useState("");
+
+  const [isMemberListOpen, setIsMemberListOpen] = useState(false);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -74,6 +81,7 @@ export default function AddWorshipEvent() {
   };
 
   const handleMemberDelete = () => {
+    setMemberIds(memberIds.filter((member) => member !== selectedMember.ID));
     setMembers(members.filter((member) => member !== selectedMember));
     setMemberIds(memberIds.filter((id) => id != selectedMember["ID"]));
   };
@@ -86,7 +94,10 @@ export default function AddWorshipEvent() {
     if (churchQuery.status === "success") {
       setChurches(churchQuery.data);
     } else if (churchQuery.status === "error") {
-      alert("An error occurred while fetching data.");
+      showAlert({
+        type: "error",
+        message: "An error occurred while fetching data.",
+      });
     }
   }, [churchQuery.data, churchQuery.status]);
 
@@ -96,7 +107,10 @@ export default function AddWorshipEvent() {
         memberIds.map(async (id) => {
           const res = await fetch(`/api/members/${id}`, { method: "GET" });
           if (!res.ok) {
-            alert(`Member with ID ${id} does not exist`);
+            showAlert({
+              type: "error",
+              message: `Member with ID ${id} does not exist`,
+            });
           } else {
             return await res.json();
           }
@@ -124,7 +138,7 @@ export default function AddWorshipEvent() {
                 className="text-[#01438F] cursor-pointer hover:text-[#FCC346]"
                 size={24}
                 aria-label="Register Member"
-                onClick={() => handleOpenRegistration("member")}
+                onClick={() => setIsMemberListOpen(true)}
               />
             </div>
           </h2>
@@ -361,7 +375,10 @@ export default function AddWorshipEvent() {
                     }),
                   });
                   if (!resp.ok) {
-                    alert("Error adding member " + id);
+                    showAlert({
+                      type: "error",
+                      message: "Error adding member " + id,
+                    });
                   }
                 }),
                 ...guests.map(async (guest) => {
@@ -376,14 +393,20 @@ export default function AddWorshipEvent() {
                     }),
                   });
                   if (!resp.ok) {
-                    alert("Error adding guest" + guest.Name);
+                    showAlert({
+                      type: "error",
+                      message: "Error adding guest" + guest.Name,
+                    });
                   }
                 }),
 
                 // images
               ]);
             } catch (err) {
-              alert("Error while adding event: " + err);
+              showAlert({
+                type: "error",
+                message: "Error while adding event: " + err,
+              });
             }
             setShowModal(false);
             router.push("/event");
@@ -394,23 +417,20 @@ export default function AddWorshipEvent() {
         />
       )}
 
+      <MemberListModal
+        isOpen={isMemberListOpen}
+        onClose={() => setIsMemberListOpen(false)}
+        memberIds={memberIds}
+        setMemberIds={setMemberIds}
+      ></MemberListModal>
+
       {isRegistrationModalOpen && (
         <RegistrationModal
           isOpen={isRegistrationModalOpen}
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
-            if (registrationType === "member") {
-              if (memberIds.includes(formData.memberId)) {
-                alert(`${formData.memberId} was already added to the event.`);
-              } else {
-                setMemberIds((prev) => [...prev, formData.memberId]);
-              }
-            } else {
-              console.log(formData);
-              setGuests((prev) => [...prev, formData]);
-            }
-            console.log("Registered:", formData);
-            // handleSubmit(formData);
+            console.log(formData);
+            setGuests((prev) => [...prev, formData]);
           }}
           title={
             registrationType === "member"

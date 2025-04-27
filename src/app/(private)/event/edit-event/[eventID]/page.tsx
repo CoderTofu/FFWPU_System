@@ -7,8 +7,10 @@ import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import MemberListModal from "@/components/MemberListModal";
+import { useAlert } from "@/components/context/AlertContext.jsx";
 
 interface Field {
   name: string;
@@ -17,6 +19,8 @@ interface Field {
 }
 
 export default function EditWorshipEvent() {
+  const { showAlert } = useAlert();
+
   const params = useParams();
 
   // This is the blessing ID from the URL
@@ -96,7 +100,10 @@ export default function EditWorshipEvent() {
             if (resp.ok) {
               return await resp.json();
             } else {
-              alert("Error while fetching member id: " + id);
+              showAlert({
+                type: "error",
+                message: "Error while fetching member id: " + id,
+              });
               return null;
             }
           } catch (error) {
@@ -120,6 +127,26 @@ export default function EditWorshipEvent() {
 
     fetchMembers();
   }, [memberIds]);
+
+  const churchQuery = useQuery({
+    queryKey: ["churches"],
+    queryFn: async () => {
+      const res = await fetch("/api/church", { method: "GET" });
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
+  });
+
+  useEffect(() => {
+    if (churchQuery.status === "success") {
+      setChurches(churchQuery.data);
+    } else if (churchQuery.status === "error") {
+      showAlert({
+        type: "error",
+        message: "An error occurred while fetching data.",
+      });
+    }
+  }, [churchQuery.data, churchQuery.status]);
 
   const toggleDropdown = (dropdown) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
@@ -147,6 +174,7 @@ export default function EditWorshipEvent() {
   const [attendeesToDelete, setAttendeesToDelete] = useState([]);
 
   const handleMemberDelete = async () => {
+    setMemberIds(memberIds.filter((member) => member !== selectedMember.ID));
     setAttendees(attendees.filter((member) => member !== selectedMember));
     setAttendeesToDelete((prev) => [...prev, selectedMember.attendee_id]);
   };
@@ -179,7 +207,7 @@ export default function EditWorshipEvent() {
           </h2>
           <div className="max-h-[250px] overflow-y-auto">
             <Table
-              data={attendees.filter((member) => member.ID !== selectedMember)}
+              data={attendees}
               columns={{
                 lg: ["ID", "Full Name"],
                 md: ["ID", "Full Name"],
@@ -421,7 +449,10 @@ export default function EditWorshipEvent() {
                     }),
                   });
                   if (!resp.ok) {
-                    alert("Error adding member " + id);
+                    showAlert({
+                      type: "error",
+                      message: "Error adding member: " + id,
+                    });
                   }
                 }),
                 ...newGuests.map(async (guest) => {
@@ -436,7 +467,10 @@ export default function EditWorshipEvent() {
                     }),
                   });
                   if (!resp.ok) {
-                    alert("Error adding guest" + guest.Name);
+                    showAlert({
+                      type: "error",
+                      message: "Error adding guest: " + guest["Full Name"],
+                    });
                   }
                 }),
                 ...attendeesToDelete.map(async (attendee) => {
@@ -447,13 +481,19 @@ export default function EditWorshipEvent() {
                     }
                   );
                   if (!resp.ok) {
-                    alert("Error deleting attendee " + attendee);
+                    showAlert({
+                      type: "error",
+                      message: "Error deleting attendee: " + attendee,
+                    });
                   }
                 }),
               ]);
               location.reload();
             } catch (err) {
-              alert("Error while editing worship: " + err);
+              showAlert({
+                type: "error",
+                message: "Error while editing worshi: " + err,
+              });
             }
 
             setShowModal(false);
@@ -470,18 +510,8 @@ export default function EditWorshipEvent() {
           isOpen={isRegistrationModalOpen}
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
-            if (registrationType === "member") {
-              if (memberIds.includes(formData.memberId)) {
-                alert(`${formData.memberId} was already added to the event.`);
-              } else {
-                console.log("adding");
-                setMemberIds((prev) => [...prev, formData.memberId]);
-              }
-            } else {
-              console.log(formData);
-              setNewGuests((prev) => [...prev, formData]);
-            }
-            console.log("Registered:", formData);
+            console.log(formData);
+            setNewGuests((prev) => [...prev, formData]);
           }}
           title={
             registrationType === "member"
