@@ -28,7 +28,7 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
 
   const columns = [
     { key: "ID", label: "Member ID" },
-    { key: "Family Name", label: "Name" },
+    { key: "Full Name", label: "Name" },
   ];
 
   const memberQuery = useQuery({
@@ -51,14 +51,14 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
     onClose();
   };
 
-  const handleSearchAndFilter = () => {
+  useEffect(() => {
+    console.log(data);
     if (memberQuery.status !== "success") return;
     const tableData = data.filter((m) =>
-      m.given_name.toLowerCase().includes(searchTerm)
+      m["Full Name"].toLowerCase().includes(searchTerm.toLowerCase())
     );
-
     setFilteredData(tableData);
-  };
+  }, [searchTerm, data, memberQuery.status]);
 
   useEffect(() => {
     if (memberQuery.status === "success") {
@@ -67,6 +67,7 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
         Region: member.Region.name,
         Subregion: member.Subregion.name,
       }));
+      setData(res);
       setFilteredData(res);
       setIsLoading(false);
     } else if (memberQuery.status === "error") {
@@ -141,10 +142,7 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
               placeholder="Search..."
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                handleSearchAndFilter();
-              }}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           {isLoading ? (
