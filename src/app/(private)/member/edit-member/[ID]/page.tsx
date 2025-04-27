@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 
 
-import PersonalInfoSection from "./PersonalInfoSection";
-import ContactInfoSection from "./ContactInfoSection";
-import SpiritualInfoSection from "./SpiritualInfoSection";
-import MissionHistorySection from "./MissionHistorySection";
-import ImageUploadSection from "./ImageUploadSection";
+import PersonalInfoSection from "@/components/sub_members/PersonalInfoSection";
+import ContactInfoSection from "@/components/sub_members/ContactInfoSection";
+import SpiritualInfoSection from "@/components/sub_members/SpiritualInfoSection";
+import MissionHistorySection from "@/components/sub_members/MissionHistorySection";
+import ImageUploadSection from "@/components/sub_members/ImageUploadSection";
 import { useAlert } from "@/components/context/AlertContext";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

@@ -6,9 +6,10 @@ import Table from "@/components/Table";
 import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
-import { axiosInstance } from "@/app/axiosInstance";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+
+import MemberListModal from "@/components/MemberListModal";
+
 interface Field {
   name: string;
   label: string;
@@ -19,7 +20,6 @@ export default function EditWorshipEvent() {
   const params = useParams();
 
   // This is the blessing ID from the URL
-  console.log(params.eventID);
   const [worshipInfo, setWorshipInfo] = useState({});
   const [attendees, setAttendees] = useState([]);
   const [guests, setGuests] = useState([]);
@@ -44,6 +44,8 @@ export default function EditWorshipEvent() {
   const [registrationType, setRegistrationType] = useState<
     "member" | "guest" | null
   >(null);
+
+  const [isMemberListOpen, setIsMemberListOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,27 +89,33 @@ export default function EditWorshipEvent() {
 
   useEffect(() => {
     const fetchMembers = async () => {
-      const fetched = await Promise.all([
-        ...attendees,
-        ...memberIds.map(async (id) => {
+      const newMembers = await Promise.all(
+        memberIds.map(async (id) => {
           try {
             const resp = await fetch(`/api/members/${id}`, { method: "GET" });
             if (resp.ok) {
               return await resp.json();
             } else {
               alert("Error while fetching member id: " + id);
-              return null; // Return null or handle the error case
+              return null;
             }
           } catch (error) {
             console.error("Error fetching member:", error);
-            return null; // Return null or handle the error case
+            return null;
           }
-        }),
-      ]);
+        })
+      );
 
-      // Filter out any null values (from failed fetches)
-      const validMembers = fetched.filter((member) => member !== null);
-      setAttendees(validMembers);
+      // Filter out failed fetches (null)
+      const validMembers = newMembers.filter((member) => member !== null);
+
+      // Merge: old attendees + new fetched members
+      const merged = [...attendees, ...validMembers];
+
+      // Remove duplicates by ID
+      const unique = Array.from(new Map(merged.map((m) => [m.ID, m])).values());
+
+      setAttendees(unique);
     };
 
     fetchMembers();
@@ -140,13 +148,11 @@ export default function EditWorshipEvent() {
 
   const handleMemberDelete = async () => {
     setAttendees(attendees.filter((member) => member !== selectedMember));
-    console.log(selectedMember);
     setAttendeesToDelete((prev) => [...prev, selectedMember.attendee_id]);
   };
   const handleGuestDelete = async () => {
     setGuests(guests.filter((member) => member !== selectedGuest));
     setNewGuests(newGuests.filter((guest) => guest !== selectedGuest));
-    console.log(selectedGuest);
     setAttendeesToDelete((prev) => [...prev, selectedGuest.ID]);
   };
 
@@ -167,13 +173,13 @@ export default function EditWorshipEvent() {
                 className="text-[#01438F] cursor-pointer hover:text-[#FCC346]"
                 size={24}
                 aria-label="Register Member"
-                onClick={() => handleOpenRegistration("member")}
+                onClick={() => setIsMemberListOpen(true)}
               />
             </div>
           </h2>
           <div className="max-h-[250px] overflow-y-auto">
             <Table
-              data={attendees}
+              data={attendees.filter((member) => member.ID !== selectedMember)}
               columns={{
                 lg: ["ID", "Full Name"],
                 md: ["ID", "Full Name"],
@@ -379,13 +385,19 @@ export default function EditWorshipEvent() {
         </button>
       </div>
 
+      <MemberListModal
+        isOpen={isMemberListOpen}
+        onClose={() => setIsMemberListOpen(false)}
+        memberIds={memberIds}
+        setMemberIds={setMemberIds}
+      ></MemberListModal>
+
       {/* Modal for Updating Event*/}
       {showModal && (
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           onConfirm={async () => {
-            console.log("Updating...");
             try {
               const res = await fetch(`/api/worship/${params.eventID}`, {
                 method: "PATCH",
