@@ -79,29 +79,28 @@ export default function EventInfo() {
   );
 
   const handleAddClick = () => {
-    router.push("/event/add-event")
-  }
+    router.push("/event/add-event");
+  };
 
   const handleEditClick = () => {
     if (selectedRow) {
-      router.push(`/event/edit-event/${selectedRow[dataID]}`)
+      router.push(`/event/edit-event/${selectedRow[dataID]}`);
     }
-  }
+  };
 
   const handleDeleteClick = () => {
     if (selectedRow) {
       setRowToDelete(selectedRow);
       setShowDeleteModal(true);
     }
-  }
+  };
 
   return (
-    <div className="px-0 md:px-[150px] mt-8">
+    <div className="px-0 md:px-[150px] min-h-screen h-full bg-[#f8fafc] pt-8">
       {/* Header */}
-      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
-        <p className="text-3xl font-bold uppercase">WORSHIP EVENT INFORMATION</p>
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#01438F] border-2 shadow-lg">
+        <p className="text-3xl font-bold uppercase">EVENTS INFORMATION</p>
       </div>
-
       {/* Search and Filters */}
       <div className="flex flex-wrap items-center gap-4 mt-4 justify-between ">
         {/* Search */}
@@ -117,11 +116,10 @@ export default function EventInfo() {
         </div>
 
         {/* INSERT FILTER DROPDOWN HERE */}
-        
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg bg-white mt-6">
+      <div className="overflow-hidden rounded-lg bg-white mt-6 border border-[#CBCBCB] shadow-lg">
         <Table
           data={filteredData}
           columns={columnConfig}
@@ -165,28 +163,28 @@ export default function EventInfo() {
 
       {/* Modal */}
       {showDeleteModal && (
-          <Modal
-            isOpen={showDeleteModal}
-            onClose={() => setShowDeleteModal(false)}
-            onConfirm={async () => {
-              console.log("Deleting event...");
-              const resp = await fetch(`/api/worship/${rowToDelete["ID"]}`, {
-                method: "DELETE",
-              });
-              if (resp.ok) {
-                queryClient.refetchQueries(["worships"]);
-              } else {
-                alert(
-                  "An error occurred while deleting worship: " + resp.statusText
-                );
-              }
-              setShowDeleteModal(false);
-            }}
-            message="Are you sure you want to delete this worship event?"
-            confirmText="Delete"
-            cancelText="Cancel"
-          />
-        )}
+        <Modal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={async () => {
+            console.log("Deleting event...");
+            const resp = await fetch(`/api/worship/${rowToDelete["ID"]}`, {
+              method: "DELETE",
+            });
+            if (resp.ok) {
+              queryClient.refetchQueries(["worships"]);
+            } else {
+              alert(
+                "An error occurred while deleting worship: " + resp.statusText
+              );
+            }
+            setShowDeleteModal(false);
+          }}
+          message="Are you sure you want to delete this worship event?"
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
+      )}
     </div>
   );
 }

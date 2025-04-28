@@ -58,12 +58,11 @@ export default function ViewBlessing() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredData = blessings.filter(
-    (item) =>
-      Object.values(item)
-        .join(" ")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
+  const filteredData = blessings.filter((item) =>
+    Object.values(item)
+      .join(" ")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
   );
 
   const handleEditClick = () => {
@@ -95,20 +94,20 @@ export default function ViewBlessing() {
   };
 
   const handleAddClick = () => {
-    router.push("/blessings/add-blessing")
-  }
+    router.push("/blessings/add-blessing");
+  };
 
   const handleDeleteClick = () => {
     if (selectedRow) {
       setRowToDelete(selectedRow);
       setIsOpen(true);
     }
-  }
+  };
 
   return (
-    <div className="px-0 md:px-[150px] mt-8">
+    <div className="px-0 md:px-[150px] min-h-screen h-full pt-8">
       {/* Header */}
-      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg">
         <p className="text-3xl font-bold uppercase">BLESSINGS INFORMATION</p>
       </div>
 
@@ -127,11 +126,10 @@ export default function ViewBlessing() {
         </div>
 
         {/* INSERT FILTER DROPDOWN HERE */}
-        
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg bg-white mt-6">
+      <div className="overflow-hidden rounded-lg bg-white mt-6 border border-[#CBCBCB] shadow-lg">
         <Table
           data={filteredData}
           columns={columns}

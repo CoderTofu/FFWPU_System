@@ -6,17 +6,25 @@ export default function Preloader() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    // Check if the page has already loaded
+    if (document.readyState === "complete") {
       setLoading(false);
-    }, 1000); // Adjust this time as needed
+    } else {
+      const handleLoad = () => {
+        setLoading(false);
+      };
 
-    return () => clearTimeout(timer);
+      window.addEventListener("load", handleLoad);
+
+      // Cleanup event listener
+      return () => window.removeEventListener("load", handleLoad);
+    }
   }, []);
 
   if (!loading) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white">
       <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
     </div>
   );
