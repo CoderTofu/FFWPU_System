@@ -30,13 +30,14 @@ body {
 .pane {
   background-color: #ffffff;
   opacity: 0.1;
-  background-image: linear-gradient(135deg, #444cf755 25%, transparent 25%),
+  background-image: 
+    linear-gradient(135deg, #444cf755 25%, transparent 25%),
     linear-gradient(225deg, #444cf7 25%, transparent 25%),
     linear-gradient(315deg, #444cf755 25%, transparent 25%),
     linear-gradient(45deg, #444cf7 25%, #ffffff 25%);
   background-size: 200px 200px;
   background-position: -100px 0, -100px 0, 0px 0, 0px 0;
-  animation: zigzagMove 3s linear infinite alternate;
+  animation: zigzagMove 20s linear infinite;
 }
 
 @keyframes zigzagMove {
@@ -44,7 +45,7 @@ body {
     background-position: -100px 0, -100px 0, 0px 0, 0px 0;
   }
   100% {
-    background-position: -100px 100px, -100px -100px, 0px 100px, 0px -100px;
+    background-position: 100px 0, 100px 0, 200px 0, 200px 0;
   }
 }
 

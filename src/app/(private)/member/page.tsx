@@ -7,39 +7,43 @@ import Table from "@/components/Table";
 import Modal from "@/components/Modal"; // Assuming you have a Modal component
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useAlert } from '@/components/context/AlertContext'; // Assuming you have an AlertContext
+
 export default function Member() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const { showAlert } = useAlert();
+
+  const [searchQuery, setSearchQuery] = useState('');
   const [data, setData] = useState([]);
 
   const memberQuery = useQuery({
-    queryKey: ["members"],
+    queryKey: ['members'],
     queryFn: async () => {
-      const res = await fetch("/api/members", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
+      const res = await fetch('/api/members', { method: 'GET' });
+      if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },
   });
 
-  const dataID = "ID";
+  const dataID = 'ID';
 
   const columnConfig = {
     lg: [
-      "ID",
-      "Full Name",
-      "Gender",
-      "Birthday",
-      "Age",
-      "Marital Status",
-      "Address",
-      "Nation",
-      "Region",
-      "Membership Category",
-      "Generation",
-      "Blessing Status",
-      "Spiritual Birthday",
+      'ID',
+      'Full Name',
+      'Gender',
+      'Birthday',
+      'Age',
+      'Marital Status',
+      'Address',
+      'Nation',
+      'Region',
+      'Membership Category',
+      'Generation',
+      'Blessing Status',
+      'Spiritual Birthday',
     ],
-    md: ["Member ID", "Full Name", "Gender", "Age"],
-    sm: ["Member ID", "Full Name"],
+    md: ['Member ID', 'Full Name', 'Gender', 'Age'],
+    sm: ['Member ID', 'Full Name'],
   };
 
   const [selectedRow, setSelectedRow] = useState<{ ID: number } | null>(null);
@@ -56,7 +60,7 @@ export default function Member() {
   };
 
   const handleAddClick = () => {
-    router.push("/member/add-member");
+    router.push('/member/add-member');
   };
 
   const handleDeleteClick = () => {
@@ -67,16 +71,17 @@ export default function Member() {
   };
 
   const handleConfirm = async () => {
-    console.log("Confirmed!", rowToDelete);
+    console.log('Confirmed!', rowToDelete);
     // Add your deletion logic here
-    const response = await fetch(`/api/members/${rowToDelete["ID"]}`, {
-      method: "DELETE",
+    const response = await fetch(`/api/members/${rowToDelete['ID']}`, {
+      method: 'DELETE',
     });
     if (response.ok) {
-      queryClient.refetchQueries(["members"]);
-      alert("Deleted successfully");
+      queryClient.refetchQueries(['members']);
+      showAlert({ type: 'success', message: 'Deleted successfully' });
+      window.location.reload();
     } else {
-      alert("An error occurred while deleting member: " + response.statusText);
+      alert('An error occurred while deleting member: ' + response.statusText);
     }
     setIsOpen(false);
   };
@@ -88,7 +93,7 @@ export default function Member() {
   );
 
   useEffect(() => {
-    if (memberQuery.status === "success") {
+    if (memberQuery.status === 'success') {
       console.log(memberQuery.data);
       const data = memberQuery.data.map((member) => ({
         ...member,
@@ -96,8 +101,8 @@ export default function Member() {
         Subregion: member.Subregion.name,
       }));
       setData(data);
-    } else if (memberQuery.status === "error") {
-      alert("An error occurred while fetching data.");
+    } else if (memberQuery.status === 'error') {
+      alert('An error occurred while fetching data.');
     }
   }, [memberQuery.data, memberQuery.status]);
 
@@ -149,8 +154,8 @@ export default function Member() {
           disabled={!selectedRow}
           className={`px-6 py-2 rounded ${
             selectedRow
-              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
+              ? 'bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed font-bold'
           }`}
         >
           EDIT
@@ -160,8 +165,8 @@ export default function Member() {
           disabled={!selectedRow}
           className={`px-4 py-2 rounded ${
             selectedRow
-              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
+              ? 'bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed font-bold'
           }`}
         >
           DELETE

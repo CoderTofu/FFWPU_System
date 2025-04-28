@@ -266,6 +266,8 @@ export default function Home() {
         </motion.div>
       </section>
 
+      <section></section>
+
       <ChatbotWidget />
     </div>
   );

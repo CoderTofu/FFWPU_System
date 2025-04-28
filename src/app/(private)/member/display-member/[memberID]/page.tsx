@@ -86,7 +86,7 @@ export default function DisplayMember() {
   );
 
   return (
-    <div className="container mx-auto py-8 px-4 bg-[#f8fafc] w-full">
+    <div className="container mx-auto py-8 bg-[#f8fafc] w-full px-0 md:[60px] lg:px-[150px]">
       <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg">
         <p className="text-3xl font-bold uppercase">PROFILE INFORMATION</p>
       </div>
@@ -96,22 +96,17 @@ export default function DisplayMember() {
           {/* Profile Header */}
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
             <Avatar className="w-24 h-24 border-2 border-primary">
-              <AvatarImage
-                src="/placeholder.svg?height=96&width=96"
-                alt={userData["Full Name"]}
-              />
+              <AvatarImage src="/placeholder.svg?height=96&width=96" alt={userData['Full Name']} />
               <AvatarFallback className="bg-primary/10">
                 <User className="h-12 w-12 text-primary" />
               </AvatarFallback>
             </Avatar>
 
             <div className="flex flex-col items-center md:items-start">
-              <h2 className="text-2xl md:text-3xl font-bold">
-                {userData["Full Name"]}
-              </h2>
+              <h2 className="text-2xl md:text-3xl font-bold">{userData['Full Name']}</h2>
               <div className="flex items-center gap-2 mt-2">
                 <Badge variant="outline" className="bg-primary/10">
-                  {userData["Membership Category"]}
+                  {userData['Membership Category']}
                 </Badge>
                 <Badge variant="outline" className="bg-primary/10">
                   Generation: {userData.Generation}
@@ -139,21 +134,13 @@ export default function DisplayMember() {
             {/* Personal Information Tab */}
             <TabsContent value="personal" className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold mb-4 text-[#BE9231]">
-                  Personal Information
-                </h3>
+                <h3 className="text-lg font-semibold mb-4 text-[#BE9231]">Personal Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <InfoField label="Gender" value={userData.Gender} />
-                  <InfoField
-                    label="Date of Birth"
-                    value={userData["Date Of Birth"]}
-                  />
+                  <InfoField label="Date of Birth" value={userData['Date Of Birth']} />
                   <InfoField label="Age" value={userData.Age} />
                   <InfoField label="Nation" value={userData.Country} />
-                  <InfoField
-                    label="Marital Status"
-                    value={userData["Marital Status"]}
-                  />
+                  <InfoField label="Marital Status" value={userData['Marital Status']} />
                   {/* <InfoField
                     label="Name of Spouse"
                     value={userData.spouseName}
@@ -164,9 +151,7 @@ export default function DisplayMember() {
                   <InfoField label="Address" value={userData.Address} />
                   <div className="flex items-start gap-2 mt-2">
                     <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                    <span className="text-sm text-muted-foreground">
-                      {userData.Address}
-                    </span>
+                    <span className="text-sm text-muted-foreground">{userData.Address}</span>
                   </div>
                 </div>
               </div>
@@ -175,28 +160,16 @@ export default function DisplayMember() {
             {/* Spiritual Information Tab */}
             <TabsContent value="spiritual" className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-[#BE9231] mb-4">
-                  Spiritual Information
-                </h3>
+                <h3 className="text-lg font-semibold text-[#BE9231] mb-4">Spiritual Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <InfoField label="Generation" value={userData.Generation} />
-                  <InfoField
-                    label="Spiritual Birthday"
-                    value={userData["Spiritual Birthday"]}
-                  />
-                  <InfoField
-                    label="Membership Category"
-                    value={userData["Membership Category"]}
-                  />
+                  <InfoField label="Spiritual Birthday" value={userData['Spiritual Birthday']} />
+                  <InfoField label="Membership Category" value={userData['Membership Category']} />
 
                   <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-muted-foreground">
-                      Spiritual Parents
-                    </span>
+                    <span className="text-sm text-muted-foreground">Spiritual Parents</span>
                     <ul className="space-y-1">
-                      <li className="font-medium">
-                        {userData["Spiritual Parent"]}
-                      </li>
+                      <li className="font-medium">{userData['Spiritual Parent']}</li>
                       {/* <li className="font-medium">
                         {userData.spiritualParent2}
                       </li> */}
@@ -205,9 +178,7 @@ export default function DisplayMember() {
                 </div>
 
                 <div className="mt-8">
-                  <h4 className="text-md font-semibold mb-3 text-[#BE9231]">
-                    Blessings
-                  </h4>
+                  <h4 className="text-md font-semibold mb-3 text-[#BE9231]">Blessings</h4>
                   <div className="space-y-3">
                     {userBlessings != undefined ? (
                       userBlessings.map((blessing, index) => (
@@ -217,20 +188,16 @@ export default function DisplayMember() {
                         >
                           <Award className="h-5 w-5 text-primary" />
                           <div>
-                            <div className="font-medium">
-                              {blessing["Name Of Blessing"]}
-                            </div>
+                            <div className="font-medium">{blessing['Name Of Blessing']}</div>
                             <div className="text-sm text-muted-foreground flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              {blessing["Blessing Date"]}
+                              {blessing['Blessing Date']}
                             </div>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <div className="text-sm text-muted-foreground">
-                        No blessings available.
-                      </div>
+                      <div className="text-sm text-muted-foreground">No blessings available.</div>
                     )}
                   </div>
                 </div>
