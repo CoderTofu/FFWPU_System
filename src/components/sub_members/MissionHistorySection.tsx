@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface Props {
   formData: any;
@@ -9,7 +9,10 @@ export default function MissionHistorySection({ formData, setFormData }: Props) 
   const addMission = () => {
     setFormData((prev) => ({
       ...prev,
-      missionHistory: [...prev.missionHistory, { role: "", organization: "", country: "", startDate: "", endDate: "" }],
+      missionHistory: [
+        ...prev.missionHistory,
+        { role: '', organization: '', country: '', startDate: '', endDate: '' },
+      ],
     }));
   };
 
@@ -24,13 +27,20 @@ export default function MissionHistorySection({ formData, setFormData }: Props) 
     updated[index][field] = value;
     setFormData((prev) => ({ ...prev, missionHistory: updated }));
   };
+  const formatDateForInput = (dateString: string) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    } catch {
+      return '';
+    }
+  };
 
   return (
     <section className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-[#01438f] mb-2">
-          Mission History
-        </h2>
+        <h2 className="text-2xl font-bold text-[#01438f] mb-2">Mission History</h2>
         <p className="text-sm text-gray-600 mb-6">
           List your past missions, organizations, and service periods.
         </p>
@@ -46,7 +56,7 @@ export default function MissionHistorySection({ formData, setFormData }: Props) 
                 <input
                   type="text"
                   value={mission.role}
-                  onChange={(e) => handleMissionChange(idx, "role", e.target.value)}
+                  onChange={(e) => handleMissionChange(idx, 'role', e.target.value)}
                   placeholder="Enter role"
                   className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
@@ -58,7 +68,7 @@ export default function MissionHistorySection({ formData, setFormData }: Props) 
                 <input
                   type="text"
                   value={mission.organization}
-                  onChange={(e) => handleMissionChange(idx, "organization", e.target.value)}
+                  onChange={(e) => handleMissionChange(idx, 'organization', e.target.value)}
                   placeholder="Enter organization"
                   className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
@@ -70,7 +80,7 @@ export default function MissionHistorySection({ formData, setFormData }: Props) 
                 <input
                   type="text"
                   value={mission.country}
-                  onChange={(e) => handleMissionChange(idx, "country", e.target.value)}
+                  onChange={(e) => handleMissionChange(idx, 'country', e.target.value)}
                   placeholder="Enter country"
                   className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
@@ -81,8 +91,8 @@ export default function MissionHistorySection({ formData, setFormData }: Props) 
                 <label className="text-sm font-semibold text-gray-700 mb-1">Start Date</label>
                 <input
                   type="date"
-                  value={mission.startDate}
-                  onChange={(e) => handleMissionChange(idx, "startDate", e.target.value)}
+                  value={mission.start_date}
+                  onChange={(e) => handleMissionChange(idx, 'startDate', e.target.value)}
                   className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
@@ -92,8 +102,8 @@ export default function MissionHistorySection({ formData, setFormData }: Props) 
                 <label className="text-sm font-semibold text-gray-700 mb-1">End Date</label>
                 <input
                   type="date"
-                  value={mission.endDate}
-                  onChange={(e) => handleMissionChange(idx, "endDate", e.target.value)}
+                  value={mission.end_date}
+                  onChange={(e) => handleMissionChange(idx, 'endDate', e.target.value)}
                   className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
