@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+
 import {
   User,
   Calendar,
@@ -86,12 +86,12 @@ export default function DisplayMember() {
   );
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
-        <p className="text-3xl font-bold uppercase">MEMBER PROFILE</p>
+    <div className="container mx-auto py-8 px-4 bg-[#f8fafc] w-full">
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg">
+        <p className="text-3xl font-bold uppercase">PROFILE INFORMATION</p>
       </div>
 
-      <Card className="shadow-lg mt-4">
+      <Card className="shadow-lg mt-4 w-full">
         <CardContent className="p-[30px] pt-6">
           {/* Profile Header */}
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
@@ -209,6 +209,7 @@ export default function DisplayMember() {
                     Blessings
                   </h4>
                   <div className="space-y-3">
+<<<<<<< HEAD
                     {userBlessings.map((blessing, index) => (
                       <div
                         key={index}
@@ -226,6 +227,31 @@ export default function DisplayMember() {
                         </div>
                       </div>
                     ))}
+=======
+                    {userBlessings != undefined ? (
+                      userBlessings.map((blessing, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-4 p-3 rounded-md bg-muted/50"
+                        >
+                          <Award className="h-5 w-5 text-primary" />
+                          <div>
+                            <div className="font-medium">
+                              {blessing["Name Of Blessing"]}
+                            </div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {blessing["Blessing Date"]}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-sm text-muted-foreground">
+                        No blessings available.
+                      </div>
+                    )}
+>>>>>>> 22a6cef (IN PROGRESS: UI Update)
                   </div>
                 </div>
               </div>

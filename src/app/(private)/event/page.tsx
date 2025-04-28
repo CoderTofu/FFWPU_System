@@ -78,6 +78,7 @@ export default function EventInfo() {
       (selectedYear ? event.Date.startsWith(selectedYear) : true)
   );
 
+<<<<<<< HEAD
   return (
     <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
       {/* Header */}
@@ -90,6 +91,35 @@ export default function EventInfo() {
       <div className="w-full flex flex-wrap items-center justify-between mt-[30px] gap-4">
         <div className="relative w-full sm:w-[310px] h-[29px] ">
           <Search className="absolute left-[10px] top-1/2 transform -translate-y-1/2 text-[#01438F] w-[18px] h-[18px]" />
+=======
+  const handleAddClick = () => {
+    router.push("/event/add-event");
+  };
+
+  const handleEditClick = () => {
+    if (selectedRow) {
+      router.push(`/event/edit-event/${selectedRow[dataID]}`);
+    }
+  };
+
+  const handleDeleteClick = () => {
+    if (selectedRow) {
+      setRowToDelete(selectedRow);
+      setShowDeleteModal(true);
+    }
+  };
+
+  return (
+    <div className="px-0 md:px-[150px] min-h-screen h-full bg-[#f8fafc] pt-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#01438F] border-2 shadow-lg">
+        <p className="text-3xl font-bold uppercase">EVENTS INFORMATION</p>
+      </div>
+      {/* Search and Filters */}
+      <div className="flex flex-wrap items-center gap-4 mt-4 justify-between ">
+        {/* Search */}
+        <div className="relative w-full sm:max-w-xs">
+>>>>>>> 22a6cef (IN PROGRESS: UI Update)
           <input
             className="w-full h-full pl-[35px] pr-[12px] border border-[#01438F] rounded-md outline-none text-[14px]"
             type="text"
@@ -99,6 +129,7 @@ export default function EventInfo() {
           />
         </div>
 
+<<<<<<< HEAD
         <div className="flex flex-wrap items-center gap-4">
           <span className="text-[14px]">Filter By:</span>
           <div className="flex items-center gap-4" ref={dropdownRef}>
@@ -154,6 +185,13 @@ export default function EventInfo() {
 
       {/* Table Section */}
       <div className="w-full mt-[25px]">
+=======
+        {/* INSERT FILTER DROPDOWN HERE */}
+      </div>
+
+      {/* Table */}
+      <div className="overflow-hidden rounded-lg bg-white mt-6 border border-[#CBCBCB] shadow-lg">
+>>>>>>> 22a6cef (IN PROGRESS: UI Update)
         <Table
           data={filteredData}
           columns={columnConfig}

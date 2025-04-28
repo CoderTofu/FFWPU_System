@@ -90,6 +90,7 @@ export default function ViewBlessing() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+<<<<<<< HEAD
   const filteredData = blessings.filter(
     (item) =>
       Object.values(item)
@@ -99,6 +100,13 @@ export default function ViewBlessing() {
     // (selectedYear && selectedYear !== "All Years"
     //   ? item.Year.toString() === selectedYear
     //   : true)
+=======
+  const filteredData = blessings.filter((item) =>
+    Object.values(item)
+      .join(" ")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+>>>>>>> 22a6cef (IN PROGRESS: UI Update)
   );
 
   const handleEditClick = () => {
@@ -129,10 +137,24 @@ export default function ViewBlessing() {
     setIsOpen(false);
   };
 
+<<<<<<< HEAD
+=======
+  const handleAddClick = () => {
+    router.push("/blessings/add-blessing");
+  };
+
+  const handleDeleteClick = () => {
+    if (selectedRow) {
+      setRowToDelete(selectedRow);
+      setIsOpen(true);
+    }
+  };
+
+>>>>>>> 22a6cef (IN PROGRESS: UI Update)
   return (
-    <div className="px-0 md:px-[150px] mt-8">
+    <div className="px-0 md:px-[150px] min-h-screen h-full pt-8">
       {/* Header */}
-      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg">
         <p className="text-3xl font-bold uppercase">BLESSINGS INFORMATION</p>
       </div>
 
@@ -150,6 +172,7 @@ export default function ViewBlessing() {
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
         </div>
 
+<<<<<<< HEAD
         {/* Filter Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
@@ -181,10 +204,13 @@ export default function ViewBlessing() {
             </div>
           )}
         </div>
+=======
+        {/* INSERT FILTER DROPDOWN HERE */}
+>>>>>>> 22a6cef (IN PROGRESS: UI Update)
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg bg-white mt-6">
+      <div className="overflow-hidden rounded-lg bg-white mt-6 border border-[#CBCBCB] shadow-lg">
         <Table
           data={filteredData}
           columns={columns}

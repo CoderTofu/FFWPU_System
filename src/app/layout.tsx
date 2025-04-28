@@ -14,9 +14,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <link rel="icon" href="/icons/ffwpu_icon.svg" sizes="any" />
-      <body className="antialiased min-h-screen flex flex-col bg-[#f1f1f1]">
+      <body className="antialiased min-h-screen flex flex-col bg-[#f8fafc]">
         <Preloader />
+<<<<<<< HEAD
         <LayoutWrapper>{children}</LayoutWrapper>
+=======
+
+        <AlertProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </AlertProvider>
+>>>>>>> 22a6cef (IN PROGRESS: UI Update)
       </body>
     </html>
   );

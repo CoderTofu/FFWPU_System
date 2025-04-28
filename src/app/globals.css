@@ -1,18 +1,52 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
-
 :root {
   --roboto-font: "Roboto", "arial";
+  --averia-font: "Averia Serif Libre", serif;
+  --instrument-font: "Instrument Sans", sans-serif;
 }
 
-* {
+html {
+  scroll-behavior: smooth;
+}
+
+body {
   font-family: var(--roboto-font);
 }
 
+.averia-font {
+  font-family: "Averia Serif Libre", serif !important;
+}
 
+.font-instrument {
+  font-family: var(--instrument-font);
+}
+
+.pane {
+  background-color: #ffffff;
+  opacity: 0.1;
+  background-image: linear-gradient(135deg, #444cf755 25%, transparent 25%),
+    linear-gradient(225deg, #444cf7 25%, transparent 25%),
+    linear-gradient(315deg, #444cf755 25%, transparent 25%),
+    linear-gradient(45deg, #444cf7 25%, #ffffff 25%);
+  background-size: 200px 200px;
+  background-position: -100px 0, -100px 0, 0px 0, 0px 0;
+  animation: zigzagMove 3s linear infinite alternate;
+}
+
+@keyframes zigzagMove {
+  0% {
+    background-position: -100px 0, -100px 0, 0px 0, 0px 0;
+  }
+  100% {
+    background-position: -100px 100px, -100px -100px, 0px 100px, 0px -100px;
+  }
+}
 
 @layer base {
   :root {
@@ -69,8 +103,6 @@
     --chart-5: 340 75% 55%;
   }
 }
-
-
 
 @layer base {
   * {

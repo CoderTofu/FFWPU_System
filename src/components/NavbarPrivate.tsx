@@ -36,7 +36,7 @@ export default function NavbarPrivate() {
   };
 
   return (
-    <div className="bg-[#01438F] border-b-4 border-[#FCC346] text-white p-4 px-[100px] min-h-[100px] flex justify-between items-center">
+    <div className="bg-[#fff] border-b-4 shadow p-4 px-[100px] min-h-[100px] flex justify-between items-center">
       {/* Logo */}
       <div className="flex gap-4 items-center">
         <a href={"/"}>
@@ -46,6 +46,10 @@ export default function NavbarPrivate() {
             alt="Site Icon"
           />
         </a>
+        <div className="text-[#1C5CA8] averia-font italic">
+          <h1 className="text-[21px] italic font-semibold">FFWPU</h1>
+          <h1 className="text-[21px] italic font-semibold">PHILIPPINES</h1>
+        </div>
       </div>
 
       {/* Mobile Menu Button */}
@@ -60,7 +64,7 @@ export default function NavbarPrivate() {
       <div
         className={`z-50 fixed top-0 right-0 w-64 h-full ${
           isSidebarOpen ? "translate-x-0" : "translate-x-full"
-        } bg-[#01438F] shadow-xl p-6 flex flex-col gap-6 text-lg transition-all duration-300 border-yellow-400 border-l-8`}
+        } bg-[#01438F] shadow-xl p-6 flex flex-col gap-6 text-lg transition-all duration-300 border-yellow-400 border-l-8 text-white`}
       >
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold text-yellow-400">FFWPU</h2>

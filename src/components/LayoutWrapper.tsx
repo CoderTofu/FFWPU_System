@@ -26,7 +26,7 @@ export default function LayoutWrapper({
     <QueryClientProvider client={queryClient}>
       {isPublic ? <NavbarPublic /> : <NavbarPrivate />}
       <main className="min-h-screen flex-grow">{children}</main>
-      {isPublic ? <FooterPublic /> : <FooterPrivate />}
+      <FooterPublic />
     </QueryClientProvider>
   );
 }
