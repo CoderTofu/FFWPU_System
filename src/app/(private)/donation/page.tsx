@@ -131,41 +131,37 @@ export default function Donation() {
   };
 
   return (
-    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
-      <div className="w-full flex flex-col md:flex-row justify-center items-center bg-white rounded-md shadow-md shadow-black/25 p-4">
-        <p className="text-[28px] font-bold">DONATIONS</p>
+    <div className="px-0 md:px-[150px] min-h-screen h-full pt-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg">
+        <p className="text-3xl font-bold uppercase">DONATIONS INFORMATION</p>
       </div>
 
-            {/* Search and Filters */}
-            <div className="flex flex-wrap items-center gap-4 mt-4 justify-between ">
-              {/* Search */}
-              <div className="relative w-full sm:max-w-xs">
-                <input
-                  className="w-full h-7 pl-8 border border-[#01438F] rounded outline-none text-sm"
-                  type="text"
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
-              </div>
-      
-              {/* INSERT FILTER DROPDOWN HERE */}
-              
-            </div>
+      {/* Search and Filters */}
+      <div className="flex flex-wrap items-center gap-4 mt-4 justify-between ">
+        {/* Search */}
+        <div className="relative w-full sm:max-w-xs">
+          <input
+            className="w-full h-7 pl-8 border border-[#01438F] rounded outline-none text-sm"
+            type="text"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
+        </div>
+
+        {/* INSERT FILTER DROPDOWN HERE */}
+      </div>
 
       <div className="rounded-lg items-center justify-center mt-4">
-        <div className="bg-white">
-          <Table
-            data={sortedData}
-            columns={column}
-            onRowSelect={setSelectedRow}
-          />
+        <div className="overflow-hidden rounded-lg bg-white mt-6 border border-[#CBCBCB] shadow-lg">
+          <Table data={sortedData} columns={column} onRowSelect={setSelectedRow} />
         </div>
 
         <div className="flex justify-center items-center m-7 gap-5">
           <button
-            onClick={() => router.push("/donation/add-donation")}
+            onClick={() => router.push('/donation/add-donation')}
             className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
           >
             ADD
@@ -176,8 +172,8 @@ export default function Donation() {
             disabled={!selectedRow}
             className={`px-6 py-2 rounded ${
               selectedRow
-                ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
+                ? 'bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed font-bold'
             }`}
           >
             EDIT
@@ -193,8 +189,8 @@ export default function Donation() {
             disabled={!selectedRow}
             className={`px-6 py-2 rounded ${
               selectedRow
-                ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
+                ? 'bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed font-bold'
             }`}
           >
             DELETE
@@ -206,13 +202,13 @@ export default function Donation() {
             isOpen={showDeleteModal}
             onClose={() => setShowDeleteModal(false)}
             onConfirm={async () => {
-              const res = await fetch(`/api/donations/${rowToDelete["ID"]}`, {
-                method: "DELETE",
+              const res = await fetch(`/api/donations/${rowToDelete['ID']}`, {
+                method: 'DELETE',
               });
               if (res.ok) {
                 location.reload();
               } else {
-                alert("An error occurred while deleting: " + res.statusText);
+                alert('An error occurred while deleting: ' + res.statusText);
               }
               setShowDeleteModal(false);
             }}

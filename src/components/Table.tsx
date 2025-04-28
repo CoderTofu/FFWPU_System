@@ -86,7 +86,7 @@ const Table: React.FC<TableProps> = ({
       <table className="min-w-full border-gray-300 bg-white rounded-lg">
         {/* Table Head */}
         <thead className="bg-gray-200 sticky top-0">
-          <tr className="bg-[#01438F] text-[#FCC346] cursor-pointer">
+          <tr className="bg-[#1C5CA8] text-[#FFF] cursor-pointer">
             {visibleHeaders.map((header) => (
               <th key={header} className="px-4 py-2 text-center top-0">
                 {header}
@@ -101,13 +101,13 @@ const Table: React.FC<TableProps> = ({
             <tr
               key={index}
               className={`cursor-pointer transition
-              ${selectedRow === index ? "bg-[#E7E6E6]" : "hover:bg-[#E7E6E6]"}`}
+              ${selectedRow === index ? 'bg-[#E7E6E6]' : 'hover:bg-[#E7E6E6]'}`}
               onClick={() => handleRowClick(index, row)}
               onDoubleClick={() => handleRowDoubleClick(row, idName)}
             >
               {visibleHeaders.map((header) => (
                 <td key={header} className="px-4 py-2 text-center">
-                  {row[header] ?? "-"}
+                  {row[header] ?? '-'}
                 </td>
               ))}
             </tr>

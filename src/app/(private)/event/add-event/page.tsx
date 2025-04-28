@@ -122,13 +122,13 @@ export default function AddWorshipEvent() {
   }, [memberIds]);
 
   return (
-    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
+    <div className="px-0 md:px-[60px] lg:px-[150px] my-8">
       {/* Header */}
-      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
-        <p className="text-3xl font-bold uppercase">ADD WORSHIP EVENT</p>
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#01438F] border-2 shadow-lg">
+        <p className="text-3xl font-bold uppercase">ADD EVENT</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row min-h-screen py-4 pb-0 w-full gap-6">
+      <div className="flex flex-col lg:flex-row py-4 pb-0 w-full gap-6">
         {/* Attendance Tables */}
         <div className="lg:w-1/2 p-8 bg-white rounded-lg shadow-md flex flex-col relative">
           <h2 className="text-lg font-semibold mb-3 flex justify-between">
@@ -142,13 +142,13 @@ export default function AddWorshipEvent() {
               />
             </div>
           </h2>
-          <div className="max-h-[250px] overflow-y-auto">
+          <div className="max-h-[250px] overflow-y-auto border border-[#CBCBCB] shadow-lg rounded-lg">
             <Table
               data={members}
               columns={{
-                lg: ["ID", "Full Name"],
-                md: ["ID", "Full Name"],
-                sm: ["Full Name"],
+                lg: ['ID', 'Full Name'],
+                md: ['ID', 'Full Name'],
+                sm: ['Full Name'],
               }}
               onRowSelect={setSelectedMember}
             />
@@ -158,8 +158,8 @@ export default function AddWorshipEvent() {
             disabled={!selectedMember}
             className={`py-1 w-[100px] text-sm rounded mt-5 transition duration-300 ease-in-out border-2 ${
               selectedMember
-                ? "border-red-600 text-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg"
-                : "border-gray-400 text-gray-400 cursor-not-allowed"
+                ? 'border-red-600 text-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg'
+                : 'border-gray-400 text-gray-400 cursor-not-allowed'
             }`}
           >
             Remove
@@ -172,17 +172,17 @@ export default function AddWorshipEvent() {
                 className="text-[#01438F] cursor-pointer hover:text-[#FCC346]"
                 size={24}
                 aria-label="Register Guest"
-                onClick={() => handleOpenRegistration("guest")}
+                onClick={() => handleOpenRegistration('guest')}
               />
             </div>
           </h2>
-          <div className="max-h-[250px] overflow-y-auto">
+          <div className="max-h-[250px] overflow-y-auto border border-[#CBCBCB] shadow-lg rounded-lg">
             <Table
               data={guests}
               columns={{
-                lg: ["Name", "Email"],
-                md: ["Name", "Email"],
-                sm: ["Name"],
+                lg: ['Name', 'Email'],
+                md: ['Name', 'Email'],
+                sm: ['Name'],
               }}
               onRowSelect={setSelectedGuest}
             />
@@ -192,8 +192,8 @@ export default function AddWorshipEvent() {
             disabled={!selectedGuest}
             className={`py-1 w-[100px] rounded mt-5 text-sm transition duration-300 ease-in-out border-2 ${
               selectedGuest
-                ? "border-red-600 text-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg"
-                : "border-gray-400 text-gray-400 cursor-not-allowed"
+                ? 'border-red-600 text-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg'
+                : 'border-gray-400 text-gray-400 cursor-not-allowed'
             }`}
           >
             Remove
@@ -225,31 +225,31 @@ export default function AddWorshipEvent() {
 
           <label className="block font-medium mt-5">Worship Type</label>
           <div
-            onClick={() => toggleDropdown("type")}
+            onClick={() => toggleDropdown('type')}
             className="relative flex flex-col justify-start items-start border border-[#01438F] rounded p-2 hover:cursor-pointer "
           >
             <div className="flex w-full justify-between">
-              {worshipType === "" ? (
+              {worshipType === '' ? (
                 <button className="opacity-50">Worship Type</button>
               ) : (
                 <button>{worshipType}</button>
               )}
-              {openDropdown === "type" ? (
-                <ChevronUp style={{ color: "#01438F" }} />
+              {openDropdown === 'type' ? (
+                <ChevronUp style={{ color: '#01438F' }} />
               ) : (
-                <ChevronDown style={{ color: "#01438F" }} />
+                <ChevronDown style={{ color: '#01438F' }} />
               )}
             </div>
-            {openDropdown === "type" && (
+            {openDropdown === 'type' && (
               <div className="absolute z-50 mt-10 flex flex-col w-full bg-white border border-[#01438F] rounded">
-                {["Onsite", "Online"].map((val) => {
+                {['Onsite', 'Online'].map((val) => {
                   return (
                     <button
                       key={val}
                       className="hover:bg-gray-200 w-full text-left rounded p-2"
                       onClick={() => {
                         setWorshipType(val);
-                        toggleDropdown("type");
+                        toggleDropdown('type');
                       }}
                     >
                       {val}
@@ -262,7 +262,7 @@ export default function AddWorshipEvent() {
 
           <label className="block font-medium mt-5">Church</label>
           <div
-            onClick={() => toggleDropdown("church")}
+            onClick={() => toggleDropdown('church')}
             className="relative flex flex-col justify-start items-start border border-[#01438F] rounded p-2 hover:cursor-pointer "
           >
             <div className="flex w-full justify-between">
@@ -271,13 +271,13 @@ export default function AddWorshipEvent() {
               ) : (
                 <button> {`${church.Name} (${church.Country})`}</button>
               )}
-              {openDropdown === "church" ? (
-                <ChevronUp style={{ color: "#01438F" }} />
+              {openDropdown === 'church' ? (
+                <ChevronUp style={{ color: '#01438F' }} />
               ) : (
-                <ChevronDown style={{ color: "#01438F" }} />
+                <ChevronDown style={{ color: '#01438F' }} />
               )}
             </div>
-            {openDropdown === "church" && (
+            {openDropdown === 'church' && (
               <div className="absolute mt-10 flex flex-col w-full bg-white border border-[#01438F] rounded">
                 {churches.map((val) => {
                   return (
@@ -286,7 +286,7 @@ export default function AddWorshipEvent() {
                       className="hover:bg-gray-200 w-full text-left rounded p-2"
                       onClick={() => {
                         setChurch(val);
-                        toggleDropdown("church");
+                        toggleDropdown('church');
                       }}
                     >
                       {`${val.Name} (${val.Country})`}
@@ -351,10 +351,10 @@ export default function AddWorshipEvent() {
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           onConfirm={async () => {
-            console.log("Saving...");
+            console.log('Saving...');
             try {
-              const resp = await fetch("/api/worship/", {
-                method: "POST",
+              const resp = await fetch('/api/worship/', {
+                method: 'POST',
                 body: JSON.stringify({
                   event_name: eventName,
                   date: date,
@@ -363,30 +363,30 @@ export default function AddWorshipEvent() {
                 }),
               });
 
-              const addedID = (await resp.json())["ID"];
+              const addedID = (await resp.json())['ID'];
               await Promise.all([
                 ...memberIds.map(async (id) => {
                   const resp = await fetch(`/api/worship/attendee`, {
-                    method: "POST",
+                    method: 'POST',
                     body: JSON.stringify({
                       worship: addedID,
-                      type: "Member",
+                      type: 'Member',
                       member: id,
                     }),
                   });
                   if (!resp.ok) {
                     showAlert({
-                      type: "error",
-                      message: "Error adding member " + id,
+                      type: 'error',
+                      message: 'Error adding member ' + id,
                     });
                   }
                 }),
                 ...guests.map(async (guest) => {
                   const resp = await fetch(`/api/worship/attendee`, {
-                    method: "POST",
+                    method: 'POST',
                     body: JSON.stringify({
                       worship: addedID,
-                      type: "Guest",
+                      type: 'Guest',
                       full_name: guest.Name,
                       email: guest.Email,
                       invited_by: guest.invitedBy || null,
@@ -394,8 +394,8 @@ export default function AddWorshipEvent() {
                   });
                   if (!resp.ok) {
                     showAlert({
-                      type: "error",
-                      message: "Error adding guest" + guest.Name,
+                      type: 'error',
+                      message: 'Error adding guest' + guest.Name,
                     });
                   }
                 }),
@@ -404,12 +404,12 @@ export default function AddWorshipEvent() {
               ]);
             } catch (err) {
               showAlert({
-                type: "error",
-                message: "Error while adding event: " + err,
+                type: 'error',
+                message: 'Error while adding event: ' + err,
               });
             }
             setShowModal(false);
-            router.push("/event");
+            router.push('/event');
           }}
           message="Are you sure you want to add this worship event?"
           confirmText="Add"
@@ -432,38 +432,34 @@ export default function AddWorshipEvent() {
             console.log(formData);
             setGuests((prev) => [...prev, formData]);
           }}
-          title={
-            registrationType === "member"
-              ? "Member Registration"
-              : "Guest Registration"
-          }
+          title={registrationType === 'member' ? 'Member Registration' : 'Guest Registration'}
           fields={
-            registrationType === "member"
+            registrationType === 'member'
               ? [
                   {
-                    name: "memberId",
-                    label: "Member ID:",
-                    type: "text",
+                    name: 'memberId',
+                    label: 'Member ID:',
+                    type: 'text',
                     required: true,
                   },
                 ]
               : [
                   {
-                    name: "Name",
-                    label: "Full Name:",
-                    type: "text",
+                    name: 'Name',
+                    label: 'Full Name:',
+                    type: 'text',
                     required: true,
                   },
                   {
-                    name: "Email",
-                    label: "Email:",
-                    type: "email",
+                    name: 'Email',
+                    label: 'Email:',
+                    type: 'email',
                     required: true,
                   },
                   {
-                    name: "invitedBy",
-                    label: "Invited By (Member ID):",
-                    type: "text",
+                    name: 'invitedBy',
+                    label: 'Invited By (Member ID):',
+                    type: 'text',
                   },
                 ]
           }

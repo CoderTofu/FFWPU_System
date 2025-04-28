@@ -18,13 +18,13 @@ const ListTable = ({
   return (
     <div className="h-full">
       <table className="w-full text-sm">
-        <thead className="sticky top-0 bg-[#F7F7F7]">
-          <tr className="bg-muted/50">
+        <thead className="sticky top-0 bg-[#1C5CA8]">
+          <tr className="">
             {columns.map((column, index) => (
               <th
                 key={index}
-                className={`px-4 py-3 font-medium text-center min-w-[200px] ${
-                  minWidth ? "min-w-[200px]" : ""
+                className={`px-4 py-3 font-medium text-center min-w-[200px] text-white ${
+                  minWidth ? 'min-w-[200px]' : ''
                 }`}
               >
                 {column.label}
@@ -39,16 +39,16 @@ const ListTable = ({
               <tr
                 key={index}
                 className={`transition-colors hover:bg-gray-200 cursor-pointer ${
-                  isSelected ? "bg-blue-300 hover:bg-blue-500" : ""
+                  isSelected ? 'bg-blue-300 hover:bg-blue-500' : ''
                 }`}
                 onClick={() => handleRowClick(row)}
               >
                 {columns.map((column, colIndex) => {
-                    return (
-                      <td key={colIndex} className="px-4 py-3 text-center">
-                        {row[column.key] ?? "-"}
-                      </td>
-                    );
+                  return (
+                    <td key={colIndex} className="px-4 py-3 text-center">
+                      {row[column.key] ?? '-'}
+                    </td>
+                  );
                 })}
               </tr>
             );

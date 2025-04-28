@@ -1,191 +1,126 @@
-"use client";
+'use client';
 
-import Table from "@/components/Table";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-export default function ViewWorship() {
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import Table from '@/components/Table';
+
+export default function ViewWorshipEvent() {
   const params = useParams();
 
-  // This is the blessing ID from the URL
-  console.log(params.eventID);
   const [attendees, setAttendees] = useState([]);
   const [guests, setGuests] = useState([]);
   const [worshipInfo, setWorshipInfo] = useState({});
-  const [churches, setChurches] = useState([]);
-  const [church, setChurch] = useState("");
+  const [church, setChurch] = useState('');
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     (async function () {
-      const res = await fetch(`/api/event/${params.eventID}`, {
-        method: "GET",
-      });
-      const data = await res.json();
+      const res = await fetch(`/api/worship/${params.eventID}`, { method: 'GET' });
       if (res.ok) {
-        setAttendees(data.Attendees);
+        const data = await res.json();
+        setGuests(data.Attendees.filter((a) => a.Type === 'Guest'));
+        const members = data.Attendees.filter((a) => a.Type === 'Member');
+        setAttendees(
+          members.map((a) => ({
+            ID: a.Member.ID,
+            'Full Name': a.Member['Full Name'],
+          }))
+        );
         setWorshipInfo(data);
-        setGuests(data.Guests);
+        console.log(data?.Church.Name);
+        setChurch(data?.Church.Name); // You might need to adjust this
+        setImages(data?.Images || []); // Assume `Images` is array of URLs
       } else {
-        alert("An error occurred while fetching event: " + res.statusText);
-      }
-
-      const c = await fetch("/api/members/church", { method: "GET" });
-      if (c.ok) {
-        setChurches(await c.json());
-      } else {
-        alert("An error occurred while fetching churches: " + c.statusText);
+        alert('Failed to fetch event information');
       }
     })();
   }, []);
 
-  useEffect(() => {
-    const selectedChurch = churches.filter((church) => {
-      return church.ID == worshipInfo.Church;
-    });
-    if (selectedChurch.length > 0) {
-      setChurch(selectedChurch[0]["Name"]);
-    }
-  }, [churches, worshipInfo]);
-  // const data = [
-  //   { ID: 6001, Name: "Orton, Johan H." },
-  //   { ID: 6002, Name: "Reigns, Jeff T." },
-  //   { ID: 6003, Name: "Cena, John B." },
-  //   { ID: 6004, Name: "Hardy, Randy A." },
-  //   { ID: 6005, Name: "Ambrose, Matt R." },
-  // ];
-
   const columnConfig = {
-    lg: ["Member ID", "Full Name"],
-    md: ["Member ID", "Full Name"],
-    sm: ["Member ID", "Full Name"],
+    lg: ['ID', 'Full Name'],
+    md: ['ID', 'Full Name'],
+    sm: ['Full Name'],
   };
 
   return (
-    <div className="p-[20px] sm:p-[50px] bg-[#D9D9D9] min-h-screen justify-center items-center">
-      {/* Banner */}
-      <div className="bg-white p-4 shadow-[0px_4px_4px_rgba(0,0,0,0.25)]">
-        <p className="mt-4 mb-4 text-center text-2xl sm:text-3xl font-semibold">
-          WORSHIP EVENTS
-        </p>
+    <div className="bg-[#f8fafc] min-h-screen p-6 sm:p-12">
+      {/* Event Info Header */}
+      <div className="w-full bg-white p-6 rounded-lg shadow-md border-2 border-[#01438F] text-center">
+        <h1 className="text-3xl font-bold uppercase text-[#01438F]">Event Information</h1>
       </div>
 
-      {/* Text Under Bordered Box */}
-      <div className="w-full mt-[50px]">
-        <p className="text-xl font-roboto font-normal whitespace-nowrap">
-          First Sunday Event
-        </p>
-        <div className="border-2 border-[#01438F] border-solid rounded-lg flex items-center justify-center bg-white mt-6 min-h-[300px]">
-          <label className="flex flex-col items-center cursor-pointer">
-            <input
-              type="file"
-              accept=".png,.jpg,.jpeg,.svg"
-              className="hidden"
-            />
-            <div className="flex flex-col items-center text-gray-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-12 h-12 mb-2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 16v-4m0 0V8m0 4h4m-4 0H8m8-4a4 4 0 01-8 0 4 4 0 018 0z"
-                />
-              </svg>
-              <p className="text-sm">Click or drag an image here</p>
-              <p className="text-xs text-gray-400">SVG, PNG, JPG, JPEG</p>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <section>
-        <div className="md:p-6">
-          <div className="flex flex-col md:flex-row">
-            <div className="flex flex-1 justify-center items-start gap-2">
-              <div className="rounded-lg mt-[20px] sm:mt-0 w-full">
-                <div className="flex flex-wrap gap-4 justify-center">
-                  {/* First table */}
-                  <div className="w-full rounded-lg p-4 pb-0">
-                    <h2 className="text-lg font-semibold mb-2">
-                      Members Attended
-                    </h2>
-                    <Table data={attendees} columns={columnConfig} />
-                  </div>
-
-                  {/* Second table */}
-                  <div className="w-full rounded-lg p-4">
-                    <h2 className="text-lg font-semibold mb-2">
-                      Guests Attended
-                    </h2>
-                    <Table
-                      data={guests}
-                      columns={{
-                        lg: ["Name", "Email"],
-                        md: ["Name", "Email"],
-                        sm: ["Name"],
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
+      {/* Main Content */}
+      <section className="mt-16">
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* Left: Attendees and Guests */}
+          <div className="flex-1 flex flex-col gap-10">
+            {/* Members */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold text-[#1C5CA8] mb-6">Members Attended</h2>
+              <Table data={attendees} columns={columnConfig} />
             </div>
 
-            <div className="flex flex-1 justify-start items-start flex-col">
-              <div className="flex justify-center items-center w-full text-xl font-semibold">
-                <p className="text-2xl m-8">DETAILS</p>
-              </div>
-              <form className="flex flex-col gap-4 text-left pl-8 w-full">
-                <div className="flex flex-col mb-1 w-full">
-                  <label className="text-base font-bold">Worship ID:</label>
-                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">{worshipInfo["Worship ID"]}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col mb-1 w-full">
-                  <label className="text-base font-bold">Event Name:</label>
-                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">{worshipInfo.Name}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col mb-1 w-full">
-                  <label className="text-base font-bold">Date:</label>
-                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">{worshipInfo.Date}</p>
-                  </div>
-                </div>
-                {/* <div className="flex flex-col mb-1 w-full">
-                  <label className="text-base font-bold">Sub Region:</label>
-                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base"></p>
-                  </div>
-                </div>
-                <div className="flex flex-col mb-1 w-full">
-                  <label className="text-base font-bold">Region:</label>
-                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base"></p>
-                  </div>
-                </div> */}
-                <div className="flex flex-col mb-1 w-full">
-                  <label className="text-base font-bold">Church:</label>
-                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">{church}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col mb-1 w-full">
-                  <label className="text-base font-bold">Worship Type:</label>
-                  <div className="flex items-center p-2 rounded-md border border-[#01438F] bg-white w-full">
-                    <p className="text-base">{worshipInfo["Worship Type"]}</p>
-                  </div>
-                </div>
-              </form>
+            {/* Guests */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold text-[#1C5CA8] mb-6">Guests Attended</h2>
+              <Table
+                data={guests}
+                columns={{
+                  lg: ['Full Name', 'Email'],
+                  md: ['Full Name', 'Email'],
+                  sm: ['Full Name'],
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Right: Event Details */}
+          <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold text-[#1C5CA8] mb-8 text-center">Event Details</h2>
+            <div className="flex flex-col gap-6">
+              <DetailField label="Worship ID" value={worshipInfo.ID} />
+              <DetailField label="Event Name" value={worshipInfo['Event Name']} />
+              <DetailField label="Date" value={worshipInfo.Date} />
+              <DetailField label="Worship Type" value={worshipInfo['Worship Type']} />
+              <DetailField label="Church" value={church} />
             </div>
           </div>
         </div>
       </section>
+
+      {/* Event Images at Bottom */}
+      <section className="w-full mt-20">
+        <h2 className="text-2xl font-bold text-center text-[#1C5CA8] mb-8">Event Photos</h2>
+        <div className="flex flex-wrap justify-center gap-6">
+          {images.length > 0 ? (
+            images.map((imgUrl, idx) => (
+              <div
+                key={idx}
+                className="w-[300px] h-[200px] overflow-hidden rounded-lg shadow-md border-2 border-[#01438F]"
+              >
+                <img
+                  src={imgUrl}
+                  alt={`Event Image ${idx}`}
+                  className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-400">No images uploaded for this event.</p>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function DetailField({ label, value }) {
+  return (
+    <div className="flex flex-col">
+      <label className="font-bold text-base mb-1">{label}:</label>
+      <div className="border-2 border-[#01438F] rounded-md p-2 bg-white">
+        <p className="text-base">{value || '-'}</p>
+      </div>
     </div>
   );
 }

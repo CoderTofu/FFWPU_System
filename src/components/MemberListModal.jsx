@@ -125,7 +125,7 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
         {/* HEADER */}
-        <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
+        <div className="w-full bg-[#1C5CA8] py-[20px] px-[30px] border-b border-[#cbcbcb] text-white">
           <h2 id="modal-title" className="text-xl font-semibold">
             List of Members
           </h2>
@@ -134,7 +134,7 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
         {/* Close button */}
         <button
           ref={closeButtonRef}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-900 rounded-full p-1 text-3xl cursor-pointer transition-all duration-200"
+          className="absolute top-3 right-3 text-gray-100 hover:text-gray-900 rounded-full p-1 text-3xl cursor-pointer transition-all duration-200"
           onClick={onClose}
           aria-label="Close modal"
         >
@@ -159,18 +159,14 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
             </div>
           ) : (
             <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
-              <ListTable
-                columns={columns}
-                data={filteredData}
-                onSelect={setSelectedCustomer}
-              />
+              <ListTable columns={columns} data={filteredData} onSelect={setSelectedCustomer} />
             </div>
           )}
           <div className="mt-4 flex justify-between">
             <div>
               <Button
                 type="primary"
-                className={"mr-2"}
+                className={'mr-2'}
                 onClick={handleConfirm}
                 disabled={!selectedCustomer}
               >
