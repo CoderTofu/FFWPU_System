@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface Props {
   formData: any;
@@ -6,27 +6,27 @@ interface Props {
 }
 
 export default function ImageUploadSection({ formData, setFormData }: Props) {
+  const [preview, setPreview] = React.useState<ArrayBuffer | null>(null);
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, image: reader.result }));
+        setPreview(reader.result);
+        setFormData((prev) => ({ ...prev, image: file }));
       };
       reader.readAsDataURL(file);
     }
   };
 
   const clearImage = () => {
-    setFormData((prev) => ({ ...prev, image: "" }));
+    setFormData((prev) => ({ ...prev, image: null }));
   };
 
   return (
     <section className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-[#01438f] mb-2">
-          Profile Image
-        </h2>
+        <h2 className="text-2xl font-bold text-[#01438f] mb-2">Profile Image</h2>
         <p className="text-sm text-gray-600 mb-6">
           Upload a clear photo (JPEG, JPG, or PNG format recommended).
         </p>
@@ -38,7 +38,7 @@ export default function ImageUploadSection({ formData, setFormData }: Props) {
           {formData.image ? (
             <>
               <img
-                src={formData.image}
+                src={typeof formData.image === 'string' ? formData.image : preview}
                 alt="Profile Preview"
                 className="w-40 h-40 rounded-full object-cover border-4 border-gray-300 shadow-sm"
               />
