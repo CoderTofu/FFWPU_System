@@ -6,6 +6,8 @@ import Table from '@/components/Table';
 import Modal from '@/components/Modal';
 import RegistrationModal from '@/components/RegistrationModal';
 
+import Button from '@/components/Button';
+
 import MemberListModal from '@/components/MemberListModal';
 import { useAlert } from '@/components/context/AlertContext';
 import { useRouter } from 'next/navigation';
@@ -34,16 +36,10 @@ export default function AddBlessing() {
     setIsRegistrationModalOpen(true);
   };
 
-  const handleSubmit = (formData: Record<string, string>) => {
-    console.log('Form Data Submitted:', formData);
-  };
-
   const handleGuestDelete = () => {
-    console.log('Deleting Guest: ' + selectedGuest);
     setGuests(guests.filter((guest) => guest != selectedGuest));
   };
   const handleMemberDelete = () => {
-    console.log('Deleting Member: ' + selectedMember);
     setMemberIds(memberIds.filter((id) => id != selectedMember['ID']));
     setMembers(members.filter((member) => member != selectedMember));
   };
@@ -192,21 +188,43 @@ export default function AddBlessing() {
 
       {/* Save Button Below Container */}
       <div className="w-full flex justify-center my-3">
-        <button
-          className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
+        <Button
+          type="primary"
           onClick={() => {
-            if (!blessingName || !date || !chaenbo) {
+            const trimmedBlessingName = blessingName.trim();
+            const trimmedDate = date.trim();
+            const trimmedChaenbo = chaenbo.trim();
+
+            if (!trimmedBlessingName) {
               showAlert({
                 type: 'error',
-                message: 'Please fill in all the required fields: Name, Date, and Chaenbo.',
+                message: 'Please enter a Blessing Name.',
               });
-            } else {
-              setShowModal(true);
+              return;
             }
+
+            if (!trimmedDate) {
+              showAlert({
+                type: 'error',
+                message: 'Please select a Blessing Date.',
+              });
+              return;
+            }
+
+            if (!trimmedChaenbo) {
+              showAlert({
+                type: 'error',
+                message: 'Please select Chaenbo/HTM.',
+              });
+              return;
+            }
+
+            // If all validations pass
+            setShowModal(true);
           }}
         >
-          ADD BLESSING
-        </button>
+          Add Blessing
+        </Button>
       </div>
 
       {/* Modal for Adding Blessing*/}

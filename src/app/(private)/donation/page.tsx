@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+
 import Modal from '@/components/Modal';
 import Table from '@/components/Table';
 import DonationModal from '@/components/DonationModal';
@@ -9,9 +9,9 @@ import MemberListModal from '@/components/MemberListModal';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAlert } from '@/components/context/AlertContext';
 
+import Button from '@/components/Button';
+
 export default function Donation() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
   const { showAlert } = useAlert();
 
   const [selectedRow, setSelectedRow] = useState(null);
@@ -149,38 +149,25 @@ export default function Donation() {
           />
         </div>
 
-        <div className="flex justify-center items-center m-7 gap-5">
-          <button
-            onClick={() => setIsMemberListOpen(true)}
-            className="px-6 py-2 bg-[#01438F] text-[#FCC346] rounded font-bold hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-          >
-            Add
-          </button>
-          <button
-            onClick={() => setIsEditModalOpen(true)}
-            disabled={!selectedRow}
-            className={`px-6 py-2 rounded font-bold ${
-              selectedRow
-                ? 'bg-[#01438F] text-[#FCC346] hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => {
-              if (selectedRow) setRowToDelete(selectedRow);
-              setShowDeleteModal(true);
-            }}
-            disabled={!selectedRow}
-            className={`px-6 py-2 rounded font-bold ${
-              selectedRow
-                ? 'bg-[#01438F] text-[#FCC346] hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Delete
-          </button>
+        <div className="flex flex-wrap justify-between items-center my-7 gap-4">
+          <div className="flex flex-wrap gap-3 sm:gap-5">
+            <Button type="primary" onClick={() => setIsMemberListOpen(true)}>
+              Add
+            </Button>
+            <Button type="primary" onClick={() => setIsEditModalOpen(true)} disabled={!selectedRow}>
+              Edit
+            </Button>
+            <Button
+              type="primary"
+              onClick={() => {
+                if (selectedRow) setRowToDelete(selectedRow);
+                setShowDeleteModal(true);
+              }}
+              disabled={!selectedRow}
+            >
+              Delete
+            </Button>
+          </div>
         </div>
 
         <MemberListModal

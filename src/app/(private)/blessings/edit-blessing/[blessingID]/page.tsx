@@ -7,11 +7,13 @@ import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
 
+import Button from '@/components/Button';
+
 import MemberListModal from '@/components/MemberListModal';
 import { useAlert } from '@/components/context/AlertContext';
 
 export default function EditBlessing() {
-  const showAlert = useAlert();
+  const { showAlert } = useAlert();
 
   const params = useParams();
   const [members, setMembers] = useState([]);
@@ -250,12 +252,43 @@ export default function EditBlessing() {
 
       {/* Save Button Below Container */}
       <div className="w-full flex justify-center my-3">
-        <button
-          className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
-          onClick={() => setShowModal(true)}
+        <Button
+          type="primary"
+          onClick={() => {
+            const trimmedBlessingName = formData.name_of_blessing();
+            const trimmedDate = formData.blessing_date.trim();
+            const trimmedChaenbo = formData.chaenbo.trim();
+
+            if (!trimmedBlessingName) {
+              showAlert({
+                type: 'error',
+                message: 'Please enter a Blessing Name.',
+              });
+              return;
+            }
+
+            if (!trimmedDate) {
+              showAlert({
+                type: 'error',
+                message: 'Please select a Blessing Date.',
+              });
+              return;
+            }
+
+            if (!trimmedChaenbo) {
+              showAlert({
+                type: 'error',
+                message: 'Please select Chaenbo/HTM.',
+              });
+              return;
+            }
+
+            // If all validations pass
+            setShowModal(true);
+          }}
         >
-          SAVE CHANGES
-        </button>
+          Save Changes
+        </Button>
       </div>
 
       {/* Modal for Adding Blessing*/}

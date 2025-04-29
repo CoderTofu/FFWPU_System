@@ -11,6 +11,8 @@ import MissionHistorySection from '@/components/sub_members/MissionHistorySectio
 import ImageUploadSection from '@/components/sub_members/ImageUploadSection';
 import { useAlert } from '@/components/context/AlertContext';
 
+import Button from '@/components/Button';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function AddMemberForm() {
@@ -278,8 +280,6 @@ export default function AddMemberForm() {
     };
     memberMutation.mutate(data);
   };
-  
-  
 
   return (
     <div className="px-0 md:px-[150px] min-h-screen h-full bg-[#f8fafc] pt-8">
@@ -305,24 +305,22 @@ export default function AddMemberForm() {
 
       <div className="flex justify-between mt-8">
         {step > 0 && (
-          <button onClick={prevStep} className="px-6 py-3 rounded-lg bg-gray-300 hover:bg-gray-400">
+          <Button type="outline" onClick={prevStep}>
             Back
-          </button>
+          </Button>
         )}
         {step < steps.length - 1 ? (
-          <button
-            onClick={nextStep}
-            className="px-6 py-3 rounded-lg bg-[#01438f] text-white hover:bg-blue-700"
-          >
+          <Button type="primary" onClick={nextStep}>
             Next
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
+            type="primary"
             onClick={handleSubmit}
-            className="px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700"
+            className={'bg-green-500 hover:bg-green-600'}
           >
             Submit
-          </button>
+          </Button>
         )}
       </div>
     </div>

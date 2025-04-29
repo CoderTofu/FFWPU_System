@@ -6,10 +6,17 @@ import { Search } from "lucide-react";
 import Table from "@/components/Table";
 import Modal from "@/components/Modal"; // Assuming you have a Modal component
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Button from '@/components/Button';
 
 import { useAlert } from '@/components/context/AlertContext'; // Assuming you have an AlertContext
 
 export default function Member() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.prefetch('/member/add-member');
+  }, []);
+
   const { showAlert } = useAlert();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,13 +56,12 @@ export default function Member() {
   const [selectedRow, setSelectedRow] = useState<{ ID: number } | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<{ ID: number } | null>(null);
-  const router = useRouter();
 
   const queryClient = useQueryClient();
 
   const handleEditClick = () => {
     if (selectedRow) {
-      router.push(`/member/edit-member/${selectedRow[dataID]}`);
+      window.location.href = `/member/edit-member/${selectedRow[dataID]}`;
     }
   };
 
@@ -67,6 +73,12 @@ export default function Member() {
     if (selectedRow) {
       setRowToDelete(selectedRow);
       setIsOpen(true);
+    }
+  };
+
+  const handleViewClick = () => {
+    if (selectedRow) {
+      window.location.href = `/member/display-member/${selectedRow[dataID]}`;
     }
   };
 
@@ -142,35 +154,22 @@ export default function Member() {
       </div>
 
       {/* Buttons */}
-      <div className="flex justify-center items-center m-7 gap-5">
-        <button
-          className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-          onClick={handleAddClick}
-        >
-          ADD
-        </button>
-        <button
-          onClick={handleEditClick}
-          disabled={!selectedRow}
-          className={`px-6 py-2 rounded ${
-            selectedRow
-              ? 'bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed font-bold'
-          }`}
-        >
-          EDIT
-        </button>
-        <button
-          onClick={handleDeleteClick}
-          disabled={!selectedRow}
-          className={`px-4 py-2 rounded ${
-            selectedRow
-              ? 'bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed font-bold'
-          }`}
-        >
-          DELETE
-        </button>
+      <div className="flex flex-wrap justify-between items-center my-7 gap-4">
+        <div className="flex flex-wrap gap-3 sm:gap-5">
+          <Button type="primary" onClick={handleAddClick}>
+            Add
+          </Button>
+          <Button type="primary" onClick={handleEditClick} disabled={!selectedRow}>
+            Edit
+          </Button>
+          <Button type="primary" onClick={handleDeleteClick} disabled={!selectedRow}>
+            Delete
+          </Button>
+        </div>
+
+        <Button type="outline" onClick={handleViewClick} disabled={!selectedRow}>
+          View
+        </Button>
       </div>
 
       {/* Modal */}

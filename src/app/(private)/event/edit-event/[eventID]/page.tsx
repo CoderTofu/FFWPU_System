@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import MemberListModal from '@/components/MemberListModal';
 import { useAlert } from '@/components/context/AlertContext.jsx';
+import Button from '@/components/Button';
 
 interface Field {
   name: string;
@@ -58,14 +59,16 @@ export default function EditWorshipEvent() {
         const data = await res.json();
         setGuests(data.Attendees.filter((attendee) => attendee.Type === 'Guest'));
         const members = data.Attendees.filter((attendee) => attendee.Type === 'Member');
-        setAttendees(
-          members.map((attendee) => ({
-            ...attendee,
-            attendee_id: attendee.ID,
-            ID: attendee.Member.ID,
-            'Full Name': attendee.Member['Full Name'],
-          }))
-        );
+        if (members.length < 0) {
+          setAttendees(
+            members.map((attendee) => ({
+              ...attendee,
+              attendee_id: attendee.ID,
+              ID: attendee.Member.ID,
+              'Full Name': attendee.Member['Full Name'],
+            }))
+          );
+        }
         setWorshipID(data.ID);
         setEventName(data['Event Name']);
         setDate(data.Date);
@@ -397,12 +400,47 @@ export default function EditWorshipEvent() {
 
       {/* Save Button */}
       <div className="w-full flex justify-center my-4">
-        <button
-          className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
-          onClick={() => setShowModal(true)}
+        <Button
+          type="primary"
+          onClick={() => {
+            if (!eventName.trim()) {
+              showAlert({
+                type: 'error',
+                message: 'Please enter an Event Name.',
+              });
+              return;
+            }
+
+            if (!date) {
+              showAlert({
+                type: 'error',
+                message: 'Please select a Date for the event.',
+              });
+              return;
+            }
+
+            if (!worshipType) {
+              showAlert({
+                type: 'error',
+                message: 'Please select a Worship Type.',
+              });
+              return;
+            }
+
+            if (!church) {
+              showAlert({
+                type: 'error',
+                message: 'Please select a Church.',
+              });
+              return;
+            }
+
+            // All required fields are filled, proceed to open the confirmation modal
+            setShowModal(true);
+          }}
         >
-          SAVE CHANGES
-        </button>
+          Save Changes
+        </Button>
       </div>
 
       <MemberListModal

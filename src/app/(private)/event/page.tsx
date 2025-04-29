@@ -8,47 +8,54 @@ import Modal from "@/components/Modal";
 import { axiosInstance } from "@/app/axiosInstance";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+import Button from '@/components/Button';
+
 export default function EventInfo() {
   const router = useRouter();
+
+  useEffect(() => {
+    router.prefetch('/event/add-event');
+  }, []);
+
   const [data, setData] = useState([]);
 
   const eventQuery = useQuery({
-    queryKey: ["worships"],
+    queryKey: ['worships'],
     queryFn: async () => {
-      const res = await fetch("/api/worship", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
+      const res = await fetch('/api/worship', { method: 'GET' });
+      if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },
   });
 
   useEffect(() => {
-    if (eventQuery.status === "success") {
+    if (eventQuery.status === 'success') {
       const data = eventQuery.data.map((event) => ({
         ...event,
         Church: event.Church.Name,
       }));
       setData(data);
-    } else if (eventQuery.status === "error") {
-      alert("An error occurred while fetching data.");
+    } else if (eventQuery.status === 'error') {
+      alert('An error occurred while fetching data.');
     }
   }, [eventQuery.data, eventQuery.status]);
 
-  const dataID = "ID";
+  const dataID = 'ID';
 
   // Column configuration for responsive table
   const columnConfig = {
-    lg: ["ID", "Event Name", "Date", "Church", "Worship Type"],
-    md: ["Event Name", "Date", "Church Name", "Worship Type"],
-    sm: ["Event Name", "Church Name"],
+    lg: ['ID', 'Event Name', 'Date', 'Church', 'Worship Type'],
+    md: ['Event Name', 'Date', 'Church Name', 'Worship Type'],
+    sm: ['Event Name', 'Church Name'],
   };
   const queryClient = useQueryClient();
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
   const [selectedRow, setSelectedRow] = useState(null);
   const [rowToDelete, setRowToDelete] = useState(null);
 
@@ -58,15 +65,12 @@ export default function EventInfo() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const filteredData = data.filter(
@@ -79,11 +83,12 @@ export default function EventInfo() {
   );
 
   const handleAddClick = () => {
-    router.push("/event/add-event");
+    router.push('/event/add-event');
   };
 
   const handleEditClick = () => {
     if (selectedRow) {
+      window.location.href = `/event/edit-event/${selectedRow[dataID]}`;
       router.push(`/event/edit-event/${selectedRow[dataID]}`);
     }
   };
@@ -92,6 +97,12 @@ export default function EventInfo() {
     if (selectedRow) {
       setRowToDelete(selectedRow);
       setShowDeleteModal(true);
+    }
+  };
+
+  const handleViewClick = () => {
+    if (selectedRow) {
+      window.location.href = `/event/${selectedRow[dataID]}`;
     }
   };
 
@@ -130,35 +141,23 @@ export default function EventInfo() {
       </div>
 
       {/* Buttons */}
-      <div className="flex justify-center items-center m-7 gap-5">
-        <button
-          className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-          onClick={handleAddClick}
-        >
-          ADD
-        </button>
-        <button
-          onClick={handleEditClick}
-          disabled={!selectedRow}
-          className={`px-6 py-2 rounded ${
-            selectedRow
-              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
-          }`}
-        >
-          EDIT
-        </button>
-        <button
-          onClick={handleDeleteClick}
-          disabled={!selectedRow}
-          className={`px-4 py-2 rounded ${
-            selectedRow
-              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
-          }`}
-        >
-          DELETE
-        </button>
+
+      <div className="flex flex-wrap justify-between items-center my-7 gap-4">
+        <div className="flex flex-wrap gap-3 sm:gap-5">
+          <Button type="primary" onClick={handleAddClick}>
+            Add
+          </Button>
+          <Button type="primary" onClick={handleEditClick} disabled={!selectedRow}>
+            Edit
+          </Button>
+          <Button type="primary" onClick={handleDeleteClick} disabled={!selectedRow}>
+            Delete
+          </Button>
+        </div>
+
+        <Button type="outline" onClick={handleViewClick} disabled={!selectedRow}>
+          View
+        </Button>
       </div>
 
       {/* Modal */}
@@ -167,16 +166,14 @@ export default function EventInfo() {
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
           onConfirm={async () => {
-            console.log("Deleting event...");
-            const resp = await fetch(`/api/worship/${rowToDelete["ID"]}`, {
-              method: "DELETE",
+            console.log('Deleting event...');
+            const resp = await fetch(`/api/worship/${rowToDelete['ID']}`, {
+              method: 'DELETE',
             });
             if (resp.ok) {
-              queryClient.refetchQueries(["worships"]);
+              queryClient.refetchQueries(['worships']);
             } else {
-              alert(
-                "An error occurred while deleting worship: " + resp.statusText
-              );
+              alert('An error occurred while deleting worship: ' + resp.statusText);
             }
             setShowDeleteModal(false);
           }}

@@ -20,14 +20,17 @@ export default function ViewWorshipEvent() {
         const data = await res.json();
         setGuests(data.Attendees.filter((a) => a.Type === 'Guest'));
         const members = data.Attendees.filter((a) => a.Type === 'Member');
-        setAttendees(
-          members.map((a) => ({
-            ID: a.Member.ID,
-            'Full Name': a.Member['Full Name'],
-          }))
-        );
+
+        if (members.length < 0) {
+          setAttendees(
+            members.map((a) => ({
+              ID: a.Member.ID,
+              'Full Name': a.Member['Full Name'],
+            }))
+          );
+        }
         setWorshipInfo(data);
-        console.log(data?.Church.Name);
+        console.log(data);
         setChurch(data?.Church.Name); // You might need to adjust this
         setImages(data?.Images || []); // Assume `Images` is array of URLs
       } else {
@@ -46,7 +49,7 @@ export default function ViewWorshipEvent() {
     <div className="px-0 md:px-[60px] lg:px-[150px] my-8">
       {/* Header */}
       <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#01438F] border-2 shadow-lg">
-        <p className="text-3xl font-bold uppercase">EDIT EVENT</p>
+        <p className="text-3xl font-bold uppercase">EVENT INFORMATION</p>
       </div>
 
       <div className="flex flex-col lg:flex-row py-4 w-full gap-6">
@@ -118,7 +121,7 @@ function DetailField({ label, value }) {
   return (
     <div className="flex flex-col">
       <label className="font-bold text-base mb-1">{label}:</label>
-      <div className="border-2 border-[#01438F] rounded-md p-2 bg-white">
+      <div className="border-2 border-gray-400 rounded-md p-2 bg-white">
         <p className="text-base">{value || '-'}</p>
       </div>
     </div>

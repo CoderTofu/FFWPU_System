@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import MemberListModal from "@/components/MemberListModal";
 import { useAlert } from "@/components/context/AlertContext.jsx";
+import Button from '@/components/Button';
 
 export default function AddWorshipEvent() {
   const { showAlert } = useAlert();
@@ -32,38 +33,34 @@ export default function AddWorshipEvent() {
   const [selectedGuest, setSelectedGuest] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
-  const [eventName, setEventName] = useState<string>("");
-  const [date, setDate] = useState<string>("");
+  const [eventName, setEventName] = useState<string>('');
+  const [date, setDate] = useState<string>('');
   const dateInputRef = useRef<HTMLInputElement | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
-  const [registrationType, setRegistrationType] = useState<
-    "member" | "guest" | null
-  >(null);
-  const [worshipType, setWorshipType] = useState("");
+  const [registrationType, setRegistrationType] = useState<'member' | 'guest' | null>(null);
+  const [worshipType, setWorshipType] = useState('');
 
   const [isMemberListOpen, setIsMemberListOpen] = useState(false);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      const newImages = Array.from(files).map((file) =>
-        URL.createObjectURL(file)
-      );
+      const newImages = Array.from(files).map((file) => URL.createObjectURL(file));
       setImages((prevImages) => [...prevImages, ...newImages]);
     }
   };
 
   const churchQuery = useQuery({
-    queryKey: ["churches"],
+    queryKey: ['churches'],
     queryFn: async () => {
-      const res = await fetch("/api/church", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
+      const res = await fetch('/api/church', { method: 'GET' });
+      if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },
   });
 
-  const [openDropdown, setOpenDropdown] = useState("");
+  const [openDropdown, setOpenDropdown] = useState('');
   const [churches, setChurches] = useState([]);
   const [church, setChurch] = useState(null);
 
@@ -71,7 +68,7 @@ export default function AddWorshipEvent() {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
-  const handleOpenRegistration = (type: "member" | "guest") => {
+  const handleOpenRegistration = (type: 'member' | 'guest') => {
     setRegistrationType(type);
     setIsRegistrationModalOpen(true);
   };
@@ -83,7 +80,7 @@ export default function AddWorshipEvent() {
   const handleMemberDelete = () => {
     setMemberIds(memberIds.filter((member) => member !== selectedMember.ID));
     setMembers(members.filter((member) => member !== selectedMember));
-    setMemberIds(memberIds.filter((id) => id != selectedMember["ID"]));
+    setMemberIds(memberIds.filter((id) => id != selectedMember['ID']));
   };
 
   const toggleDropdown = (dropdown) => {
@@ -91,12 +88,12 @@ export default function AddWorshipEvent() {
   };
 
   useEffect(() => {
-    if (churchQuery.status === "success") {
+    if (churchQuery.status === 'success') {
       setChurches(churchQuery.data);
-    } else if (churchQuery.status === "error") {
+    } else if (churchQuery.status === 'error') {
       showAlert({
-        type: "error",
-        message: "An error occurred while fetching data.",
+        type: 'error',
+        message: 'An error occurred while fetching data.',
       });
     }
   }, [churchQuery.data, churchQuery.status]);
@@ -105,10 +102,10 @@ export default function AddWorshipEvent() {
     const getMember = async () => {
       const m = await Promise.all(
         memberIds.map(async (id) => {
-          const res = await fetch(`/api/members/${id}`, { method: "GET" });
+          const res = await fetch(`/api/members/${id}`, { method: 'GET' });
           if (!res.ok) {
             showAlert({
-              type: "error",
+              type: 'error',
               message: `Member with ID ${id} does not exist`,
             });
           } else {
@@ -334,15 +331,47 @@ export default function AddWorshipEvent() {
 
       {/* Add Button Message */}
       <div className="w-full flex justify-center my-4">
-        <button
-          className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
+        <Button
+          type="primary"
           onClick={() => {
+            if (!eventName.trim()) {
+              showAlert({
+                type: 'error',
+                message: 'Please enter an Event Name.',
+              });
+              return;
+            }
+
+            if (!date) {
+              showAlert({
+                type: 'error',
+                message: 'Please select a Date for the event.',
+              });
+              return;
+            }
+
+            if (!worshipType) {
+              showAlert({
+                type: 'error',
+                message: 'Please select a Worship Type.',
+              });
+              return;
+            }
+
+            if (!church) {
+              showAlert({
+                type: 'error',
+                message: 'Please select a Church.',
+              });
+              return;
+            }
+
+            // All required fields are filled, proceed to open the confirmation modal
             setShowModal(true);
           }}
-          type="submit"
         >
-          ADD WORSHIP EVENT
-        </button>
+          Add Worship Event
+        </Button>
       </div>
 
       {/* Modal for Adding Event*/}

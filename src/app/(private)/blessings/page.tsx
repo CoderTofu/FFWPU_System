@@ -6,68 +6,70 @@ import { useParams, useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import { Search, ChevronDown } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+import Button from '@/components/Button';
+
 export default function ViewBlessing() {
   const router = useRouter();
+
+  useEffect(() => {
+    router.prefetch('/member/add-member');
+  }, []);
+
   const [selectedRow, setSelectedRow] = useState<{
     ID: number;
   } | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedYear, setSelectedYear] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [blessings, setBlessings] = useState([]);
   const [rowToDelete, setRowToDelete] = useState(null);
   const blessingQuery = useQuery({
-    queryKey: ["blessings"],
+    queryKey: ['blessings'],
     queryFn: async () => {
-      const res = await fetch("/api/blessings/", { method: "GET" });
+      const res = await fetch('/api/blessings/', { method: 'GET' });
       if (!res.ok) {
-        throw new Error("An error occurred while fetching blessings");
+        throw new Error('An error occurred while fetching blessings');
       }
       return await res.json();
     },
   });
 
   useEffect(() => {
-    if (blessingQuery.status === "success") {
+    if (blessingQuery.status === 'success') {
       setBlessings(blessingQuery.data);
-    } else if (blessingQuery.status === "error") {
+    } else if (blessingQuery.status === 'error') {
       alert(blessingQuery.error.message);
     }
   }, [blessingQuery.data, blessingQuery.status]);
 
   const columns = {
-    lg: ["ID", "Date", "Name", "Chaenbo"],
-    md: ["ID", "Date", "Name"],
-    sm: ["ID", "Date"],
+    lg: ['ID', 'Date', 'Name', 'Chaenbo'],
+    md: ['ID', 'Date', 'Name'],
+    sm: ['ID', 'Date'],
   };
 
   // DATA ID
-  const dataId = "ID";
+  const dataId = 'ID';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const filteredData = blessings.filter((item) =>
-    Object.values(item)
-      .join(" ")
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase())
+    Object.values(item).join(' ').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleEditClick = () => {
     if (selectedRow) {
-      router.push(`/blessings/edit-blessing/${selectedRow[dataId]}`);
+      window.location.href = `/blessings/edit-blessing/${selectedRow[dataId]}`;
     }
   };
 
@@ -82,25 +84,31 @@ export default function ViewBlessing() {
     //   );
     // }
 
-    const res = await fetch(`/api/blessings/${rowToDelete["ID"]}`, {
-      method: "DELETE",
+    const res = await fetch(`/api/blessings/${rowToDelete['ID']}`, {
+      method: 'DELETE',
     });
     if (res.ok) {
-      queryClient.refetchQueries(["blessings"]);
+      queryClient.refetchQueries(['blessings']);
     } else {
-      alert("An error occurred while deleting blessing: " + res.statusText);
+      alert('An error occurred while deleting blessing: ' + res.statusText);
     }
     setIsOpen(false);
   };
 
   const handleAddClick = () => {
-    router.push("/blessings/add-blessing");
+    router.push('/blessings/add-blessing');
   };
 
   const handleDeleteClick = () => {
     if (selectedRow) {
       setRowToDelete(selectedRow);
       setIsOpen(true);
+    }
+  };
+
+  const handleViewClick = () => {
+    if (selectedRow) {
+      window.location.href = `/blessings/${selectedRow['ID']}`;
     }
   };
 
@@ -140,35 +148,22 @@ export default function ViewBlessing() {
       </div>
 
       {/* Buttons */}
-      <div className="flex justify-center items-center m-7 gap-5">
-        <button
-          className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-          onClick={handleAddClick}
-        >
-          ADD
-        </button>
-        <button
-          onClick={handleEditClick}
-          disabled={!selectedRow}
-          className={`px-6 py-2 rounded ${
-            selectedRow
-              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
-          }`}
-        >
-          EDIT
-        </button>
-        <button
-          onClick={handleDeleteClick}
-          disabled={!selectedRow}
-          className={`px-4 py-2 rounded ${
-            selectedRow
-              ? "bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed font-bold"
-          }`}
-        >
-          DELETE
-        </button>
+      <div className="flex flex-wrap justify-between items-center my-7 gap-4">
+        <div className="flex flex-wrap gap-3 sm:gap-5">
+          <Button type="primary" onClick={handleAddClick}>
+            Add
+          </Button>
+          <Button type="primary" onClick={handleEditClick} disabled={!selectedRow}>
+            Edit
+          </Button>
+          <Button type="primary" onClick={handleDeleteClick} disabled={!selectedRow}>
+            Delete
+          </Button>
+        </div>
+
+        <Button type="outline" onClick={handleViewClick} disabled={!selectedRow}>
+          View
+        </Button>
       </div>
 
       {/* Modal */}
