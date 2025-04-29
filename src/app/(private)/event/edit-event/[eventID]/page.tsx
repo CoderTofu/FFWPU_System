@@ -495,8 +495,8 @@ export default function EditWorshipEvent() {
 
             setShowModal(false);
           }}
-          message="Are you sure you want to update this worship event?"
-          confirmText="Update"
+          message="Are you sure you want to save your changes?"
+          confirmText="Confirm"
           cancelText="Cancel"
         />
       )}

@@ -43,73 +43,73 @@ export default function ViewWorshipEvent() {
   };
 
   return (
-    <div className="bg-[#f8fafc] min-h-screen p-6 sm:p-12">
-      {/* Event Info Header */}
-      <div className="w-full bg-white p-6 rounded-lg shadow-md border-2 border-[#01438F] text-center">
-        <h1 className="text-3xl font-bold uppercase text-[#01438F]">Event Information</h1>
+    <div className="px-0 md:px-[60px] lg:px-[150px] my-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#01438F] border-2 shadow-lg">
+        <p className="text-3xl font-bold uppercase">EDIT EVENT</p>
       </div>
 
-      {/* Main Content */}
-      <section className="mt-16">
-        <div className="flex flex-col lg:flex-row gap-10">
-          {/* Left: Attendees and Guests */}
-          <div className="flex-1 flex flex-col gap-10">
-            {/* Members */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold text-[#1C5CA8] mb-6">Members Attended</h2>
-              <Table data={attendees} columns={columnConfig} />
-            </div>
-
-            {/* Guests */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold text-[#1C5CA8] mb-6">Guests Attended</h2>
-              <Table
-                data={guests}
-                columns={{
-                  lg: ['Full Name', 'Email'],
-                  md: ['Full Name', 'Email'],
-                  sm: ['Full Name'],
-                }}
-              />
-            </div>
+      <div className="flex flex-col lg:flex-row py-4 w-full gap-6">
+        {/* Attendance Tables */}
+        <div className="lg:w-1/2 p-8 bg-white rounded-lg shadow-md flex flex-col relative">
+          <h2 className="text-lg font-semibold mb-3 flex justify-between">Member Attendees</h2>
+          <div className="max-h-[250px] overflow-y-auto border border-[#CBCBCB] shadow-lg rounded-lg">
+            <Table
+              data={attendees}
+              columns={{
+                lg: ['ID', 'Full Name'],
+                md: ['ID', 'Full Name'],
+                sm: ['Full Name'],
+              }}
+            />
           </div>
-
-          {/* Right: Event Details */}
-          <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-[#1C5CA8] mb-8 text-center">Event Details</h2>
-            <div className="flex flex-col gap-6">
-              <DetailField label="Worship ID" value={worshipInfo.ID} />
-              <DetailField label="Event Name" value={worshipInfo['Event Name']} />
-              <DetailField label="Date" value={worshipInfo.Date} />
-              <DetailField label="Worship Type" value={worshipInfo['Worship Type']} />
-              <DetailField label="Church" value={church} />
-            </div>
+          <h2 className="text-lg font-semibold mt-4 mb-3 flex justify-between">Guest Attendees</h2>
+          <div className="max-h-[250px] overflow-y-auto border border-[#CBCBCB] shadow-lg rounded-lg">
+            <Table
+              data={[...guests]}
+              columns={{
+                lg: ['Full Name', 'Email'],
+                md: ['Full Name', 'Email'],
+                sm: ['Full Name'],
+              }}
+            />
           </div>
         </div>
-      </section>
 
-      {/* Event Images at Bottom */}
-      <section className="w-full mt-20">
-        <h2 className="text-2xl font-bold text-center text-[#1C5CA8] mb-8">Event Photos</h2>
-        <div className="flex flex-wrap justify-center gap-6">
-          {images.length > 0 ? (
-            images.map((imgUrl, idx) => (
-              <div
-                key={idx}
-                className="w-[300px] h-[200px] overflow-hidden rounded-lg shadow-md border-2 border-[#01438F]"
-              >
-                <img
-                  src={imgUrl}
-                  alt={`Event Image ${idx}`}
-                  className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
-                />
+        {/* Worship Event Details */}
+        <div className="lg:w-1/2 p-8 bg-white rounded-lg shadow-md flex flex-col">
+          <h2 className="text-lg font-semibold mb-5">Worship Event Details</h2>
+
+          <DetailField label="Worship ID" value={worshipInfo.ID} />
+          <DetailField label="Event Name" value={worshipInfo['Event Name']} />
+          <DetailField label="Date" value={worshipInfo.Date} />
+          <DetailField label="Worship Type" value={worshipInfo['Worship Type']} />
+          <DetailField label="Church" value={church} />
+
+          {/* Show uploaded images */}
+          {images.length > 0 && (
+            <div className="mt-4 w-full overflow-x-auto">
+              <div className="flex space-x-2 p-2">
+                {images.map((image, index) => (
+                  <div key={index} className="relative w-24 h-24 flex-shrink-0">
+                    <img
+                      src={image}
+                      alt={`Uploaded ${index}`}
+                      className="w-full h-full object-cover rounded-lg border border-gray-300"
+                    />
+                    <button
+                      onClick={() => handleDeleteImage(index)}
+                      className="absolute top-1 right-1"
+                    >
+                      <XCircle className="text-red-500 w-5 h-5" />
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))
-          ) : (
-            <p className="text-gray-400">No images uploaded for this event.</p>
+            </div>
           )}
         </div>
-      </section>
+      </div>
     </div>
   );
 }

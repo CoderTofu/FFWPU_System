@@ -330,8 +330,8 @@ export default function EditBlessing() {
             location.reload();
             setShowModal(false);
           }}
-          message="Are you sure you want to add the data?"
-          confirmText="Add"
+          message="Are you sure you want to save your changes?"
+          confirmText="Confirm"
           cancelText="Cancel"
         />
       )}
