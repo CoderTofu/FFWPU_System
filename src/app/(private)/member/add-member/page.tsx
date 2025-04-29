@@ -118,6 +118,14 @@ export default function AddMemberForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Trim all string fields first
+    const trimmedFormData = { ...formData };
+    Object.keys(trimmedFormData).forEach((key) => {
+      if (typeof trimmedFormData[key] === 'string') {
+        trimmedFormData[key] = trimmedFormData[key].trim();
+      }
+    });
+
     const requiredFields = [
       { key: 'givenName', label: 'Given Name', step: 0 },
       { key: 'familyName', label: 'Family Name', step: 0 },
@@ -135,46 +143,75 @@ export default function AddMemberForm() {
       { key: 'membershipCategory', label: 'Membership Category', step: 2 },
     ];
 
-    // Check each required field
     for (const field of requiredFields) {
-      if (!formData[field.key] || formData[field.key].toString().trim() === '') {
-        showAlert({
-          type: 'error',
-          title: `Please fill out the ${field.label} field.`,
-        });
-
-        // Set page/step where that field is located
+      if (!trimmedFormData[field.key]) {
+        showAlert({ type: 'error', title: `Please fill out the ${field.label} field.` });
         setStep(field.step);
-
-        // STOP submitting
         return;
       }
     }
 
+    // Custom Field Validations
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(trimmedFormData.email)) {
+      showAlert({ type: 'error', title: 'Invalid email format.' });
+      setStep(1);
+      return;
+    }
+
+    if (!phoneRegex.test(trimmedFormData.phone)) {
+      showAlert({ type: 'error', title: 'Phone number must start with "09" and have 11 digits.' });
+      setStep(1);
+      return;
+    }
+
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(trimmedFormData.birthdate)) {
+      showAlert({ type: 'error', title: 'Birthdate must be in YYYY-MM-DD format.' });
+      setStep(0);
+      return;
+    }
+
+    if (trimmedFormData.spiritualBirthday && !dateRegex.test(trimmedFormData.spiritualBirthday)) {
+      showAlert({ type: 'error', title: 'Spiritual Birthday must be in YYYY-MM-DD format.' });
+      setStep(2);
+      return;
+    }
+
+    // Image type check (optional)
+    if (typeof trimmedFormData.image === 'object' && trimmedFormData.image !== null) {
+      const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (!validImageTypes.includes(trimmedFormData.image.type)) {
+        showAlert({ type: 'error', title: 'Uploaded file must be an image (jpg, jpeg, png).' });
+        setStep(4);
+        return;
+      }
+    }
+
+    // If all validations pass, submit
     const data = {
-      given_name: formData.givenName,
-      middle_name: formData.middleName,
-      family_name: formData.familyName,
-      gender: formData.gender,
-      birthday: formData.birthdate,
-      region: formData.region,
-      nation: formData.nation,
-      marital_status: formData.maritalStatus,
-      name_of_spouse: formData.spouseName,
-      phone: formData.phone,
-      email: formData.email,
-      address: formData.address,
-      image: formData.image || null,
-      generation: formData.generation,
-      blessing_status: formData.blessingStatus,
-      spiritual_birthday: formData.spiritualBirthday,
-      spiritual_parent: formData.spiritualParent,
-      membership_category: formData.membershipCategory,
+      given_name: trimmedFormData.givenName,
+      middle_name: trimmedFormData.middleName,
+      family_name: trimmedFormData.familyName,
+      gender: trimmedFormData.gender,
+      birthday: trimmedFormData.birthdate,
+      region: trimmedFormData.region,
+      nation: trimmedFormData.nation,
+      marital_status: trimmedFormData.maritalStatus,
+      name_of_spouse: trimmedFormData.spouseName,
+      phone: trimmedFormData.phone,
+      email: trimmedFormData.email,
+      address: trimmedFormData.address,
+      image: trimmedFormData.image || null,
+      generation: trimmedFormData.generation,
+      blessing_status: trimmedFormData.blessingStatus,
+      spiritual_birthday: trimmedFormData.spiritualBirthday,
+      spiritual_parent: trimmedFormData.spiritualParent,
+      membership_category: trimmedFormData.membershipCategory,
     };
     memberMutation.mutate(data);
-
-    console.log('Member added:', data);
   };
+  
 
   return (
     <div className="px-0 md:px-[150px] min-h-screen h-full bg-[#f8fafc] pt-8">
