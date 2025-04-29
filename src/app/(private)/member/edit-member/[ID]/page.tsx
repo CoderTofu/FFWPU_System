@@ -119,7 +119,6 @@ export default function AddMemberForm() {
     },
     onSuccess: (data) => {
       formData.missionHistory.forEach((mission) => {
-        console.log(mission);
         if (!mission.id || mission.id === undefined) {
           const missionData = {
             member: params.ID,
@@ -221,14 +220,8 @@ export default function AddMemberForm() {
       spiritual_parent: formData.spiritualParent,
       membership_category: formData.membershipCategory,
     };
-    console.log('Form data:', data);
     memberMutation.mutate(data);
-
-    console.log('missions:', formData.missionHistory);
   };
-  useEffect(() => {
-    console.log('To delete:', toDelete);
-  }, [toDelete]);
 
   return (
     <div className="px-0 md:px-[150px] min-h-screen h-full bg-[#f8fafc] pt-8">
