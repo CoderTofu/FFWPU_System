@@ -227,7 +227,7 @@ export default function AddMemberForm() {
       setStep(1);
       return;
     }
-
+    const phoneRegex = /^[0-9+\-() ]+$/;
     if (!phoneRegex.test(trimmedFormData.phone)) {
       showAlert({ type: 'error', title: 'Phone number must start with "09" and have 11 digits.' });
       setStep(1);

@@ -1,26 +1,32 @@
-"use client";
+// Updated Member page with functional search + filter modal
 
-import React, { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
-import Table from "@/components/Table";
-import Modal from "@/components/Modal"; // Assuming you have a Modal component
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Search } from 'lucide-react';
+import Table from '@/components/Table';
+import Modal from '@/components/Modal';
 import Button from '@/components/Button';
-
-import { useAlert } from '@/components/context/AlertContext'; // Assuming you have an AlertContext
+import FilterModal from '@/components/FilterMemberModal';
+import { useAlert } from '@/components/context/AlertContext';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function Member() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.prefetch('/member/add-member');
-  }, []);
-
   const { showAlert } = useAlert();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [data, setData] = useState([]);
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    region: '',
+    generation: '',
+    nation: '',
+    age: '',
+    maritalStatus: '',
+    membershipCategory: '',
+    gender: '',
+  });
 
   const memberQuery = useQuery({
     queryKey: ['members'],
@@ -56,7 +62,6 @@ export default function Member() {
   const [selectedRow, setSelectedRow] = useState<{ ID: number } | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<{ ID: number } | null>(null);
-
   const queryClient = useQueryClient();
 
   const handleEditClick = () => {
@@ -66,7 +71,7 @@ export default function Member() {
   };
 
   const handleAddClick = () => {
-    router.push('/member/add-member');
+    window.location.href = '/member/add-member';
   };
 
   const handleDeleteClick = () => {
@@ -83,8 +88,6 @@ export default function Member() {
   };
 
   const handleConfirm = async () => {
-    console.log('Confirmed!', rowToDelete);
-    // Add your deletion logic here
     const response = await fetch(`/api/members/${rowToDelete['ID']}`, {
       method: 'DELETE',
     });
@@ -98,15 +101,32 @@ export default function Member() {
     setIsOpen(false);
   };
 
-  const filteredData = data.filter((member) =>
-    Object.values(member).some((value) =>
-      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  );
+  const filteredData = data.filter((member) => {
+    console.log('data', member['Membership Category'] === filters.membershipCategory);
+
+    const matchesSearch = member['Full Name']?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRegion =
+      !filters.region || member.Region?.toLowerCase().includes(filters.region.toLowerCase());
+    const matchesGeneration = !filters.generation || member['Generation'] === filters.generation;
+    const matchesAge = !filters.age || member.Age?.toString() < filters.age;
+    const matchesMaritalStatus =
+      !filters.maritalStatus || member['Marital Status'] === filters.maritalStatus;
+    const membershipCategory =
+      !filters.membershipCategory || member['Membership Category'] === filters.membershipCategory;
+    const gender = !filters.gender || member['Gender'] === filters.gender;
+    return (
+      matchesSearch &&
+      matchesRegion &&
+      matchesGeneration &&
+      matchesAge &&
+      matchesMaritalStatus &&
+      membershipCategory &&
+      gender
+    );
+  });
 
   useEffect(() => {
     if (memberQuery.status === 'success') {
-      console.log(memberQuery.data);
       const data = memberQuery.data.map((member) => ({
         ...member,
         Region: member.Region.name,
@@ -126,20 +146,28 @@ export default function Member() {
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-wrap items-center gap-4 mt-4 justify-between ">
-        {/* Search */}
-        <div className="relative w-full sm:max-w-xs">
-          <input
-            className="w-full h-7 pl-8 border border-[#01438F] rounded outline-none text-sm"
-            type="text"
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
+      <div className="flex flex-wrap items-center gap-4 mt-4 justify-between">
+        <div className="relative w-full sm:max-w-md flex items-center">
+          <label htmlFor="">Search:</label>
+          <div className="ml-2 relative w-full">
+            <input
+              className="w-full h-9 pl-8 border border-[#01438F] rounded outline-none text-sm"
+              type="text"
+              placeholder="Search Full Name"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
+          </div>
         </div>
 
-        {/* INSERT FILTER DROPDOWN HERE */}
+        <Button
+          type="primary"
+          onClick={() => setFilterModalOpen(true)}
+          className={'text-lg !py-2 !px-12'}
+        >
+          Ⴤ Filters
+        </Button>
       </div>
 
       {/* Table */}
@@ -180,6 +208,17 @@ export default function Member() {
         message="Are you sure you want to delete the data?"
         confirmText="Yes"
         cancelText="No"
+      />
+
+      {/* Filter Modal */}
+      <FilterModal
+        isOpen={filterModalOpen}
+        onClose={() => setFilterModalOpen(false)}
+        filters={filters}
+        onApply={setFilters}
+        onReset={() =>
+          setFilters({ region: '', generation: '', nation: '', age: '', maritalStatus: '' })
+        }
       />
     </div>
   );
