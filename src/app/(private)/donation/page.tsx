@@ -4,38 +4,33 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Modal from '@/components/Modal';
 import Table from '@/components/Table';
-import AddDonationModal from '@/components/AddDonationModal'; // ← import it
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-
+import DonationModal from '@/components/DonationModal';
 import MemberListModal from '@/components/MemberListModal';
-
-interface DataItem {
-  ID: number;
-  Member: number;
-  Name: string;
-  Date: string;
-  Church: string;
-  Amount: string;
-  Currency: string;
-}
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAlert } from '@/components/context/AlertContext';
 
 export default function Donation() {
   const router = useRouter();
-  const [selectedRow, setSelectedRow] = useState<any>(null);
+  const queryClient = useQueryClient();
+  const { showAlert } = useAlert();
+
+  const [selectedRow, setSelectedRow] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [rowToDelete, setRowToDelete] = useState<any>(null);
-  const [data, setData] = useState<DataItem[]>([]);
-  const [churches, setChurches] = useState([]);
+  const [rowToDelete, setRowToDelete] = useState(null);
 
   const [isMemberListOpen, setIsMemberListOpen] = useState(false);
-  const [memberIds, setMemberIds] = useState<number[]>([]);
-  const [selectedMember, setSelectedMember] = useState(null); // for display selected member
+  const [memberIds, setMemberIds] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [toDelete, setToDelete] = useState('');
+
+  const [churches, setChurches] = useState([]);
 
   const donationQuery = useQuery({
     queryKey: ['donations'],
     queryFn: async () => {
-      const res = await fetch('/api/donations', { method: 'GET' });
+      const res = await fetch('/api/donations');
       if (!res.ok) throw new Error('Error fetching donations');
       return await res.json();
     },
@@ -44,23 +39,11 @@ export default function Donation() {
   const churchQuery = useQuery({
     queryKey: ['churches'],
     queryFn: async () => {
-      const res = await fetch('/api/church', { method: 'GET' });
+      const res = await fetch('/api/church');
       if (!res.ok) throw new Error('Error fetching churches');
       return await res.json();
     },
   });
-
-  useEffect(() => {
-    if (donationQuery.status === 'success') {
-      const donations = donationQuery.data.map((donation: any) => ({
-        ...donation,
-        'Member ID': donation.Member.ID,
-        'Full Name': donation.Member['Full Name'],
-        Church: donation.Church?.Name || '-',
-      }));
-      setData(donations);
-    }
-  }, [donationQuery.data]);
 
   useEffect(() => {
     if (churchQuery.status === 'success') {
@@ -73,42 +56,76 @@ export default function Donation() {
     md: ['ID', 'Full Name', 'Date', 'Amount'],
     sm: ['Full Name', 'Amount'],
   };
-  const queryClient = useQueryClient();
 
-  const handleEditClick = () => {
-    if (selectedRow) {
-      router.push(`/donation/edit-donation/${selectedRow['ID']}`);
-    }
-  };
-
-  const handleAddDonation = async (formData: any) => {
+  const handleAddDonation = async (formData) => {
     try {
       const res = await fetch('/api/donations', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json', // important!
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-
       if (res.ok) {
-        await queryClient.refetchQueries(['donations']);
-        alert('Donation added successfully!');
+        showAlert({ type: 'success', message: 'Donation added successfully!' });
+        await donationQuery.refetch();
+
         setIsAddModalOpen(false);
       } else {
         const errorData = await res.text();
         console.error('Server error:', errorData);
-        alert('Failed to add donation: ' + res.statusText);
+        showAlert({ type: 'error', message: 'Failed to add donation.' });
       }
     } catch (error) {
       console.error(error);
-      alert('An unexpected error occurred.');
+      showAlert({ type: 'error', message: 'An unexpected error occurred.' });
+    }
+  };
+
+  const handleEditDonation = async (formData) => {
+    try {
+      const res = await fetch(`/api/donations/${formData.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        showAlert({ type: 'success', message: 'Donation updated successfully!' });
+        await donationQuery.refetch();
+
+        setIsEditModalOpen(false);
+      } else {
+        const errorData = await res.text();
+        console.error('Server error:', errorData);
+        showAlert({ type: 'error', message: 'Failed to update donation.' });
+      }
+    } catch (error) {
+      console.error(error);
+      showAlert({ type: 'error', message: 'An unexpected error occurred.' });
+    }
+  };
+
+  const handleDeleteDonation = async () => {
+    try {
+      const res = await fetch(`/api/donations/${rowToDelete.ID}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        await donationQuery.refetch();
+        await donationQuery.refetch();
+
+        showAlert({ type: 'success', message: 'Donation deleted successfully!' });
+        setShowDeleteModal(false);
+      } else {
+        showAlert({ type: 'error', message: 'Failed to delete donation.' });
+      }
+    } catch (error) {
+      showAlert({ type: 'error', message: 'An unexpected error occurred.' });
     }
   };
 
   useEffect(() => {
-    if (!selectedMember) return;
-    setIsAddModalOpen(true);
+    if (selectedMember) {
+      setIsAddModalOpen(true);
+    }
   }, [selectedMember]);
 
   return (
@@ -119,20 +136,27 @@ export default function Donation() {
 
       <div className="rounded-lg items-center justify-center mt-4">
         <div className="bg-white">
-          <Table data={data} columns={column} onRowSelect={setSelectedRow} />
+          <Table
+            data={(donationQuery.data || []).map((donation) => ({
+              ...donation,
+              'Member ID': donation.Member.ID,
+              'Full Name': donation.Member['Full Name'],
+              Church: donation.Church?.Name || '-',
+            }))}
+            columns={column}
+            onRowSelect={setSelectedRow}
+          />
         </div>
 
         <div className="flex justify-center items-center m-7 gap-5">
           <button
-            onClick={() => {
-              setIsMemberListOpen(true);
-            }}
+            onClick={() => setIsMemberListOpen(true)}
             className="px-6 py-2 bg-[#01438F] text-[#FCC346] rounded font-bold hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
           >
             Add
           </button>
           <button
-            onClick={handleEditClick}
+            onClick={() => setIsEditModalOpen(true)}
             disabled={!selectedRow}
             className={`px-6 py-2 rounded font-bold ${
               selectedRow
@@ -144,10 +168,8 @@ export default function Donation() {
           </button>
           <button
             onClick={() => {
-              if (selectedRow) {
-                setRowToDelete(selectedRow);
-                setShowDeleteModal(true);
-              }
+              if (selectedRow) setRowToDelete(selectedRow);
+              setShowDeleteModal(true);
             }}
             disabled={!selectedRow}
             className={`px-6 py-2 rounded font-bold ${
@@ -164,35 +186,43 @@ export default function Donation() {
           isOpen={isMemberListOpen}
           onClose={() => setIsMemberListOpen(false)}
           memberIds={memberIds}
-          setMemberIds={setSelectedMember} // ← here you now directly set the selected Member
-          forUnique={false} // Important
+          setMemberIds={setSelectedMember}
+          forUnique={false}
         />
 
+        {/* Add Donation Modal */}
         {isAddModalOpen && selectedMember && (
-          <AddDonationModal
+          <DonationModal
+            mode="add"
             isOpen={isAddModalOpen}
             onClose={() => setIsAddModalOpen(false)}
             onSubmit={handleAddDonation}
             churches={churches}
-            memberParam={selectedMember} // Pass selected member
+            selectedMember={selectedMember}
           />
         )}
 
+        {/* Edit Donation Modal */}
+        {isEditModalOpen && (
+          <DonationModal
+            mode="edit"
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            onSubmit={handleEditDonation}
+            churches={churches}
+            selectedDonation={selectedRow}
+          />
+        )}
+
+        {/* Delete Confirmation Modal */}
         {showDeleteModal && (
           <Modal
             isOpen={showDeleteModal}
             onClose={() => setShowDeleteModal(false)}
-            onConfirm={async () => {
-              const res = await fetch(`/api/donations/${rowToDelete['ID']}`, {
-                method: 'DELETE',
-              });
-              if (res.ok) {
-                location.reload();
-              } else {
-                alert('Failed to delete donation: ' + res.statusText);
-              }
-              setShowDeleteModal(false);
-            }}
+            onConfirm={handleDeleteDonation}
+            message="Are you sure you want to delete this donation?"
+            confirmText="Delete"
+            cancelText="Cancel"
           />
         )}
       </div>

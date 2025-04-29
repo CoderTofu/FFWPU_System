@@ -55,10 +55,6 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds, forUnique =
     if (!forUnique) {
       // For Donation — you want to pass the FULL MEMBER
       setMemberIds(selectedCustomer); // ← pass full object (Member)
-      showAlert({
-        type: 'success',
-        title: 'Member selected.',
-      });
     } else {
       // For other cases (if still using unique ID array)
       if (memberIds.includes(selectedCustomer.ID)) {
