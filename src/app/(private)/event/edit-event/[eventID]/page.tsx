@@ -59,7 +59,7 @@ export default function EditWorshipEvent() {
         const data = await res.json();
         setGuests(data.Attendees.filter((attendee) => attendee.Type === 'Guest'));
         const members = data.Attendees.filter((attendee) => attendee.Type === 'Member');
-        if (members.length < 0) {
+        if (members.length > 0) {
           setAttendees(
             members.map((attendee) => ({
               ...attendee,

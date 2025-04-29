@@ -21,7 +21,7 @@ export default function ViewWorshipEvent() {
         setGuests(data.Attendees.filter((a) => a.Type === 'Guest'));
         const members = data.Attendees.filter((a) => a.Type === 'Member');
 
-        if (members.length < 0) {
+        if (members.length > 0) {
           setAttendees(
             members.map((a) => ({
               ID: a.Member.ID,
