@@ -129,13 +129,14 @@ export default function Donation() {
   }, [selectedMember]);
 
   return (
-    <div className="px-0 md:px-[60px] lg:px-[150px] mt-8">
-      <div className="w-full flex flex-col md:flex-row justify-center items-center bg-white rounded-md shadow-md p-4">
-        <p className="text-[28px] font-bold">DONATIONS</p>
+    <div className="px-0 md:px-[150px] min-h-screen h-full pt-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg">
+        <p className="text-3xl font-bold uppercase">DONATIONS INFORMATION</p>
       </div>
 
       <div className="rounded-lg items-center justify-center mt-4">
-        <div className="bg-white">
+        <div className="overflow-hidden rounded-lg bg-white mt-6 border border-[#CBCBCB] shadow-lg">
           <Table
             data={(donationQuery.data || []).map((donation) => ({
               ...donation,
