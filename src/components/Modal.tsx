@@ -1,15 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'; // (optional) or you can replace this too
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -24,49 +16,44 @@ export default function Modal({
   isOpen,
   onClose,
   onConfirm,
-  message = "Are you sure you want to delete the data?",
-  confirmText = "Confirm",
-  cancelText = "Cancel",
+  message = 'Are you sure you want to delete the data?',
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
 }: ConfirmationModalProps) {
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[400px] border-4 border-orange-300 p-0">
-        <section>
-          <DialogHeader className="p-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-2 h-8 w-8 rounded-full"
-              onClick={onClose}
-            >
-              <X className="h-4 w-4 text-blue-800" />
-            </Button>
-          </DialogHeader>
-          <DialogTitle>
-            <div className="px-6 py-4 text-center mt-10">
-              <p className="text-base font-normal">{message}</p>
-            </div>
-          </DialogTitle>
-          <DialogFooter className="py-6 ">
-            <div className="flex justify-center gap-4 w-full">
-              <Button
-                variant="default"
-                className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-                onClick={onConfirm}
-              >
-                {confirmText}
-              </Button>
-              <Button
-                variant="default"
-                className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-                onClick={onClose}
-              >
-                {cancelText}
-              </Button>
-            </div>
-          </DialogFooter>
-        </section>
-      </DialogContent>
-    </Dialog>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+      <div className="bg-white rounded-lg overflow-hidden shadow-lg w-[400px]">
+        {/* Modal Header */}
+        <div className="bg-[#1C5CA8] flex justify-between items-center px-6 py-4">
+          <h2 className="text-white text-lg font-bold">Confirmation</h2>
+          <button onClick={onClose} className="text-white hover:text-gray-300">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="px-6 py-8 text-center">
+          <p className="text-gray-700 text-base">{message}</p>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex justify-between gap-4 px-6 pb-6">
+          <button
+            onClick={onConfirm}
+            className="px-5 py-2 rounded-md bg-[#1C5CA8] text-white font-semibold hover:bg-[#174c92]"
+          >
+            {confirmText}
+          </button>
+          <button
+            onClick={onClose}
+            className="px-5 py-2 rounded-md bg-white text-[#1C5CA8] border border-[#1C5CA8] font-semibold hover:bg-gray-100"
+          >
+            {cancelText}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -249,12 +249,12 @@ export default function EditBlessing() {
       </div>
 
       {/* Save Button Below Container */}
-      <div className="w-full max-w-[1420px] flex justify-center my-3">
+      <div className="w-full flex justify-center my-3">
         <button
           className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
           onClick={() => setShowModal(true)}
         >
-          EDIT BLESSING
+          SAVE CHANGES
         </button>
       </div>
 

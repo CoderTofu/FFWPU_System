@@ -33,7 +33,6 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    // Remove error message once the user starts typing
     if (errors[e.target.name]) {
       setErrors((prevErrors) => {
         const updatedErrors = { ...prevErrors };
@@ -46,7 +45,6 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const handleSubmit = () => {
     let newErrors: Record<string, string> = {};
 
-    // Check for required fields
     fields.forEach((field) => {
       if (field.required && !formData[field.name]) {
         newErrors[field.name] = `${field.label} is required`;
@@ -55,7 +53,7 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      return; // Stop submission if there are errors
+      return;
     }
 
     onSubmit(formData);
@@ -63,48 +61,54 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#D9D9D9] bg-opacity-50">
-      <div className="bg-[#e0e0e0] border-4 border-[#FCC346] p-6 rounded-lg shadow-lg w-[450px] relative">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 bg-[#01438F] text-white rounded-full p-2"
-        >
-          <X size={16} strokeWidth={3} />
-        </button>
-        <h2 className="text-lg font-semibold my-5 text-center">{title}</h2>
-
-        {fields.map((field) => (
-          <div key={field.name} className="mx-5 mb-3">
-            <label className="block text-sm mb-2">
-              {field.label}{" "}
-              {field.required && <span className="text-red-500">*</span>}
-            </label>
-            <input
-              type={field.type}
-              name={field.name}
-              className={`w-full mb-1 px-3 py-2 border-2 rounded-md ${
-                errors[field.name] ? "border-red-500" : "border-[#01438F]"
-              }`}
-              onChange={handleChange}
-            />
-            {errors[field.name] && (
-              <p className="text-red-500 text-xs">{errors[field.name]}</p>
-            )}
-          </div>
-        ))}
-
-        <div className="flex justify-center font-semibold mt-5 mb-3 space-x-3">
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 bg-[#01438F] text-[#FCC346] rounded-md"
-          >
-            Save
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+      <div className="bg-white rounded-lg overflow-hidden shadow-lg w-[500px]">
+        {/* Modal Header */}
+        <div className="bg-[#1C5CA8] flex justify-between items-center p-4">
+          <h2 className="text-white text-lg font-bold">{title}</h2>
+          <button onClick={onClose} className="text-white hover:text-gray-300">
+            <X size={20} />
           </button>
+        </div>
+
+        {/* Modal Content */}
+        <div className="p-6">
+          {fields.map((field) => (
+            <div key={field.name} className="mb-5">
+              <label className="block text-gray-700 mb-1 font-semibold">
+                {field.label} {field.required && <span className="text-red-500">*</span>}
+              </label>
+              <input
+                type={field.type}
+                name={field.name}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+                  errors[field.name]
+                    ? 'border-red-500 focus:ring-red-300'
+                    : 'border-[#1C5CA8] focus:ring-[#1C5CA8]'
+                }`}
+                value={formData[field.name] || ''}
+                onChange={handleChange}
+              />
+              {errors[field.name] && (
+                <p className="text-red-500 text-xs mt-1">{errors[field.name]}</p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex justify-end gap-3 p-4 bg-gray-100">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[#01438F] text-[#FCC346] rounded-md"
+            className="px-4 py-2 rounded-md bg-white text-[#1C5CA8] border border-[#1C5CA8] font-semibold hover:bg-[#f1f5f9]"
           >
             Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 rounded-md bg-[#1C5CA8] text-white font-semibold hover:bg-[#174c92]"
+          >
+            Save
           </button>
         </div>
       </div>
