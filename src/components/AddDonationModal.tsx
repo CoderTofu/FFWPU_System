@@ -48,10 +48,6 @@ export default function AddDonationModal({
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    console.log('Selected Member PARM:', memberParam);
-  }, [memberParam]);
-
   const handleSave = () => {
     const newErrors: { [key: string]: string } = {};
 

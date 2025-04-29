@@ -458,7 +458,7 @@ export default function AddWorshipEvent() {
                   },
                   {
                     name: 'invitedBy',
-                    label: 'Invited By (Member ID):',
+                    label: 'Invited By:',
                     type: 'text',
                   },
                 ]
