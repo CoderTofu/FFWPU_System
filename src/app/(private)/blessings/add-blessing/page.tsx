@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Calendar, PlusCircle } from "lucide-react";
-import Table from "@/components/Table";
-import Modal from "@/components/Modal";
-import RegistrationModal from "@/components/RegistrationModal";
+import { useEffect, useState } from 'react';
+import { Calendar, PlusCircle } from 'lucide-react';
+import Table from '@/components/Table';
+import Modal from '@/components/Modal';
+import RegistrationModal from '@/components/RegistrationModal';
 
 import MemberListModal from '@/components/MemberListModal';
 import { useAlert } from '@/components/context/AlertContext';
+import { useRouter } from 'next/navigation';
 
 export default function AddBlessing() {
   const { showAlert } = useAlert();
@@ -22,6 +23,7 @@ export default function AddBlessing() {
     'Member ID': number;
   } | null>(null);
   const [selectedGuest, setSelectedGuest] = useState<string[]>([]);
+  const router = useRouter();
 
   const [showModal, setShowModal] = useState(false);
   const [date, setDate] = useState('');
@@ -259,6 +261,8 @@ export default function AddBlessing() {
             ]);
 
             setShowModal(false);
+            alert('Successfully added blessing');
+            router.push('/blessings');
           }}
           message="Are you sure you want to add this blessing?"
           confirmText="Add"
@@ -291,7 +295,7 @@ export default function AddBlessing() {
                 setMemberIds((prev) => [...prev, id]);
               }
             } else {
-              setNewGuests([...newGuests, formData]);
+              setGuests([...guests, formData]);
             }
             setIsRegistrationModalOpen(false);
           }}

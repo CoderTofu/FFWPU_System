@@ -1,22 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 
-import {
-  User,
-  Calendar,
-  MapPin,
-  Phone,
-  Mail,
-  Award,
-  Briefcase,
-} from "lucide-react";
-import { axiosInstance } from "@/app/axiosInstance";
+import { User, Calendar, MapPin, Phone, Mail, Award, Briefcase } from 'lucide-react';
+import { axiosInstance } from '@/app/axiosInstance';
 
 export default function DisplayMember() {
   const params = useParams();
@@ -26,11 +18,11 @@ export default function DisplayMember() {
   // In a real app, you would fetch data based on memberID
   useEffect(() => {
     // This would be replaced with an actual API call
-    console.log("here");
-    console.log("Fetching data for member ID:", memberID);
+    console.log('here');
+    console.log('Fetching data for member ID:', memberID);
     (async function () {
       const response = await fetch(`/api/members/${params.memberID}`, {
-        method: "GET",
+        method: 'GET',
       });
       const data = await response.json();
       console.log(data.Blessings);
@@ -81,7 +73,7 @@ export default function DisplayMember() {
   const InfoField = ({ label, value }) => (
     <div className="flex flex-col space-y-1">
       <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="font-medium">{value || "—"}</span>
+      <span className="font-medium">{value || '—'}</span>
     </div>
   );
 
@@ -96,10 +88,23 @@ export default function DisplayMember() {
           {/* Profile Header */}
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
             <Avatar className="w-24 h-24 border-2 border-primary">
-              <AvatarImage src="/placeholder.svg?height=96&width=96" alt={userData['Full Name']} />
-              <AvatarFallback className="bg-primary/10">
-                <User className="h-12 w-12 text-primary" />
-              </AvatarFallback>
+              {userData.Image != undefined ? (
+                <img
+                  src={userData.Image}
+                  alt={userData['Full Name']}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <>
+                  <AvatarImage
+                    src="/placeholder.svg?height=96&width=96"
+                    alt={userData['Full Name']}
+                  />
+                  <AvatarFallback className="bg-primary/10">
+                    <User className="h-12 w-12 text-primary" />
+                  </AvatarFallback>
+                </>
+              )}
             </Avatar>
 
             <div className="flex flex-col items-center md:items-start">
@@ -137,9 +142,9 @@ export default function DisplayMember() {
                 <h3 className="text-lg font-semibold mb-4 text-[#BE9231]">Personal Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <InfoField label="Gender" value={userData.Gender} />
-                  <InfoField label="Date of Birth" value={userData['Date Of Birth']} />
+                  <InfoField label="Date of Birth" value={userData['Birthday']} />
                   <InfoField label="Age" value={userData.Age} />
-                  <InfoField label="Nation" value={userData.Country} />
+                  <InfoField label="Nation" value={userData.Nation} />
                   <InfoField label="Marital Status" value={userData['Marital Status']} />
                   {/* <InfoField
                     label="Name of Spouse"
@@ -180,18 +185,18 @@ export default function DisplayMember() {
                 <div className="mt-8">
                   <h4 className="text-md font-semibold mb-3 text-[#BE9231]">Blessings</h4>
                   <div className="space-y-3">
-                    {userBlessings != undefined ? (
-                      userBlessings.map((blessing, index) => (
+                    {userData.Blessings != undefined ? (
+                      userData.Blessings.map((blessing, index) => (
                         <div
                           key={index}
                           className="flex items-center gap-4 p-3 rounded-md bg-muted/50"
                         >
                           <Award className="h-5 w-5 text-primary" />
                           <div>
-                            <div className="font-medium">{blessing['Name Of Blessing']}</div>
+                            <div className="font-medium">{blessing.name}</div>
                             <div className="text-sm text-muted-foreground flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              {blessing['Blessing Date']}
+                              {blessing.date}
                             </div>
                           </div>
                         </div>
@@ -205,40 +210,39 @@ export default function DisplayMember() {
             </TabsContent>
 
             {/* Mission History Tab */}
-            {/* <TabsContent value="history" className="space-y-6">
+            <TabsContent value="history" className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-[#BE9231] mb-4">
-                  Mission History
-                </h3>
+                <h3 className="text-lg font-semibold text-[#BE9231] mb-4">Mission History</h3>
                 <div className="space-y-4">
-                  {userData.missions.map((mission, index) => (
-                    <Card key={index} className="overflow-hidden">
-                      <div className="p-4 border-l-4 border-primary">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                          <div className="flex items-start gap-3">
-                            <Briefcase className="h-5 w-5 text-primary mt-0.5" />
-                            <div>
-                              <h4 className="font-semibold">{mission.role}</h4>
-                              <p className="text-sm text-muted-foreground">
-                                {mission.organization}
-                              </p>
+                  {userData.Missions !== undefined &&
+                    userData['Missions'].map((mission, index) => (
+                      <Card key={index} className="overflow-hidden">
+                        <div className="p-4 border-l-4 border-primary">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex items-start gap-3">
+                              <Briefcase className="h-5 w-5 text-primary mt-0.5" />
+                              <div>
+                                <h4 className="font-semibold">{mission.role}</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {mission.organization}
+                                </p>
+                              </div>
                             </div>
-                          </div>
 
-                          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                            <Badge variant="outline">{mission.country}</Badge>
-                            <div className="text-sm flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {mission.date}
+                            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                              <Badge variant="outline">{mission.country}</Badge>
+                              <div className="text-sm flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {mission.start_date}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </Card>
-                  ))}
+                      </Card>
+                    ))}
                 </div>
               </div>
-            </TabsContent> */}
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>

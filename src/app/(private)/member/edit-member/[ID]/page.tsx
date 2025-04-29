@@ -48,6 +48,7 @@ export default function AddMemberForm() {
     spiritualBirthday: '',
     spiritualParent: '',
     membershipCategory: '',
+    image: '',
     missionHistory: [],
   });
 
@@ -83,6 +84,7 @@ export default function AddMemberForm() {
           membershipCategory: details['Membership Category'],
           profileImage: null,
           missionHistory: details['Missions'], // to do
+          image: details['Image'],
         };
         setFormData(data);
         //   setIsLoading(false);
@@ -110,9 +112,25 @@ export default function AddMemberForm() {
 
   const memberMutation = useMutation({
     mutationFn: async (data) => {
+      const formData = new FormData();
+
+      // Append all text fields
+      Object.keys(data).forEach((key) => {
+        if (key !== 'image') {
+          formData.append(key, data[key]);
+        }
+      });
+
+      // Append image if it exists
+      if (data.image instanceof File) {
+        formData.append('image', data.image);
+      } else if (data.image === null) {
+        formData.append('image', '');
+      }
+      console.log('formData', formData);
       const res = await fetch(`/api/members/${params.ID}`, {
         method: 'PATCH',
-        body: JSON.stringify(data),
+        body: formData,
       });
       if (!res.ok) throw new Error('Failed to fetch');
       return await res.json();
@@ -213,7 +231,7 @@ export default function AddMemberForm() {
       phone: formData.phone,
       email: formData.email,
       address: formData.address,
-      image,
+      image: formData.image || null,
       generation: formData.generation,
       blessing_status: formData.blessingStatus,
       spiritual_birthday: formData.spiritualBirthday,

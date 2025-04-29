@@ -32,17 +32,20 @@ export async function DELETE(request: Request, { params }) {
 }
 
 export async function PATCH(request: Request, { params }) {
-  const { id } = await params;
-  const body = await request.json();
-  const res = await fetchWithAuth(`/member/${id}/`, {
-    method: 'PATCH',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  if (res.status >= 200 && res.status <= 299) {
-    return Response.json(res.data);
+  try {
+    const { id } = await params;
+    const formData = await request.formData();
+    const resp = await fetchWithAuth(`/member/${id}/`, {
+      method: 'PATCH',
+      body: formData,
+      // Remove Content-Type header to let the browser set it with boundary
+    });
+
+    if (resp.status >= 200 && resp.status <= 299) {
+      return NextResponse.json(resp.data);
+    }
+    return NextResponse.json({ error: resp.statusText }, { status: resp.status });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
   }
-  return Response.json({});
 }
