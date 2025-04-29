@@ -33,10 +33,12 @@ export default function AddBlessing() {
           }))
         );
         const members = data.Recipients.filter((attendee) => attendee.Type === 'Member');
+        console.log(members[0].ID);
         setMembers(
           members.map((attendee) => ({
             ...attendee,
             attendee_id: attendee.ID,
+            'Member ID': attendee.Member.ID,
             ID: attendee.Member.ID,
             Name: attendee.Member['Full Name'], // Fix members
           }))
@@ -50,33 +52,6 @@ export default function AddBlessing() {
       }
     })();
   }, []);
-
-  useEffect(() => {
-    const fetchMembers = async () => {
-      const fetched = await Promise.all([
-        ...members,
-        ...memberIds.map(async (id) => {
-          try {
-            const resp = await fetch(`/api/members/${id}`, { method: 'GET' });
-            if (resp.ok) {
-              return await resp.json();
-            } else {
-              alert('Error while fetching member id: ' + id);
-              return null;
-            }
-          } catch (error) {
-            console.error('Error fetching member:', error);
-            return null;
-          }
-        }),
-      ]);
-
-      const validMembers = fetched.filter((member) => member !== null);
-      setMembers(validMembers);
-    };
-
-    fetchMembers();
-  }, [memberIds]);
 
   return (
     <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7 mb-10">
