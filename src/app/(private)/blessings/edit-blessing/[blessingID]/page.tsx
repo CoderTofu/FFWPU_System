@@ -112,10 +112,6 @@ export default function EditBlessing() {
     fetchMembers();
   }, [memberIds]);
 
-  useEffect(() => {
-    console.log('Selected Member:', selectedMember);
-  }, [selectedMember]);
-
   return (
     <div className="px-0 md:px-[60px] lg:px-[150px] my-8">
       {/* Header */}
@@ -207,12 +203,11 @@ export default function EditBlessing() {
           <div className="relative w-full">
             <input
               className="w-full border border-[#01438F] p-2 rounded mt-2 pr-10"
-              type="text"
+              type="date"
               placeholder="MM/DD/YYYY"
               value={formData.blessing_date}
               onChange={(e) => setFormData({ ...formData, blessing_date: e.target.value })}
             />
-            <Calendar className="absolute right-3 top-4 text-[#01438F] cursor-pointer" size={16} />
           </div>
           {/*Checkbox*/}
           <div className="mt-8">
