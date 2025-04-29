@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { PlusCircle, Calendar, XCircle } from "lucide-react";
-import Table from "@/components/Table";
-import Modal from "@/components/Modal";
-import RegistrationModal from "@/components/RegistrationModal";
-import { useParams } from "next/navigation";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from 'react';
+import { PlusCircle, Calendar, XCircle } from 'lucide-react';
+import Table from '@/components/Table';
+import Modal from '@/components/Modal';
+import RegistrationModal from '@/components/RegistrationModal';
+import { useParams } from 'next/navigation';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
-import MemberListModal from "@/components/MemberListModal";
-import { useAlert } from "@/components/context/AlertContext.jsx";
+import MemberListModal from '@/components/MemberListModal';
+import { useAlert } from '@/components/context/AlertContext.jsx';
 
 interface Field {
   name: string;
@@ -31,51 +31,45 @@ export default function EditWorshipEvent() {
 
   const [memberIds, setMemberIds] = useState([]);
   const worshipTypes = { Onsite: 1, Online: 2 };
-  const [worshipID, setWorshipID] = useState("");
-  const [worshipType, setWorshipType] = useState("");
+  const [worshipID, setWorshipID] = useState('');
+  const [worshipType, setWorshipType] = useState('');
   const [openDropdown, setOpenDropdown] = useState(null);
   const [church, setChurch] = useState(null);
-  const [eventName, setEventName] = useState("");
+  const [eventName, setEventName] = useState('');
 
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [newGuests, setNewGuests] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [date, setDate] = useState<string>("");
+  const [date, setDate] = useState<string>('');
   const dateInputRef = useRef<HTMLInputElement | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
-  const [registrationType, setRegistrationType] = useState<
-    "member" | "guest" | null
-  >(null);
+  const [registrationType, setRegistrationType] = useState<'member' | 'guest' | null>(null);
 
   const [isMemberListOpen, setIsMemberListOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch(`/api/worship/${params.eventID}`, {
-        method: "GET",
+        method: 'GET',
       });
       if (res.ok) {
         const data = await res.json();
-        setGuests(
-          data.Attendees.filter((attendee) => attendee.Type === "Guest")
-        );
-        const members = data.Attendees.filter(
-          (attendee) => attendee.Type === "Member"
-        );
+        setGuests(data.Attendees.filter((attendee) => attendee.Type === 'Guest'));
+        const members = data.Attendees.filter((attendee) => attendee.Type === 'Member');
         setAttendees(
           members.map((attendee) => ({
             ...attendee,
             attendee_id: attendee.ID,
             ID: attendee.Member.ID,
-            "Full Name": attendee.Member["Full Name"],
+            'Full Name': attendee.Member['Full Name'],
           }))
         );
         setWorshipID(data.ID);
-        setEventName(data["Event Name"]);
+        setEventName(data['Event Name']);
         setDate(data.Date);
-        setWorshipType(data["Worship Type"]);
+        setWorshipType(data['Worship Type']);
         setChurch(data.Church);
         // set images
       }
@@ -96,18 +90,18 @@ export default function EditWorshipEvent() {
       const newMembers = await Promise.all(
         memberIds.map(async (id) => {
           try {
-            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+            const resp = await fetch(`/api/members/${id}`, { method: 'GET' });
             if (resp.ok) {
               return await resp.json();
             } else {
               showAlert({
-                type: "error",
-                message: "Error while fetching member id: " + id,
+                type: 'error',
+                message: 'Error while fetching member id: ' + id,
               });
               return null;
             }
           } catch (error) {
-            console.error("Error fetching member:", error);
+            console.error('Error fetching member:', error);
             return null;
           }
         })
@@ -129,21 +123,21 @@ export default function EditWorshipEvent() {
   }, [memberIds]);
 
   const churchQuery = useQuery({
-    queryKey: ["churches"],
+    queryKey: ['churches'],
     queryFn: async () => {
-      const res = await fetch("/api/church", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
+      const res = await fetch('/api/church', { method: 'GET' });
+      if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },
   });
 
   useEffect(() => {
-    if (churchQuery.status === "success") {
+    if (churchQuery.status === 'success') {
       setChurches(churchQuery.data);
-    } else if (churchQuery.status === "error") {
+    } else if (churchQuery.status === 'error') {
       showAlert({
-        type: "error",
-        message: "An error occurred while fetching data.",
+        type: 'error',
+        message: 'An error occurred while fetching data.',
       });
     }
   }, [churchQuery.data, churchQuery.status]);
@@ -155,9 +149,7 @@ export default function EditWorshipEvent() {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      const newImages = Array.from(files).map((file) =>
-        URL.createObjectURL(file)
-      );
+      const newImages = Array.from(files).map((file) => URL.createObjectURL(file));
       setImages((prevImages) => [...prevImages, ...newImages]);
     }
   };
@@ -166,7 +158,7 @@ export default function EditWorshipEvent() {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
-  const handleOpenRegistration = (type: "member" | "guest") => {
+  const handleOpenRegistration = (type: 'member' | 'guest') => {
     setRegistrationType(type);
     setIsRegistrationModalOpen(true);
   };
@@ -430,7 +422,7 @@ export default function EditWorshipEvent() {
               const res = await fetch(`/api/worship/${params.eventID}`, {
                 method: 'PATCH',
                 body: JSON.stringify({
-                  name: eventName,
+                  event_name: eventName,
                   date,
                   worship_type: worshipType,
                   church: church.ID,
@@ -489,7 +481,7 @@ export default function EditWorshipEvent() {
             } catch (err) {
               showAlert({
                 type: 'error',
-                message: 'Error while editing worshi: ' + err,
+                message: 'Error while editing worship: ' + err,
               });
             }
 
