@@ -7,7 +7,12 @@ import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
 
+import MemberListModal from '@/components/MemberListModal';
+import { useAlert } from '@/components/context/AlertContext';
+
 export default function EditBlessing() {
+  const showAlert = useAlert();
+
   const params = useParams();
   const [members, setMembers] = useState([]);
   const [memberIds, setMemberIds] = useState([]);
@@ -61,6 +66,7 @@ export default function EditBlessing() {
   const [attendeesToDelete, setAttendeesToDelete] = useState([]);
 
   const handleMemberDelete = async () => {
+    setMemberIds(memberIds.filter((member) => member !== selectedMember.ID));
     setMembers(members.filter((member) => member !== selectedMember));
     setAttendeesToDelete((prev) => [...prev, selectedMember.attendee_id]);
   };
@@ -70,65 +76,79 @@ export default function EditBlessing() {
     setAttendeesToDelete((prev) => [...prev, selectedGuest.ID]);
   };
 
+  const [isMemberListOpen, setIsMemberListOpen] = useState(false);
+
   useEffect(() => {
     const fetchMembers = async () => {
-      const fetched = await Promise.all([
-        ...members,
-        ...memberIds.map(async (id) => {
+      const fetched = await Promise.all(
+        memberIds.map(async (id) => {
           try {
             const resp = await fetch(`/api/members/${id}`, { method: 'GET' });
             if (resp.ok) {
               return await resp.json();
             } else {
-              alert('Error while fetching member id: ' + id);
-              return null; // Return null or handle the error case
+              showAlert({
+                type: 'error',
+                message: "Error while fetching member id: ' + id",
+              });
+              return null;
             }
           } catch (error) {
+            showAlert({
+              type: 'error',
+              message: 'Error fetching member:',
+              error,
+            });
             console.error('Error fetching member:', error);
-            return null; // Return null or handle the error case
+            return null;
           }
-        }),
-      ]);
+        })
+      );
 
-      // Filter out any null values (from failed fetches)
       const validMembers = fetched.filter((member) => member !== null);
-      setMembers(validMembers);
+      setMembers(validMembers); // ✅ Only freshly fetched members, no old ones
     };
 
     fetchMembers();
   }, [memberIds]);
 
+  useEffect(() => {
+    console.log('Selected Member:', selectedMember);
+  }, [selectedMember]);
+
   return (
-    <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7 mb-10">
-      {/* Page Title */}
-      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
+    <div className="px-0 md:px-[60px] lg:px-[150px] my-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#01438F] border-2 shadow-lg">
         <p className="text-3xl font-bold uppercase">EDIT BLESSING</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row min-h-screen py-4 w-full gap-6">
-        {/* Attendance Tables */}
+      <div className="flex flex-col lg:flex-row py-4 w-full gap-6">
         <div className="lg:w-1/2 p-8 bg-white rounded-lg shadow-md flex flex-col relative">
           <h2 className="text-lg font-semibold mb-3 flex justify-between">
-            Members Blessed
+            Member Attendees
             <div title="Register Member">
               <PlusCircle
                 className="text-[#01438F] cursor-pointer hover:text-[#FCC346]"
                 size={24}
                 aria-label="Register Member"
-                onClick={() => handleOpenRegistration('member')}
+                onClick={() => setIsMemberListOpen(true)}
               />
             </div>
           </h2>
-          <Table
-            data={members}
-            columns={{
-              lg: ['ID', 'Full Name'],
-              md: ['ID', 'Full Name'],
-              sm: ['Full Name'],
-            }}
-            onRowSelect={setSelectedMember}
-          />
-
+          <div className="max-h-[250px] overflow-y-auto border border-[#CBCBCB] shadow-lg rounded-lg">
+            <Table
+              data={members}
+              columns={{
+                lg: ['ID', 'Full Name'],
+                md: ['ID', 'Full Name'],
+                sm: ['Full Name'],
+              }}
+              onRowSelect={(row) => {
+                setSelectedMember(row);
+              }}
+            />
+          </div>
           <button
             onClick={handleMemberDelete}
             disabled={!selectedMember}
@@ -141,7 +161,7 @@ export default function EditBlessing() {
             Remove
           </button>
           <h2 className="text-lg font-semibold mt-4 mb-3 flex justify-between">
-            Guests Blessed
+            Guest Attendees
             <div title="Register Guest">
               <PlusCircle
                 className="text-[#01438F] cursor-pointer hover:text-[#FCC346]"
@@ -151,15 +171,17 @@ export default function EditBlessing() {
               />
             </div>
           </h2>
-          <Table
-            data={[...guests, ...newGuests]}
-            columns={{
-              lg: ['Full Name', 'Email'],
-              md: ['Full Name', 'Email'],
-              sm: ['Full Name'],
-            }}
-            onRowSelect={setSelectedGuest}
-          />
+          <div className="max-h-[250px] overflow-y-auto border border-[#CBCBCB] shadow-lg rounded-lg">
+            <Table
+              data={[...guests, ...newGuests]}
+              columns={{
+                lg: ['Full Name', 'Email'],
+                md: ['Full Name', 'Email'],
+                sm: ['Full Name'],
+              }}
+              onRowSelect={setSelectedGuest}
+            />
+          </div>
           <button
             onClick={handleGuestDelete}
             disabled={!selectedGuest}
@@ -172,8 +194,6 @@ export default function EditBlessing() {
             Remove
           </button>
         </div>
-
-        {/* Blessing Event Details */}
         <div className="lg:w-1/2 p-8 bg-white rounded-lg shadow-md flex flex-col">
           <h2 className="text-lg font-semibold mb-5">Blessing</h2>
           <label className="block font-medium">Name</label>
@@ -271,7 +291,10 @@ export default function EditBlessing() {
                   }),
                 });
                 if (!resp.ok) {
-                  alert('Error adding member ' + id);
+                  showAlert({
+                    type: 'error',
+                    message: 'Error adding member ' + id,
+                  });
                 }
               }),
               ...newGuests.map(async (guest) => {
@@ -286,7 +309,10 @@ export default function EditBlessing() {
                   }),
                 });
                 if (!resp.ok) {
-                  alert('Error adding guest' + guest.Name);
+                  showAlert({
+                    type: 'error',
+                    message: 'Error adding guest' + guest.Name,
+                  });
                 }
               }),
               ...attendeesToDelete.map(async (attendee) => {
@@ -294,7 +320,10 @@ export default function EditBlessing() {
                   method: 'DELETE',
                 });
                 if (!resp.ok) {
-                  alert('Error deleting attendee ' + attendee);
+                  showAlert({
+                    type: 'error',
+                    message: 'Error deleting attendee ' + attendee,
+                  });
                 }
               }),
             ]);
@@ -306,6 +335,14 @@ export default function EditBlessing() {
           cancelText="Cancel"
         />
       )}
+
+      <MemberListModal
+        isOpen={isMemberListOpen}
+        onClose={() => setIsMemberListOpen(false)}
+        memberIds={memberIds}
+        setMemberIds={setMemberIds}
+      ></MemberListModal>
+
       {/* Registration Modal */}
       {isRegistrationModalOpen && (
         <RegistrationModal
@@ -316,7 +353,10 @@ export default function EditBlessing() {
             if (registrationType === 'member') {
               const id = parseInt(formData.memberId);
               if (memberIds.includes(id)) {
-                alert(`Member ID ${formData.memberId} is already in the blessing.`);
+                showAlert({
+                  type: 'error',
+                  message: `Member ID ${formData.memberId} is already in the blessing.`,
+                });
               } else {
                 setMemberIds((prev) => [...prev, id]);
               }
