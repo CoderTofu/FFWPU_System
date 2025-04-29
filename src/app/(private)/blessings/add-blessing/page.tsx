@@ -260,7 +260,7 @@ export default function AddBlessing() {
 
             setShowModal(false);
           }}
-          message="Are you sure you want to add the data?"
+          message="Are you sure you want to add this blessing?"
           confirmText="Add"
           cancelText="Cancel"
         />
