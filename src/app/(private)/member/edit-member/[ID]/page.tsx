@@ -53,6 +53,8 @@ export default function AddMemberForm() {
 
   const [image, setImage] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const [toDelete, setToDelete] = useState<any>([]);
+  const [toUpdate, setToUpdate] = useState<any>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,9 +95,13 @@ export default function AddMemberForm() {
 
   const missionMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await fetch('/api/members/member-mission', {
-        method: 'POST',
-        body: JSON.stringify(data),
+      const link =
+        data.method === 'POST'
+          ? '/api/members/member-mission'
+          : `/api/members/member-mission/${data.id}`;
+      const res = await fetch(link, {
+        method: data.method,
+        body: JSON.stringify(data.payload),
       });
       if (!res.ok) throw new Error('Failed to fetch');
       return await res.json();
@@ -113,15 +119,33 @@ export default function AddMemberForm() {
     },
     onSuccess: (data) => {
       formData.missionHistory.forEach((mission) => {
-        const missionData = {
-          member: data['ID'],
-          role: mission.role,
-          organization: mission.organization,
-          country: mission.country,
-          start_date: mission.startDate,
-          end_date: mission.endDate,
-        };
-        missionMutation.mutate(missionData);
+        console.log(mission);
+        if (!mission.id || mission.id === undefined) {
+          const missionData = {
+            member: params.ID,
+            role: mission.role,
+            organization: mission.organization,
+            country: mission.country,
+            start_date: mission.startDate,
+            end_date: mission.endDate,
+          };
+          missionMutation.mutate({ method: 'POST', payload: missionData });
+        } else {
+          const missionData = {
+            role: mission.role,
+            organization: mission.organization,
+            country: mission.country,
+            start_date: mission.startDate,
+            end_date: mission.endDate,
+          };
+          missionMutation.mutate({ method: 'PATCH', payload: missionData, id: mission.id });
+        }
+      });
+
+      toDelete.forEach(async (missionID) => {
+        const resp = await fetch(`/api/members/member-mission/${missionID}`, {
+          method: 'DELETE',
+        });
       });
       queryClient.refetchQueries(['members']);
       showAlert({
@@ -197,10 +221,14 @@ export default function AddMemberForm() {
       spiritual_parent: formData.spiritualParent,
       membership_category: formData.membershipCategory,
     };
+    console.log('Form data:', data);
     memberMutation.mutate(data);
 
-    console.log('Member added:', data);
+    console.log('missions:', formData.missionHistory);
   };
+  useEffect(() => {
+    console.log('To delete:', toDelete);
+  }, [toDelete]);
 
   return (
     <div className="px-0 md:px-[150px] min-h-screen h-full bg-[#f8fafc] pt-8">
@@ -212,7 +240,13 @@ export default function AddMemberForm() {
         {step === 0 && <PersonalInfoSection formData={formData} setFormData={setFormData} />}
         {step === 1 && <ContactInfoSection formData={formData} setFormData={setFormData} />}
         {step === 2 && <SpiritualInfoSection formData={formData} setFormData={setFormData} />}
-        {step === 3 && <MissionHistorySection formData={formData} setFormData={setFormData} />}
+        {step === 3 && (
+          <MissionHistorySection
+            formData={formData}
+            setFormData={setFormData}
+            setToDelete={setToDelete}
+          />
+        )}
         {step === 4 && <ImageUploadSection formData={formData} setFormData={setFormData} />}
       </div>
 

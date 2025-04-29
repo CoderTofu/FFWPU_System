@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Modal from "@/components/Modal";
-import Table from "@/components/Table";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Modal from '@/components/Modal';
+import Table from '@/components/Table';
 import AddDonationModal from '@/components/AddDonationModal'; // ← import it
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import MemberListModal from '@/components/MemberListModal';
 
@@ -73,6 +73,7 @@ export default function Donation() {
     md: ['ID', 'Full Name', 'Date', 'Amount'],
     sm: ['Full Name', 'Amount'],
   };
+  const queryClient = useQueryClient();
 
   const handleEditClick = () => {
     if (selectedRow) {
@@ -91,9 +92,9 @@ export default function Donation() {
       });
 
       if (res.ok) {
-        alert('Successfully added donation!');
+        await queryClient.refetchQueries(['donations']);
+        alert('Donation added successfully!');
         setIsAddModalOpen(false);
-        location.reload();
       } else {
         const errorData = await res.text();
         console.error('Server error:', errorData);

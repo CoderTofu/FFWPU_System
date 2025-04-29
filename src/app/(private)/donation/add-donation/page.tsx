@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect, use } from "react";
-import Modal from "@/components/Modal";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useRef, useEffect, use } from 'react';
+import Modal from '@/components/Modal';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function AddDonation() {
   const router = useRouter();
@@ -22,40 +22,42 @@ export default function AddDonation() {
   });
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
   const dropdownButtonRef = useRef<HTMLButtonElement>(null);
+  const queryClient = useQueryClient();
 
   const churchQuery = useQuery({
-    queryKey: ["churches"],
+    queryKey: ['churches'],
     queryFn: async () => {
-      const res = await fetch("/api/church", { method: "GET" });
+      const res = await fetch('/api/church', { method: 'GET' });
       if (!res.ok) {
-        throw new Error("Error while fetching churches");
+        throw new Error('Error while fetching churches');
       }
       return await res.json();
     },
   });
 
   useEffect(() => {
-    if (churchQuery.status === "success") {
+    if (churchQuery.status === 'success') {
       setChurches(churchQuery.data);
-    } else if (churchQuery.status === "error") {
+    } else if (churchQuery.status === 'error') {
       alert(churchQuery.error.message);
     }
   }, [churchQuery.data, churchQuery.status]);
 
   const handleConfirm = async () => {
-    console.log("Confirmed!");
+    console.log('Confirmed!');
     console.log(formData);
     setIsOpen(false);
 
-    const res = await fetch("/api/donations", {
-      method: "POST",
+    const res = await fetch('/api/donations', {
+      method: 'POST',
       body: JSON.stringify(formData),
     });
     if (res.ok) {
-      alert("successfully added donation");
-      router.push("/donation");
+      await queryClient.refetchQueries(['donations']);
+      alert('successfully added donation');
+      router.push('/donation');
     } else {
-      alert("An error occurred: " + res.statusText);
+      alert('An error occurred: ' + res.statusText);
     }
   };
 
@@ -69,14 +71,13 @@ export default function AddDonation() {
         openDropdown &&
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node) &&
-        (!dropdownButtonRef.current ||
-          !dropdownButtonRef.current.contains(event.target as Node))
+        (!dropdownButtonRef.current || !dropdownButtonRef.current.contains(event.target as Node))
       ) {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, [openDropdown]);
 
   const handleCurrencySelect = (currency: string, event: React.MouseEvent) => {
@@ -104,9 +105,7 @@ export default function AddDonation() {
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
               type="number"
-              onChange={(e) =>
-                setFormData({ ...formData, member: parseInt(e.target.value) })
-              }
+              onChange={(e) => setFormData({ ...formData, member: parseInt(e.target.value) })}
               required
             />
           </div>
@@ -116,9 +115,7 @@ export default function AddDonation() {
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none"
               type="date"
-              onChange={(e) =>
-                setFormData({ ...formData, date: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
               required
             />
           </div>
@@ -135,7 +132,7 @@ export default function AddDonation() {
 
           <label className="block font-medium">Church</label>
           <div
-            onClick={() => toggleDropdown("church")}
+            onClick={() => toggleDropdown('church')}
             className="relative flex flex-col justify-start items-start bg-white border border-[#01438F] rounded p-2 hover:cursor-pointer "
           >
             <div className="flex w-full justify-between">
@@ -144,13 +141,13 @@ export default function AddDonation() {
               ) : (
                 <button> {`${church.Name} (${church.Country})`}</button>
               )}
-              {openDropdown === "church" ? (
-                <ChevronUp style={{ color: "#01438F" }} />
+              {openDropdown === 'church' ? (
+                <ChevronUp style={{ color: '#01438F' }} />
               ) : (
-                <ChevronDown style={{ color: "#01438F" }} />
+                <ChevronDown style={{ color: '#01438F' }} />
               )}
             </div>
-            {openDropdown === "church" && (
+            {openDropdown === 'church' && (
               <div className="absolute mt-10 flex flex-col w-full max-h-32 overflow-y-auto bg-white border border-[#01438F] rounded ">
                 {churches.map((val) => {
                   return (
@@ -160,7 +157,7 @@ export default function AddDonation() {
                       onClick={() => {
                         setChurch(val);
                         setFormData({ ...formData, church: val.ID });
-                        toggleDropdown("church");
+                        toggleDropdown('church');
                       }}
                     >
                       {`${val.Name} (${val.Country})`}
@@ -175,9 +172,7 @@ export default function AddDonation() {
             <input
               className="w-full h-[36px] px-2 border border-[#01438F] rounded-md outline-none [&::-webkit-inner-spin-button]:appearance-none"
               type="number"
-              onChange={(e) =>
-                setFormData({ ...formData, amount: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
               required
             />
           </div>
@@ -187,99 +182,99 @@ export default function AddDonation() {
             <div ref={dropdownRef} className="relative">
               <button
                 ref={dropdownButtonRef}
-                onClick={() => toggleDropdown("Select")}
+                onClick={() => toggleDropdown('Select')}
                 className="w-[394px] h-[36px] border border-[#01438F] rounded-md px-[12px] outline-none
                  bg-white text-[16px] text-black flex justify-between items-center
                  max-w-[100%] min-w-[50%] flex-shrink-1"
                 type="button"
               >
-                {selectedCurrency || "Select"}
+                {selectedCurrency || 'Select'}
                 <ChevronDown className="w-[16px] h-[16px] text-[#01438F]" />
               </button>
 
-              {openDropdown === "Select" && (
+              {openDropdown === 'Select' && (
                 <div className="absolute mt-1 w-full bg-white border border-[#01438F] rounded-md shadow-md">
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("USD", event)}
+                    onClick={(event) => handleCurrencySelect('USD', event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "USD"}
+                      checked={selectedCurrency === 'USD'}
                       readOnly
-                    />{" "}
+                    />{' '}
                     $ USD
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("PHP", event)}
+                    onClick={(event) => handleCurrencySelect('PHP', event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "PHP"}
+                      checked={selectedCurrency === 'PHP'}
                       readOnly
-                    />{" "}
+                    />{' '}
                     ₱ PHP
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("EUR", event)}
+                    onClick={(event) => handleCurrencySelect('EUR', event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "EUR"}
+                      checked={selectedCurrency === 'EUR'}
                       readOnly
-                    />{" "}
+                    />{' '}
                     € EUR
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("JPY", event)}
+                    onClick={(event) => handleCurrencySelect('JPY', event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "JPY"}
+                      checked={selectedCurrency === 'JPY'}
                       readOnly
-                    />{" "}
+                    />{' '}
                     ¥ JPY
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("KRW", event)}
+                    onClick={(event) => handleCurrencySelect('KRW', event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "KRW"}
+                      checked={selectedCurrency === 'KRW'}
                       readOnly
-                    />{" "}
+                    />{' '}
                     ₩ KRW
                   </div>
 
                   <div
                     className="flex items-center px-3 py-2 hover:bg-gray-200 hover:rounded-sm cursor-pointer"
-                    onClick={(event) => handleCurrencySelect("CNY", event)}
+                    onClick={(event) => handleCurrencySelect('CNY', event)}
                   >
                     <input
                       type="radio"
                       name="currency"
                       className="mr-2"
-                      checked={selectedCurrency === "CNY"}
+                      checked={selectedCurrency === 'CNY'}
                       readOnly
-                    />{" "}
+                    />{' '}
                     ¥ CNY
                   </div>
                 </div>

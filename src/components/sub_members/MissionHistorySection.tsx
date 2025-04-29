@@ -3,9 +3,14 @@ import React from 'react';
 interface Props {
   formData: any;
   setFormData: (callback: (prev: any) => any) => void;
+  setToDelete: (callback: (prev: any) => any) => void;
 }
 
-export default function MissionHistorySection({ formData, setFormData }: Props) {
+export default function MissionHistorySection({
+  formData,
+  setFormData,
+  setToDelete = null,
+}: Props) {
   const addMission = () => {
     setFormData((prev) => ({
       ...prev,
@@ -17,26 +22,19 @@ export default function MissionHistorySection({ formData, setFormData }: Props) 
   };
 
   const removeMission = (index: number) => {
+    if (setToDelete) {
+      setToDelete((prev) => [...prev, formData.missionHistory[index].id]);
+    }
     const updated = [...formData.missionHistory];
     updated.splice(index, 1);
     setFormData((prev) => ({ ...prev, missionHistory: updated }));
   };
 
-  const handleMissionChange = (index: number, field: string, value: string) => {
+  const handleMissionChange = (index: number, field: string, value: string, add: boolean) => {
     const updated = [...formData.missionHistory];
     updated[index][field] = value;
     setFormData((prev) => ({ ...prev, missionHistory: updated }));
   };
-  const formatDateForInput = (dateString: string) => {
-    if (!dateString) return '';
-    try {
-      const date = new Date(dateString);
-      return date.toISOString().split('T')[0];
-    } catch {
-      return '';
-    }
-  };
-
   return (
     <section className="space-y-8">
       <div>
