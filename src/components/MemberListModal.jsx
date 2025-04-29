@@ -12,12 +12,14 @@ import loading from "@/components/assets/kinetiq-loading.gif";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { type } from "os";
 
-const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
+// forUnique is used to determine if the modal is for the member list or not
+// If it is for the member list, it should only allow unique members to be selected
+const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds, forUnique = true }) => {
   const { showAlert } = useAlert();
   const [data, setData] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
@@ -28,48 +30,65 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
   const closeButtonRef = useRef(null);
 
   const columns = [
-    { key: "ID", label: "Member ID" },
-    { key: "Full Name", label: "Name" },
+    { key: 'ID', label: 'Member ID' },
+    { key: 'Full Name', label: 'Name' },
   ];
 
   const memberQuery = useQuery({
-    queryKey: ["members"],
+    queryKey: ['members'],
     queryFn: async () => {
-      const res = await fetch("/api/members", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
+      const res = await fetch('/api/members', { method: 'GET' });
+      if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },
   });
 
   const handleConfirm = () => {
-    if (selectedCustomer) {
+    if (!selectedCustomer) {
+      showAlert({
+        type: 'error',
+        title: 'No member selected!',
+      });
+      return;
+    }
+  
+    if (!forUnique) {
+      // For Donation — you want to pass the FULL MEMBER
+      setMemberIds(selectedCustomer); // ← pass full object (Member)
+      showAlert({
+        type: 'success',
+        title: 'Member selected.',
+      });
+    } else {
+      // For other cases (if still using unique ID array)
       if (memberIds.includes(selectedCustomer.ID)) {
         showAlert({
-          type: "error",
-          message: "Member already selected",
+          type: 'error',
+          title: 'Member already selected.',
         });
       } else {
         setMemberIds((prev) => [...prev, selectedCustomer.ID]);
         showAlert({
-          type: "success",
-          title: "Member selected.",
+          type: 'success',
+          title: 'Member selected.',
         });
       }
     }
     onClose();
   };
+  
 
   useEffect(() => {
     console.log(data);
-    if (memberQuery.status !== "success") return;
+    if (memberQuery.status !== 'success') return;
     const tableData = data.filter((m) =>
-      m["Full Name"].toLowerCase().includes(searchTerm.toLowerCase())
+      m['Full Name'].toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredData(tableData);
   }, [searchTerm, data, memberQuery.status]);
 
   useEffect(() => {
-    if (memberQuery.status === "success") {
+    if (memberQuery.status === 'success') {
       const res = memberQuery.data.map((member) => ({
         ...member,
         Region: member.Region.name,
@@ -78,14 +97,14 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
       setData(res);
       setFilteredData(res);
       setIsLoading(false);
-    } else if (memberQuery.status === "error") {
-      alert("An error occurred while fetching data.");
+    } else if (memberQuery.status === 'error') {
+      alert('An error occurred while fetching data.');
     }
   }, [memberQuery.data, memberQuery.status]);
 
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === "Escape" && isOpen) {
+      if (e.key === 'Escape' && isOpen) {
         onClose();
       }
     };
@@ -97,15 +116,15 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
 
     // Prevent scrolling on body when modal is open
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = "";
+      document.body.style.overflow = '';
     }
 
-    document.addEventListener("keydown", handleEscape);
+    document.addEventListener('keydown', handleEscape);
     return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
     };
   }, [isOpen, onClose]);
 

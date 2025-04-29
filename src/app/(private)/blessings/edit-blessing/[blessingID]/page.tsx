@@ -7,181 +7,189 @@ import Modal from "@/components/Modal";
 import RegistrationModal from "@/components/RegistrationModal";
 import { useParams } from "next/navigation";
 
-export default function AddBlessing() {
+import MemberListModal from '@/components/MemberListModal';
+import { useAlert } from '@/components/context/AlertContext';
+
+export default function EditBlessing() {
+  const showAlert = useAlert();
+
   const params = useParams();
   const [members, setMembers] = useState([]);
   const [memberIds, setMemberIds] = useState([]);
   const [guests, setGuests] = useState([]);
   const [newGuests, setNewGuests] = useState([]);
   const [formData, setFormData] = useState({
-    name_of_blessing: "",
-    blessing_date: "",
-    chaenbo: "",
+    name_of_blessing: '',
+    blessing_date: '',
+    chaenbo: '',
   });
   const chaenboMap = { Vertical: 1, Horizontal: 2 };
   useEffect(() => {
     (async function () {
       const res = await fetch(`/api/blessings/${params.blessingID}`, {
-        method: "GET",
+        method: 'GET',
       });
       if (res.ok) {
         const data = await res.json();
-        setGuests(
-          data.Recipients.filter((attendee) => attendee.Type === "Guest")
-        );
-        const members = data.Recipients.filter(
-          (attendee) => attendee.Type === "Member"
-        );
+        setGuests(data.Recipients.filter((attendee) => attendee.Type === 'Guest'));
+        const members = data.Recipients.filter((attendee) => attendee.Type === 'Member');
         setMembers(
           members.map((attendee) => ({
             ...attendee,
             attendee_id: attendee.ID,
             ID: attendee.Member.ID,
-            "Full Name": attendee.Member["Full Name"],
+            'Full Name': attendee.Member['Full Name'],
           }))
         );
         setFormData({
-          name_of_blessing: data["Name"],
-          blessing_date: data["Date"],
+          name_of_blessing: data['Name'],
+          blessing_date: data['Date'],
           chaenbo: data.Chaenbo,
         });
       }
     })();
   }, []);
   const [selectedMember, setSelectedMember] = useState<{
-    "Member ID": number;
+    'Member ID': number;
   } | null>(null);
   const [selectedGuest, setSelectedGuest] = useState<{
-    "Guest ID": number;
+    'Guest ID': number;
   } | null>(null);
 
   const [showModal, setShowModal] = useState(false);
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
-  const [registrationType, setRegistrationType] = useState<
-    "member" | "guest" | null
-  >(null);
-  const handleOpenRegistration = (type: "member" | "guest") => {
+  const [registrationType, setRegistrationType] = useState<'member' | 'guest' | null>(null);
+  const handleOpenRegistration = (type: 'member' | 'guest') => {
     setRegistrationType(type);
     setIsRegistrationModalOpen(true);
   };
   const [attendeesToDelete, setAttendeesToDelete] = useState([]);
 
   const handleMemberDelete = async () => {
+    setMemberIds(memberIds.filter((member) => member !== selectedMember.ID));
     setMembers(members.filter((member) => member !== selectedMember));
-    console.log(selectedMember);
     setAttendeesToDelete((prev) => [...prev, selectedMember.attendee_id]);
   };
   const handleGuestDelete = async () => {
     setGuests(guests.filter((member) => member !== selectedGuest));
     setNewGuests(newGuests.filter((guest) => guest !== selectedGuest));
-    console.log(selectedGuest);
     setAttendeesToDelete((prev) => [...prev, selectedGuest.ID]);
   };
 
+  const [isMemberListOpen, setIsMemberListOpen] = useState(false);
+
   useEffect(() => {
     const fetchMembers = async () => {
-      const fetched = await Promise.all([
-        ...members,
-        ...memberIds.map(async (id) => {
+      const fetched = await Promise.all(
+        memberIds.map(async (id) => {
           try {
-            const resp = await fetch(`/api/members/${id}`, { method: "GET" });
+            const resp = await fetch(`/api/members/${id}`, { method: 'GET' });
             if (resp.ok) {
               return await resp.json();
             } else {
-              alert("Error while fetching member id: " + id);
-              return null; // Return null or handle the error case
+              showAlert({
+                type: 'error',
+                message: "Error while fetching member id: ' + id",
+              });
+              return null;
             }
           } catch (error) {
-            console.error("Error fetching member:", error);
-            return null; // Return null or handle the error case
+            showAlert({
+              type: 'error',
+              message: 'Error fetching member:',
+              error,
+            });
+            console.error('Error fetching member:', error);
+            return null;
           }
-        }),
-      ]);
+        })
+      );
 
-      // Filter out any null values (from failed fetches)
       const validMembers = fetched.filter((member) => member !== null);
-      setMembers(validMembers);
+      setMembers(validMembers); // ✅ Only freshly fetched members, no old ones
     };
 
     fetchMembers();
   }, [memberIds]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-0 lg:px-[150px] mt-7 mb-10">
-      {/* Page Title */}
-      <div className="w-full p-4 mx-auto mt-3 bg-white rounded-md drop-shadow-lg flex items-center justify-center">
+    <div className="px-0 md:px-[60px] lg:px-[150px] my-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#01438F] border-2 shadow-lg">
         <p className="text-3xl font-bold uppercase">EDIT BLESSING</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row min-h-screen py-4 w-full gap-6">
-        {/* Attendance Tables */}
+      <div className="flex flex-col lg:flex-row py-4 w-full gap-6">
         <div className="lg:w-1/2 p-8 bg-white rounded-lg shadow-md flex flex-col relative">
           <h2 className="text-lg font-semibold mb-3 flex justify-between">
-            Members Blessed
+            Member Attendees
             <div title="Register Member">
               <PlusCircle
                 className="text-[#01438F] cursor-pointer hover:text-[#FCC346]"
                 size={24}
                 aria-label="Register Member"
-                onClick={() => handleOpenRegistration("member")}
+                onClick={() => setIsMemberListOpen(true)}
               />
             </div>
           </h2>
-          <Table
-            data={members}
-            columns={{
-              lg: ["ID", "Full Name"],
-              md: ["ID", "Full Name"],
-              sm: ["Full Name"],
-            }}
-            onRowSelect={setSelectedMember}
-          />
-
+          <div className="max-h-[250px] overflow-y-auto border border-[#CBCBCB] shadow-lg rounded-lg">
+            <Table
+              data={members}
+              columns={{
+                lg: ['ID', 'Full Name'],
+                md: ['ID', 'Full Name'],
+                sm: ['Full Name'],
+              }}
+              onRowSelect={(row) => {
+                setSelectedMember(row);
+              }}
+            />
+          </div>
           <button
             onClick={handleMemberDelete}
             disabled={!selectedMember}
             className={`py-1 w-[100px] text-sm rounded mt-5 transition duration-300 ease-in-out border-2 ${
               selectedMember
-                ? "border-red-600 text-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg"
-                : "border-gray-400 text-gray-400 cursor-not-allowed"
+                ? 'border-red-600 text-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg'
+                : 'border-gray-400 text-gray-400 cursor-not-allowed'
             }`}
           >
             Remove
           </button>
           <h2 className="text-lg font-semibold mt-4 mb-3 flex justify-between">
-            Guests Blessed
+            Guest Attendees
             <div title="Register Guest">
               <PlusCircle
                 className="text-[#01438F] cursor-pointer hover:text-[#FCC346]"
                 size={24}
                 aria-label="Register Guest"
-                onClick={() => handleOpenRegistration("guest")}
+                onClick={() => handleOpenRegistration('guest')}
               />
             </div>
           </h2>
-          <Table
-            data={[...guests, ...newGuests]}
-            columns={{
-              lg: ["Full Name", "Email"],
-              md: ["Full Name", "Email"],
-              sm: ["Full Name"],
-            }}
-            onRowSelect={setSelectedGuest}
-          />
+          <div className="max-h-[250px] overflow-y-auto border border-[#CBCBCB] shadow-lg rounded-lg">
+            <Table
+              data={[...guests, ...newGuests]}
+              columns={{
+                lg: ['Full Name', 'Email'],
+                md: ['Full Name', 'Email'],
+                sm: ['Full Name'],
+              }}
+              onRowSelect={setSelectedGuest}
+            />
+          </div>
           <button
             onClick={handleGuestDelete}
             disabled={!selectedGuest}
             className={`py-1 w-[100px] rounded mt-5 text-sm transition duration-300 ease-in-out border-2 ${
               selectedGuest
-                ? "border-red-600 text-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg"
-                : "border-gray-400 text-gray-400 cursor-not-allowed"
+                ? 'border-red-600 text-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg'
+                : 'border-gray-400 text-gray-400 cursor-not-allowed'
             }`}
           >
             Remove
           </button>
         </div>
-
-        {/* Blessing Event Details */}
         <div className="lg:w-1/2 p-8 bg-white rounded-lg shadow-md flex flex-col">
           <h2 className="text-lg font-semibold mb-5">Blessing</h2>
           <label className="block font-medium">Name</label>
@@ -189,24 +197,16 @@ export default function AddBlessing() {
             className="w-full border border-[#01438F] p-2 rounded mt-2"
             placeholder="Enter Name"
             value={formData.name_of_blessing}
-            onChange={(e) =>
-              setFormData({ ...formData, name_of_blessing: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, name_of_blessing: e.target.value })}
           />
           <label className="block font-medium mt-5">Date</label>
           <div className="relative w-full">
             <input
               className="w-full border border-[#01438F] p-2 rounded mt-2 pr-10"
-              type="text"
+              type="date"
               placeholder="MM/DD/YYYY"
               value={formData.blessing_date}
-              onChange={(e) =>
-                setFormData({ ...formData, blessing_date: e.target.value })
-              }
-            />
-            <Calendar
-              className="absolute right-3 top-4 text-[#01438F] cursor-pointer"
-              size={16}
+              onChange={(e) => setFormData({ ...formData, blessing_date: e.target.value })}
             />
           </div>
           {/*Checkbox*/}
@@ -221,10 +221,10 @@ export default function AddBlessing() {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      chaenbo: e.target.checked ? "Vertical" : "Horizontal",
+                      chaenbo: e.target.checked ? 'Vertical' : 'Horizontal',
                     })
                   }
-                  checked={formData.chaenbo === "Vertical"}
+                  checked={formData.chaenbo === 'Vertical'}
                 />
                 <label>Vertical</label>
               </div>
@@ -236,10 +236,10 @@ export default function AddBlessing() {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      chaenbo: e.target.checked ? "Horizontal" : "Vertical",
+                      chaenbo: e.target.checked ? 'Horizontal' : 'Vertical',
                     })
                   }
-                  checked={formData.chaenbo === "Horizontal"}
+                  checked={formData.chaenbo === 'Horizontal'}
                 />
                 <label>Horizontal</label>
               </div>
@@ -249,12 +249,12 @@ export default function AddBlessing() {
       </div>
 
       {/* Save Button Below Container */}
-      <div className="w-full max-w-[1420px] flex justify-center my-3">
+      <div className="w-full flex justify-center my-3">
         <button
           className="px-4 py-2 font-bold bg-[#01438F] text-[#FCC346] rounded"
           onClick={() => setShowModal(true)}
         >
-          EDIT BLESSING
+          SAVE CHANGES
         </button>
       </div>
 
@@ -264,10 +264,10 @@ export default function AddBlessing() {
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           onConfirm={async () => {
-            console.log("Saving...");
+            console.log('Saving...');
             console.log(memberIds);
             const res = await fetch(`/api/blessings/${params.blessingID}`, {
-              method: "PATCH",
+              method: 'PATCH',
               body: JSON.stringify({
                 name: formData.name_of_blessing,
                 date: formData.blessing_date,
@@ -278,65 +278,80 @@ export default function AddBlessing() {
             await Promise.all([
               ...memberIds.map(async (id) => {
                 const resp = await fetch(`/api/blessings/recipient`, {
-                  method: "POST",
+                  method: 'POST',
                   body: JSON.stringify({
                     blessing: addedID,
                     member: id,
-                    type: "Member",
+                    type: 'Member',
                   }),
                 });
                 if (!resp.ok) {
-                  alert("Error adding member " + id);
+                  showAlert({
+                    type: 'error',
+                    message: 'Error adding member ' + id,
+                  });
                 }
               }),
               ...newGuests.map(async (guest) => {
                 const resp = await fetch(`/api/blessings/recipient`, {
-                  method: "POST",
+                  method: 'POST',
                   body: JSON.stringify({
                     blessing: addedID,
-                    type: "Guest",
-                    full_name: guest["Full Name"],
+                    type: 'Guest',
+                    full_name: guest['Full Name'],
                     email: guest.Email,
                     invited_by: guest.invitedBy || null,
                   }),
                 });
                 if (!resp.ok) {
-                  alert("Error adding guest" + guest.Name);
+                  showAlert({
+                    type: 'error',
+                    message: 'Error adding guest' + guest.Name,
+                  });
                 }
               }),
               ...attendeesToDelete.map(async (attendee) => {
-                const resp = await fetch(
-                  `/api/blessings/recipient/${attendee}`,
-                  {
-                    method: "DELETE",
-                  }
-                );
+                const resp = await fetch(`/api/blessings/recipient/${attendee}`, {
+                  method: 'DELETE',
+                });
                 if (!resp.ok) {
-                  alert("Error deleting attendee " + attendee);
+                  showAlert({
+                    type: 'error',
+                    message: 'Error deleting attendee ' + attendee,
+                  });
                 }
               }),
             ]);
             location.reload();
             setShowModal(false);
           }}
-          message="Are you sure you want to add the data?"
-          confirmText="Add"
+          message="Are you sure you want to save your changes?"
+          confirmText="Confirm"
           cancelText="Cancel"
         />
       )}
+
+      <MemberListModal
+        isOpen={isMemberListOpen}
+        onClose={() => setIsMemberListOpen(false)}
+        memberIds={memberIds}
+        setMemberIds={setMemberIds}
+      ></MemberListModal>
+
       {/* Registration Modal */}
       {isRegistrationModalOpen && (
         <RegistrationModal
           isOpen={isRegistrationModalOpen}
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
-            console.log("Registered:", formData);
-            if (registrationType === "member") {
+            console.log('Registered:', formData);
+            if (registrationType === 'member') {
               const id = parseInt(formData.memberId);
               if (memberIds.includes(id)) {
-                alert(
-                  `Member ID ${formData.memberId} is already in the blessing.`
-                );
+                showAlert({
+                  type: 'error',
+                  message: `Member ID ${formData.memberId} is already in the blessing.`,
+                });
               } else {
                 setMemberIds((prev) => [...prev, id]);
               }
@@ -345,28 +360,24 @@ export default function AddBlessing() {
             }
             setIsRegistrationModalOpen(false);
           }}
-          title={
-            registrationType === "member"
-              ? "Member Registration"
-              : "Guest Registration"
-          }
+          title={registrationType === 'member' ? 'Member Registration' : 'Guest Registration'}
           fields={
-            registrationType === "member"
-              ? [{ name: "memberId", label: "Member ID", type: "text" }]
+            registrationType === 'member'
+              ? [{ name: 'memberId', label: 'Member ID', type: 'text' }]
               : [
                   {
-                    name: "Full Name",
-                    label: "Full Name",
-                    type: "text",
+                    name: 'Full Name',
+                    label: 'Full Name',
+                    type: 'text',
                     required: true,
                   },
                   {
-                    name: "Email",
-                    label: "Email",
-                    type: "email",
+                    name: 'Email',
+                    label: 'Email',
+                    type: 'email',
                     required: true,
                   },
-                  { name: "invitedBy", label: "Invited By", type: "text" },
+                  { name: 'invitedBy', label: 'Invited By', type: 'text' },
                 ]
           }
         />
