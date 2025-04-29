@@ -298,7 +298,9 @@ export default function AddMemberForm() {
             setToDelete={setToDelete}
           />
         )}
-        {step === 4 && <ImageUploadSection formData={formData} setFormData={setFormData} />}
+        <div className={`${step === 4 ? 'block' : 'hidden'}`}>
+          <ImageUploadSection formData={formData} setFormData={setFormData} />
+        </div>
       </div>
 
       <div className="flex justify-between mt-8">

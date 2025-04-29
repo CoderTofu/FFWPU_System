@@ -224,7 +224,9 @@ export default function AddMemberForm() {
         {step === 1 && <ContactInfoSection formData={formData} setFormData={setFormData} />}
         {step === 2 && <SpiritualInfoSection formData={formData} setFormData={setFormData} />}
         {step === 3 && <MissionHistorySection formData={formData} setFormData={setFormData} />}
-        {step === 4 && <ImageUploadSection formData={formData} setFormData={setFormData} />}
+        <div className={`${step === 4 ? 'block' : 'hidden'}`}>
+          <ImageUploadSection formData={formData} setFormData={setFormData} />
+        </div>
       </div>
 
       <div className="flex justify-between mt-8">

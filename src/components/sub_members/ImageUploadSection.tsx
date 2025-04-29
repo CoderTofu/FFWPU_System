@@ -45,10 +45,10 @@ export default function ImageUploadSection({ formData, setFormData }: Props) {
               <button
                 type="button"
                 onClick={clearImage}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition"
+                className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-1 h-[40px] w-[40px] text-2xl hover:bg-red-600 transition"
                 title="Remove Image"
               >
-                ✖️
+                &times;
               </button>
             </>
           ) : (
