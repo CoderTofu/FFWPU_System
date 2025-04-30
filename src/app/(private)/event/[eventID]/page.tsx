@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Table from '@/components/Table';
+import { XCircle } from 'lucide-react';
 
 export default function ViewWorshipEvent() {
   const params = useParams();
@@ -96,7 +97,7 @@ export default function ViewWorshipEvent() {
                 {images.map((image, index) => (
                   <div key={index} className="relative w-24 h-24 flex-shrink-0">
                     <img
-                      src={image}
+                      src={image.photo}
                       alt={`Uploaded ${index}`}
                       className="w-full h-full object-cover rounded-lg border border-gray-300"
                     />
