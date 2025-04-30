@@ -47,6 +47,9 @@ export default function EditWorshipEvent() {
   const [images, setImages] = useState<string[]>([]);
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [registrationType, setRegistrationType] = useState<'member' | 'guest' | null>(null);
+  const [imagesToDelete, setImagesToDelete] = useState([]);
+  const [imagesToAdd, setImagesToAdd] = useState([]);
+  const [imagesPreview, setImagesPreview] = useState([]);
 
   const [isMemberListOpen, setIsMemberListOpen] = useState(false);
 
@@ -74,6 +77,7 @@ export default function EditWorshipEvent() {
         setDate(data.Date);
         setWorshipType(data['Worship Type']);
         setChurch(data.Church);
+        setImages(data.Images);
         // set images
       }
     };
@@ -154,11 +158,13 @@ export default function EditWorshipEvent() {
     if (files) {
       const newImages = Array.from(files).map((file) => URL.createObjectURL(file));
       setImages((prevImages) => [...prevImages, ...newImages]);
+      setImagesToAdd((prev) => [...prev, ...Array.from(files)]);
     }
   };
 
   const handleDeleteImage = (index: number) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    setImagesToDelete((prev) => [...prev, images[index].id]);
   };
 
   const handleOpenRegistration = (type: 'member' | 'guest') => {
@@ -380,7 +386,7 @@ export default function EditWorshipEvent() {
                 {images.map((image, index) => (
                   <div key={index} className="relative w-24 h-24 flex-shrink-0">
                     <img
-                      src={image}
+                      src={image.id ? image.photo : image}
                       alt={`Uploaded ${index}`}
                       className="w-full h-full object-cover rounded-lg border border-gray-300"
                     />
@@ -511,6 +517,32 @@ export default function EditWorshipEvent() {
                     showAlert({
                       type: 'error',
                       message: 'Error deleting attendee: ' + attendee,
+                    });
+                  }
+                }),
+                ...imagesToDelete.map(async (image) => {
+                  const resp = await fetch(`/api/worship/worship-image/${image}`, {
+                    method: 'DELETE',
+                  });
+                  if (!resp.ok) {
+                    showAlert({
+                      type: 'error',
+                      message: 'Error deleting image: ' + image,
+                    });
+                  }
+                }),
+                ...imagesToAdd.map(async (image) => {
+                  const formData = new FormData();
+                  formData.append('worship', addedID);
+                  formData.append('photo', image);
+                  const resp = await fetch(`/api/worship/worship-image`, {
+                    method: 'POST',
+                    body: formData,
+                  });
+                  if (!resp.ok) {
+                    showAlert({
+                      type: 'error',
+                      message: 'Error adding image: ' + image.name,
                     });
                   }
                 }),

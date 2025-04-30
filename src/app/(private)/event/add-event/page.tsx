@@ -1,23 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import {
-  PlusCircle,
-  Calendar,
-  XCircle,
-  ChevronDown,
-  ChevronUp,
-  Fullscreen,
-} from "lucide-react";
-import Table from "@/components/Table";
-import Modal from "@/components/Modal";
-import RegistrationModal from "@/components/RegistrationModal";
-import { axiosInstance } from "@/app/axiosInstance";
-import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from 'react';
+import { PlusCircle, Calendar, XCircle, ChevronDown, ChevronUp, Fullscreen } from 'lucide-react';
+import Table from '@/components/Table';
+import Modal from '@/components/Modal';
+import RegistrationModal from '@/components/RegistrationModal';
+import { axiosInstance } from '@/app/axiosInstance';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 
-import MemberListModal from "@/components/MemberListModal";
-import { useAlert } from "@/components/context/AlertContext.jsx";
+import MemberListModal from '@/components/MemberListModal';
+import { useAlert } from '@/components/context/AlertContext.jsx';
 import Button from '@/components/Button';
 
 export default function AddWorshipEvent() {
@@ -37,6 +30,7 @@ export default function AddWorshipEvent() {
   const [date, setDate] = useState<string>('');
   const dateInputRef = useRef<HTMLInputElement | null>(null);
   const [images, setImages] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [registrationType, setRegistrationType] = useState<'member' | 'guest' | null>(null);
   const [worshipType, setWorshipType] = useState('');
@@ -48,6 +42,7 @@ export default function AddWorshipEvent() {
     if (files) {
       const newImages = Array.from(files).map((file) => URL.createObjectURL(file));
       setImages((prevImages) => [...prevImages, ...newImages]);
+      setImageFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
     }
   };
 
@@ -421,10 +416,27 @@ export default function AddWorshipEvent() {
                       invited_by: guest.invitedBy || null,
                     }),
                   });
+
                   if (!resp.ok) {
                     showAlert({
                       type: 'error',
                       message: 'Error adding guest' + guest.Name,
+                    });
+                  }
+                }),
+                ...imageFiles.map(async (file) => {
+                  const formData = new FormData();
+                  formData.append('worship', addedID);
+                  formData.append('photo', file);
+                  const resp = await fetch(`/api/worship/worship-image/`, {
+                    method: 'POST',
+                    body: formData,
+                  });
+                  console.log(formData);
+                  if (!resp.ok) {
+                    showAlert({
+                      type: 'error',
+                      message: 'Error adding image',
                     });
                   }
                 }),

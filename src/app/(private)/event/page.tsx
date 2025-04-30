@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Table from "@/components/Table";
-import { Search, ChevronDown } from "lucide-react";
-import Modal from "@/components/Modal";
-import { axiosInstance } from "@/app/axiosInstance";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Table from '@/components/Table';
+import { Search, ChevronDown } from 'lucide-react';
+import Modal from '@/components/Modal';
+import { axiosInstance } from '@/app/axiosInstance';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import Button from '@/components/Button';
 
@@ -35,6 +35,7 @@ export default function EventInfo() {
         Church: event.Church.Name,
       }));
       setData(data);
+      console.log(data);
     } else if (eventQuery.status === 'error') {
       alert('An error occurred while fetching data.');
     }
