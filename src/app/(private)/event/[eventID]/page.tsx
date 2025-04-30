@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Table from '@/components/Table';
-import { XCircle } from 'lucide-react';
 
 export default function ViewWorshipEvent() {
   const params = useParams();
@@ -101,12 +100,6 @@ export default function ViewWorshipEvent() {
                       alt={`Uploaded ${index}`}
                       className="w-full h-full object-cover rounded-lg border border-gray-300"
                     />
-                    <button
-                      onClick={() => handleDeleteImage(index)}
-                      className="absolute top-1 right-1"
-                    >
-                      <XCircle className="text-red-500 w-5 h-5" />
-                    </button>
                   </div>
                 ))}
               </div>
