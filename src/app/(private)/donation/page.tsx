@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Search, ChevronDown } from 'lucide-react';
 
 import Modal from '@/components/Modal';
 import Table from '@/components/Table';
@@ -133,6 +134,23 @@ export default function Donation() {
       {/* Header */}
       <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg">
         <p className="text-3xl font-bold uppercase">DONATIONS INFORMATION</p>
+      </div>
+      <div className="flex flex-wrap items-center gap-4 mt-4 justify-between">
+        <div className="relative w-full sm:max-w-md flex items-center">
+          <label htmlFor="">Search:</label>
+          <div className="ml-2 relative w-full">
+            <input
+              className="w-full h-9 pl-8 border border-[#01438F] rounded outline-none text-sm"
+              type="text"
+              placeholder="Search Full Name"
+            />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
+          </div>
+        </div>
+
+        <Button type="primary" className={'text-lg !py-2 !px-12'} disabled={true}>
+          Ⴤ Filters
+        </Button>
       </div>
 
       <div className="rounded-lg items-center justify-center mt-4">

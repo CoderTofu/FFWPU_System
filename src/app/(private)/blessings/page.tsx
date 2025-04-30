@@ -64,7 +64,7 @@ export default function ViewBlessing() {
   }, []);
 
   const filteredData = blessings.filter((item) =>
-    Object.values(item).join(' ').toLowerCase().includes(searchQuery.toLowerCase())
+    Object.values(item.Name).join(' ').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleEditClick = () => {
@@ -120,20 +120,24 @@ export default function ViewBlessing() {
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-wrap items-center gap-4 mt-4 justify-between ">
-        {/* Search */}
-        <div className="relative w-full sm:max-w-xs">
-          <input
-            className="w-full h-7 pl-8 border border-[#01438F] rounded outline-none text-sm"
-            type="text"
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
+      <div className="flex flex-wrap items-center gap-4 mt-4 justify-between">
+        <div className="relative w-full sm:max-w-md flex items-center">
+          <label htmlFor="">Search:</label>
+          <div className="ml-2 relative w-full">
+            <input
+              className="w-full h-9 pl-8 border border-[#01438F] rounded outline-none text-sm"
+              type="text"
+              placeholder="Search Blessing Name"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
+          </div>
         </div>
 
-        {/* INSERT FILTER DROPDOWN HERE */}
+        <Button type="primary" className={'text-lg !py-2 !px-12'} disabled={true}>
+          Ⴤ Filters
+        </Button>
       </div>
 
       {/* Table */}
