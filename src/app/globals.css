@@ -37,7 +37,55 @@ body {
     linear-gradient(45deg, #444cf7 25%, #ffffff 25%);
   background-size: 200px 200px;
   background-position: -100px 0, -100px 0, 0px 0, 0px 0;
+}
+
+.pane-1 {
   animation: zigzagMove 20s linear infinite;
+}
+
+.cubes-container {
+  position: absolute;
+  inset: 0; /* shorthand for top: 0; right: 0; bottom: 0; left: 0 */
+  z-index: 0;
+  pointer-events: none;
+}
+
+.cubes {
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  background-color: #FFDD64;
+  background-image:
+    linear-gradient(30deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7),
+    linear-gradient(150deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7),
+    linear-gradient(30deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7),
+    linear-gradient(150deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7),
+    linear-gradient(60deg, #444cf777 25%, transparent 25.5%, transparent 75%, #444cf777 75%, #444cf777),
+    linear-gradient(60deg, #444cf777 25%, transparent 25.5%, transparent 75%, #444cf777 75%, #444cf777);
+  background-size: 160px 280px;
+  background-position: 0 0, 0 0, 80px 140px, 80px 140px, 0 0, 80px 140px;
+
+  animation: moveCubes 20s linear infinite;
+
+  mask-image: linear-gradient(to bottom, transparent, black);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black);
+}
+
+
+
+@keyframes moveCubes {
+  0% {
+    background-position: 0 0, 0 0, 80px 140px, 80px 140px, 0 0, 80px 140px;
+  }
+  100% {
+    background-position: 160px 280px, 160px 280px, 240px 420px, 240px 420px, 160px 280px, 240px 420px;
+  }
+}
+
+
+
+.pane-2 {
+  animation: zigzagMove 15s reverse infinite;
 }
 
 @keyframes zigzagMove {
@@ -48,164 +96,6 @@ body {
     background-position: 100px 0, 100px 0, 200px 0, 200px 0;
   }
 }
-
-.cloud3d {
-  position: absolute;
-  background: #444cf755;
-  border-radius: 50%;
-  opacity: 0.8;
-  filter: blur(20px);
-}
-
-
-.cloud3d::before,
-.cloud3d::after {
-  content: '';
-  position: absolute;
-  background: #444cf755;
-  border-radius: 50%;
-  filter: blur(20px);
-}
-
-.cloud1 {
-  width: 300px;
-  height: 100px;
-  top: 15%;
-  left: -400px;
-  animation: moveClouds 10s linear infinite;
-}
-
-.cloud2 {
-  width: 400px;
-  height: 120px;
-  top: 40%;
-  left: -600px;
-  animation: moveCloudsReverse 15s linear infinite;
-  opacity: 0.7;
-  transform: scale(1.1);
-}
-
-.cloud3 {
-  width: 350px;
-  height: 100px;
-  top: 65%;
-  left: -500px;
-  animation: moveClouds 17s linear infinite;
-  opacity: 0.6;
-  transform: scale(0.9);
-}
-
-.cloud4 {
-  width: 450px;
-  height: 150px;
-  top: 25%;
-  left: -700px;
-  animation: moveCloudsReverse 18s linear infinite;
-  opacity: 0.6;
-  transform: scale(1.05);
-}
-
-.cloud6 {
-  width: 500px;
-  height: 160px;
-  top: 55%;
-  left: -800px;
-  animation: moveClouds 20s linear infinite;
-  opacity: 0.5;
-  transform: scale(1.2);
-}
-
-.cloud1::before {
-  width: 200px;
-  height: 200px;
-  top: -50px;
-  left: 100px;
-}
-.cloud1::after {
-  width: 250px;
-  height: 150px;
-  top: -30px;
-  left: 200px;
-}
-
-.cloud2::before {
-  width: 250px;
-  height: 180px;
-  top: -30px;
-  left: 150px;
-}
-.cloud2::after {
-  width: 300px;
-  height: 160px;
-  top: -40px;
-  left: 300px;
-}
-
-.cloud3::before {
-  width: 200px;
-  height: 140px;
-  top: -20px;
-  left: 120px;
-}
-.cloud3::after {
-  width: 280px;
-  height: 160px;
-  top: -30px;
-  left: 250px;
-}
-
-.cloud4::before {
-  width: 300px;
-  height: 200px;
-  top: -40px;
-  left: 160px;
-}
-.cloud4::after {
-  width: 350px;
-  height: 180px;
-  top: -30px;
-  left: 320px;
-}
-
-.cloud6::before {
-  width: 320px;
-  height: 220px;
-  top: -50px;
-  left: 170px;
-}
-.cloud6::after {
-  width: 370px;
-  height: 200px;
-  top: -40px;
-  left: 340px;
-}
-
-
-@keyframes moveClouds {
-  0% {
-    transform: translateX(0) scale(1);
-  }
-  50% {
-    transform: translateX(50vw) scale(1.05);
-  }
-  100% {
-    transform: translateX(120vw) scale(1);
-  }
-}
-
-@keyframes moveCloudsReverse {
-  0% {
-    transform: translateX(120vw) scale(1);
-  }
-  50% {
-    transform: translateX(50vw) scale(1.05);
-  }
-  100% {
-    transform: translateX(0) scale(1);
-  }
-}
-
-
 
 @layer base {
   :root {

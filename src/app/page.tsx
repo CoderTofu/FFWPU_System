@@ -147,18 +147,10 @@ export default function Home() {
         </section>
 
         {/* Absolute Pane Design */}
-        <div className="pane w-screen h-screen absolute top-0"></div>
+        <div className="pane pane-1 w-screen h-screen absolute top-0"></div>
       </section>
 
       <section className="relative z-10 py-20 px-6 flex flex-col items-center w-full" id="about">
-        {/* clouds */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <div className="cloud3d cloud2"></div>
-          <div className="cloud3d cloud1"></div>
-          <div className="cloud3d cloud3"></div>
-          <div className="cloud3d cloud6"></div>
-          <div className="cloud3d cloud4"></div>
-        </div>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -266,7 +258,148 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <section></section>
+      <section className="relative min-h-screen bg-[#FFDD64]" id="contacts">
+        {/* Background cubes */}
+        <div className="cubes-container absolute inset-0 z-0">
+          <div className="cubes w-full h-full opacity-50"></div>
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 px-6 sm:px-12 md:px-20 lg:px-36 py-20 sm:py-32">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h1 className="text-white text-4xl md:text-6xl font-bold font-instrument">
+              Contact Us
+            </h1>
+            <p className="text-black text-base md:text-xl font-instrument mt-4">
+              Contact us through our accounts to know more.
+            </p>
+          </div>
+
+          {/* Contact Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+            {/* FACEBOOK */}
+            <div className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8">
+              <div className="rounded-full absolute top-0 left-8 -translate-y-1/2 bg-white p-4 shadow">
+                <img src="/icons/facebook.svg" alt="Facebook icon" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="font-instrument text-black text-2xl font-semibold">Facebook</h3>
+                <p className="font-instrument text-sm text-[#464646]">
+                  Reach us through our Facebook account
+                </p>
+                <a
+                  href="https://facebook.com/ffwpu"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-instrument mt-4 mb-12 text-base font-semibold text-[#01438F]"
+                >
+                  FFWPU Philippines
+                </a>
+                <a
+                  href="https://facebook.com/ffwpu"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Visit Facebook"
+                  className="bg-[#01438F] text-white px-8 py-4 w-[150px] rounded-sm hover:scale-110 hover:opacity-70 duration-300 text-center"
+                >
+                  Click here
+                </a>
+              </div>
+            </div>
+
+            {/* EMAIL */}
+            <div className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8">
+              <div className="rounded-full absolute top-0 left-8 -translate-y-1/2 bg-white p-4 shadow">
+                <img src="/icons/email.svg" alt="Email icon" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="font-instrument text-black text-2xl font-semibold">Email</h3>
+                <p className="font-instrument text-sm text-[#464646]">
+                  Reach us through our email address
+                </p>
+                <a
+                  href="mailto:umphils@gmail.com"
+                  className="font-instrument mt-4 mb-12 text-base font-semibold text-[#01438F]"
+                >
+                  umphils@gmail.com
+                </a>
+                <a
+                  href="mailto:umphils@gmail.com"
+                  aria-label="Send Email"
+                  className="bg-[#01438F] text-white px-8 py-4 w-[150px] rounded-sm hover:scale-110 hover:opacity-70 duration-300 text-center"
+                >
+                  Click here
+                </a>
+              </div>
+            </div>
+
+            {/* WEBSITE */}
+            <div className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8">
+              <div className="rounded-full absolute top-0 left-8 -translate-y-1/2 bg-white p-4 shadow">
+                <img src="/icons/globe.svg" alt="Website icon" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="font-instrument text-black text-2xl font-semibold">Website</h3>
+                <p className="font-instrument text-sm text-[#464646]">
+                  Reach us through our official website
+                </p>
+                <a
+                  href="https://familyfed.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-instrument mt-4 mb-12 text-base font-semibold text-[#01438F]"
+                >
+                  familyfed.org
+                </a>
+                <a
+                  href="https://familyfed.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Visit Website"
+                  className="bg-[#01438F] text-white px-8 py-4 w-[150px] rounded-sm hover:scale-110 hover:opacity-70 duration-300 text-center"
+                >
+                  Click here
+                </a>
+              </div>
+            </div>
+
+            {/* PHONE */}
+            <div className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8">
+              <div className="rounded-full absolute top-0 left-8 -translate-y-1/2 bg-white p-4 shadow">
+                <img src="/icons/telephone.svg" alt="Phone icon" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="font-instrument text-black text-2xl font-semibold">Phone No.</h3>
+                <p className="font-instrument text-sm text-[#464646]">
+                  Reach us through our phone number
+                </p>
+                <a className="font-instrument mt-4 mb-12 text-base text-[#01438F] font-semibold">
+                  +(02) 924 1833
+                </a>
+                <div className="h-[64px]"></div> {/* Preserves height */}
+              </div>
+            </div>
+
+            {/* LOCATION */}
+            <div className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8">
+              <div className="rounded-full absolute top-0 left-8 -translate-y-1/2 bg-white p-4 shadow">
+                <img src="/icons/pin.svg" alt="Location icon" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="font-instrument text-black text-2xl font-semibold">Address</h3>
+                <p className="font-instrument text-sm text-[#464646]">
+                  Reach us through our address
+                </p>
+                <a className="font-instrument mt-4 mb-12 text-base font-semibold text-[#01438F]">
+                  Quezon City, Philippines
+                </a>
+                <div className="h-[64px]"></div> {/* Preserves height */}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <ChatbotWidget />
     </div>
