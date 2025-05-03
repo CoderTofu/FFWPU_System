@@ -20,9 +20,9 @@ export default function NavbarPublic() {
   }, [isSidebarOpen]);
 
   const navItems = [
-    { name: 'Home', href: '#home', icon: Home },
-    { name: 'About Us', href: '#about', icon: Info },
-    { name: 'Contacts', href: '#contacts', icon: Phone },
+    { name: 'Home', href: '/#home', icon: Home },
+    { name: 'About Us', href: '/#about', icon: Info },
+    { name: 'Contacts', href: '/#contacts', icon: Phone },
   ];
 
   return (

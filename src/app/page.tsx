@@ -259,27 +259,43 @@ export default function Home() {
       </section>
 
       <section className="relative min-h-screen bg-[#FFDD64]" id="contacts">
-        {/* Background cubes */}
         <div className="cubes-container absolute inset-0 z-0">
           <div className="cubes w-full h-full opacity-50"></div>
         </div>
 
-        {/* Content */}
         <div className="relative z-10 px-6 sm:px-12 md:px-20 lg:px-36 py-20 sm:py-32">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-white text-4xl md:text-6xl font-bold font-instrument">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+            className="text-center mb-16"
+          >
+            <motion.h1
+              variants={fadeUpVariants}
+              className="text-white text-4xl md:text-6xl font-bold font-instrument"
+            >
               Contact Us
-            </h1>
-            <p className="text-black text-base md:text-xl font-instrument mt-4">
+            </motion.h1>
+            <motion.p
+              variants={fadeUpVariants}
+              className="text-black text-base md:text-xl font-instrument mt-4"
+            >
               Contact us through our accounts to know more.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
-          {/* Contact Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
-            {/* FACEBOOK */}
-            <div className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12"
+          >
+            <motion.div
+              variants={cardVariants}
+              className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8"
+            >
               <div className="rounded-full absolute top-0 left-8 -translate-y-1/2 bg-white p-4 shadow">
                 <img src="/icons/facebook.svg" alt="Facebook icon" />
               </div>
@@ -289,7 +305,7 @@ export default function Home() {
                   Reach us through our Facebook account
                 </p>
                 <a
-                  href="https://facebook.com/ffwpu"
+                  href="https://www.facebook.com/NCRforTP"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-instrument mt-4 mb-12 text-base font-semibold text-[#01438F]"
@@ -306,10 +322,12 @@ export default function Home() {
                   Click here
                 </a>
               </div>
-            </div>
+            </motion.div>
 
-            {/* EMAIL */}
-            <div className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8">
+            <motion.div
+              variants={cardVariants}
+              className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8"
+            >
               <div className="rounded-full absolute top-0 left-8 -translate-y-1/2 bg-white p-4 shadow">
                 <img src="/icons/email.svg" alt="Email icon" />
               </div>
@@ -332,10 +350,12 @@ export default function Home() {
                   Click here
                 </a>
               </div>
-            </div>
+            </motion.div>
 
-            {/* WEBSITE */}
-            <div className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8">
+            <motion.div
+              variants={cardVariants}
+              className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8"
+            >
               <div className="rounded-full absolute top-0 left-8 -translate-y-1/2 bg-white p-4 shadow">
                 <img src="/icons/globe.svg" alt="Website icon" />
               </div>
@@ -362,10 +382,12 @@ export default function Home() {
                   Click here
                 </a>
               </div>
-            </div>
+            </motion.div>
 
-            {/* PHONE */}
-            <div className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8">
+            <motion.div
+              variants={cardVariants}
+              className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8"
+            >
               <div className="rounded-full absolute top-0 left-8 -translate-y-1/2 bg-white p-4 shadow">
                 <img src="/icons/telephone.svg" alt="Phone icon" />
               </div>
@@ -377,12 +399,14 @@ export default function Home() {
                 <a className="font-instrument mt-4 mb-12 text-base text-[#01438F] font-semibold">
                   +(02) 924 1833
                 </a>
-                <div className="h-[64px]"></div> {/* Preserves height */}
+                <div className="h-[64px]"></div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* LOCATION */}
-            <div className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8">
+            <motion.div
+              variants={cardVariants}
+              className="bg-white relative rounded-md shadow-lg px-8 pt-16 pb-8"
+            >
               <div className="rounded-full absolute top-0 left-8 -translate-y-1/2 bg-white p-4 shadow">
                 <img src="/icons/pin.svg" alt="Location icon" />
               </div>
@@ -394,10 +418,10 @@ export default function Home() {
                 <a className="font-instrument mt-4 mb-12 text-base font-semibold text-[#01438F]">
                   Quezon City, Philippines
                 </a>
-                <div className="h-[64px]"></div> {/* Preserves height */}
+                <div className="h-[64px]"></div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
