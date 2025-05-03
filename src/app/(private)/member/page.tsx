@@ -92,9 +92,8 @@ export default function Member() {
       method: 'DELETE',
     });
     if (response.ok) {
-      queryClient.refetchQueries(['members']);
+      await queryClient.refetchQueries(['members']);
       showAlert({ type: 'success', message: 'Deleted successfully' });
-      window.location.reload();
     } else {
       alert('An error occurred while deleting member: ' + response.statusText);
     }

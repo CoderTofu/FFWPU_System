@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,41 +9,41 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
-import { axiosInstance } from "@/app/axiosInstance";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { axiosInstance } from '@/app/axiosInstance';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Helper function for button styles
 const buttonStyle =
-  "px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg";
+  'px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg';
 
 export function AddRegionModal() {
-  const [regionName, setRegionName] = useState("");
+  const [regionName, setRegionName] = useState('');
   const queryClient = useQueryClient();
   const handleAddRegion = async () => {
     // Add logic to handle adding a region
-    console.log("Adding region:", regionName);
-    const res = await fetch("/api/cms/region", {
-      method: "POST",
+    console.log('Adding region:', regionName);
+    const res = await fetch('/api/cms/region', {
+      method: 'POST',
       body: JSON.stringify({ name: regionName }),
     });
     if (res.ok) {
-      alert("successfully added region");
-      queryClient.refetchQueries(["regions"]);
+      alert('successfully added region');
+      await queryClient.refetchQueries(['regions']);
     } else {
-      alert("An error occurred: " + res.statusText);
+      alert('An error occurred: ' + res.statusText);
     }
     // Reset the input
-    setRegionName("");
+    setRegionName('');
   };
 
   return (
@@ -82,18 +82,18 @@ export function AddRegionModal() {
 }
 
 export function DeleteRegionModal() {
-  const [regionToDelete, setRegionToDelete] = useState("");
+  const [regionToDelete, setRegionToDelete] = useState('');
 
   const [regions, setRegions] = useState([]);
 
   useEffect(() => {
     const fetchRegions = async () => {
-      const res = await fetch("/api/cms/region", { method: "GET" });
+      const res = await fetch('/api/cms/region', { method: 'GET' });
       if (res.ok) {
         const data = await res.json();
         setRegions(data);
       } else {
-        alert("An error occurred while fetching regions");
+        alert('An error occurred while fetching regions');
       }
     };
     fetchRegions();
@@ -101,12 +101,12 @@ export function DeleteRegionModal() {
 
   const handleDeleteRegion = async () => {
     // Add logic to handle deleting a region
-    console.log("Deleting region:", regionToDelete);
+    console.log('Deleting region:', regionToDelete);
     const res = await fetch(`/api/cms/region/${regionToDelete}/`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
     // Reset the selection
-    setRegionToDelete("");
+    setRegionToDelete('');
   };
 
   return (
@@ -141,11 +141,7 @@ export function DeleteRegionModal() {
           </div>
         </div>
         <DialogFooter>
-          <button
-            className={buttonStyle}
-            onClick={handleDeleteRegion}
-            disabled={!regionToDelete}
-          >
+          <button className={buttonStyle} onClick={handleDeleteRegion} disabled={!regionToDelete}>
             Delete Region
           </button>
         </DialogFooter>
@@ -155,51 +151,51 @@ export function DeleteRegionModal() {
 }
 
 export function AddSubregionModal() {
-  const [selectedRegion, setSelectedRegion] = useState("");
-  const [subRegion, setSubRegion] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState('');
+  const [subRegion, setSubRegion] = useState('');
 
   const [regions, setRegions] = useState([]);
   const queryClient = useQueryClient();
 
   const regionQuery = useQuery({
-    queryKey: ["regions"],
+    queryKey: ['regions'],
     queryFn: async () => {
-      const res = await fetch("/api/cms/region", { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch");
+      const res = await fetch('/api/cms/region', { method: 'GET' });
+      if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },
   });
 
   const subregionMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await fetch("/api/cms/subregion", {
-        method: "POST",
+      const res = await fetch('/api/cms/subregion', {
+        method: 'POST',
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error("Failed to fetch");
+      if (!res.ok) throw new Error('Failed to fetch');
     },
-    onSuccess: (data) => {
-      alert("Successfully added");
-      queryClient.refetchQueries(["subregions"]);
+    onSuccess: async (data) => {
+      alert('Successfully added');
+      await queryClient.refetchQueries(['subregions']);
     },
     onError: (data) => {
-      alert("Error while adding");
+      alert('Error while adding');
     },
   });
   const handleAddSubregion = () => {
     // Add logic to handle adding a subregion
-    console.log("Adding subregion:", subRegion, "to region:", selectedRegion);
+    console.log('Adding subregion:', subRegion, 'to region:', selectedRegion);
     subregionMutation.mutate({ region: selectedRegion, name: subRegion });
     // Reset the inputs
-    setSelectedRegion("");
-    setSubRegion("");
+    setSelectedRegion('');
+    setSubRegion('');
   };
 
   useEffect(() => {
-    if (regionQuery.status === "success") {
+    if (regionQuery.status === 'success') {
       setRegions(regionQuery.data);
-    } else if (regionQuery.status === "error") {
-      alert("An error occurred while fetching data");
+    } else if (regionQuery.status === 'error') {
+      alert('An error occurred while fetching data');
     }
   }, [regionQuery.data, regionQuery.status]);
 
@@ -256,42 +252,37 @@ export function AddSubregionModal() {
 }
 
 export function DeleteSubregionModal() {
-  const [selectedRegion, setSelectedRegion] = useState<
-    keyof typeof regionsData | ""
-  >("");
-  const [selectedSubregion, setSelectedSubregion] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState<keyof typeof regionsData | ''>('');
+  const [selectedSubregion, setSelectedSubregion] = useState('');
   const [subregions, setSubregions] = useState<string[]>([]);
 
-  const regionsData: { [key: string]: { name: string; subregions: string[] } } =
-    {
-      "1": {
-        name: "North America",
-        subregions: ["California", "New York", "Texas"],
-      },
-      "2": { name: "Europe", subregions: ["Paris", "London", "Berlin"] },
-      "3": { name: "Asia", subregions: ["Tokyo", "Shanghai", "Mumbai"] },
-    };
+  const regionsData: { [key: string]: { name: string; subregions: string[] } } = {
+    '1': {
+      name: 'North America',
+      subregions: ['California', 'New York', 'Texas'],
+    },
+    '2': { name: 'Europe', subregions: ['Paris', 'London', 'Berlin'] },
+    '3': { name: 'Asia', subregions: ['Tokyo', 'Shanghai', 'Mumbai'] },
+  };
 
   useEffect(() => {
     if (selectedRegion) {
-      setSubregions(
-        selectedRegion ? regionsData[selectedRegion].subregions : []
-      );
-      setSelectedSubregion("");
+      setSubregions(selectedRegion ? regionsData[selectedRegion].subregions : []);
+      setSelectedSubregion('');
     }
   }, [selectedRegion]);
 
   const handleDeleteSubregion = () => {
     // Add logic to handle deleting a subregion
     console.log(
-      "Deleting subregion:",
+      'Deleting subregion:',
       selectedSubregion,
-      "from region:",
+      'from region:',
       regionsData[selectedRegion]?.name
     );
     // Reset the selections
-    setSelectedRegion("");
-    setSelectedSubregion("");
+    setSelectedRegion('');
+    setSelectedSubregion('');
   };
 
   return (
@@ -301,9 +292,7 @@ export function DeleteSubregionModal() {
       </DialogTrigger>
       <DialogContent className="bg-white border-4 border-[#FCC346]">
         <DialogHeader>
-          <DialogTitle className="font-bold text-lg">
-            Delete Subregion
-          </DialogTitle>
+          <DialogTitle className="font-bold text-lg">Delete Subregion</DialogTitle>
           <DialogDescription className="text-[#B7B7B7] font-light text-sm">
             Select the region and subregion you want to delete.
           </DialogDescription>
@@ -313,10 +302,7 @@ export function DeleteSubregionModal() {
             <Label htmlFor="region-select" className="text-right font-bold">
               Region
             </Label>
-            <Select
-              value={selectedRegion.toString()}
-              onValueChange={setSelectedRegion}
-            >
+            <Select value={selectedRegion.toString()} onValueChange={setSelectedRegion}>
               <SelectTrigger
                 id="region-select"
                 className="col-span-3 border-2 border-black rounded-sm"
@@ -372,68 +358,68 @@ export function DeleteSubregionModal() {
 }
 
 export function AddChurchModal() {
-  const [churchName, setChurchName] = useState("");
+  const [churchName, setChurchName] = useState('');
   const [regions, setRegions] = useState([]);
   const [subregions, setSubregions] = useState([]);
-  const [region, setRegion] = useState("");
-  const [subregion, setSubregion] = useState("");
-  const [country, setCountry] = useState("");
+  const [region, setRegion] = useState('');
+  const [subregion, setSubregion] = useState('');
+  const [country, setCountry] = useState('');
 
   const queryClient = useQueryClient();
 
   const regionQuery = useQuery({
-    queryKey: ["regions"],
+    queryKey: ['regions'],
     queryFn: async () => {
-      const res = await fetch("/api/cms/region", { method: "GET" });
+      const res = await fetch('/api/cms/region', { method: 'GET' });
       if (!res.ok) {
-        throw new Error("An error occurred while fetching regions");
+        throw new Error('An error occurred while fetching regions');
       }
       return await res.json();
     },
   });
   const subregionQuery = useQuery({
-    queryKey: ["subregions"],
+    queryKey: ['subregions'],
     queryFn: async () => {
-      const res = await fetch("/api/cms/subregion", { method: "GET" });
+      const res = await fetch('/api/cms/subregion', { method: 'GET' });
       if (!res.ok) {
-        throw new Error("An error occurred while fetching subregions");
+        throw new Error('An error occurred while fetching subregions');
       }
       return await res.json();
     },
   });
   const handleAddChurch = async () => {
     // Add logic to handle adding a region
-    console.log("Adding region:", churchName);
-    const res = await fetch("/api/church", {
-      method: "POST",
+    console.log('Adding region:', churchName);
+    const res = await fetch('/api/church', {
+      method: 'POST',
       body: JSON.stringify({ name: churchName, region, subregion, country }),
     });
     if (res.ok) {
-      queryClient.invalidateQueries(["churches"]);
-      queryClient.refetchQueries(["churches"]);
-      alert("successfully added church");
+      await queryClient.invalidateQueries(['churches']);
+      await queryClient.refetchQueries(['churches']);
+      alert('successfully added church');
     } else {
-      alert("An error occurred: " + res.statusText);
+      alert('An error occurred: ' + res.statusText);
     }
     // // Reset the input
-    setChurchName("");
-    setRegion("");
-    setSubregion("");
-    setCountry("");
+    setChurchName('');
+    setRegion('');
+    setSubregion('');
+    setCountry('');
   };
 
   useEffect(() => {
-    if (regionQuery.status === "success") {
+    if (regionQuery.status === 'success') {
       setRegions(regionQuery.data);
-    } else if (regionQuery.status === "error") {
+    } else if (regionQuery.status === 'error') {
       alert(regionQuery.error.message);
     }
   }, [regionQuery.data, regionQuery.status]);
 
   useEffect(() => {
-    if (subregionQuery.status === "success") {
+    if (subregionQuery.status === 'success') {
       setSubregions(subregionQuery.data);
-    } else if (subregionQuery.status === "error") {
+    } else if (subregionQuery.status === 'error') {
       alert(subregionQuery.error.message);
     }
   }, [subregionQuery.data, subregionQuery.status]);
@@ -531,23 +517,23 @@ export function AddChurchModal() {
 }
 
 export function DeleteChurchModal() {
-  const [regionToDelete, setRegionToDelete] = useState("");
+  const [regionToDelete, setRegionToDelete] = useState('');
   const [churches, setChurches] = useState([]);
   const queryClient = useQueryClient();
   const churchQuery = useQuery({
-    queryKey: ["churches"],
+    queryKey: ['churches'],
     queryFn: async () => {
-      const res = await fetch("/api/church", { method: "GET" });
+      const res = await fetch('/api/church', { method: 'GET' });
       if (!res.ok) {
-        throw new Error("An error occurred while fetching churches");
+        throw new Error('An error occurred while fetching churches');
       }
       return await res.json();
     },
   });
   useEffect(() => {
-    if (churchQuery.status === "success") {
+    if (churchQuery.status === 'success') {
       setChurches(churchQuery.data);
-    } else if (churchQuery.status === "error") {
+    } else if (churchQuery.status === 'error') {
       alert(churchQuery.error.message);
     }
   }, [churchQuery.data, churchQuery.status]);
@@ -555,16 +541,16 @@ export function DeleteChurchModal() {
   // This is a placeholder. In a real application, you'd fetch this data from your backend.
   const handleDeleteChurch = async () => {
     // Add logic to handle deleting a region
-    console.log("Deleting church:", regionToDelete);
+    console.log('Deleting church:', regionToDelete);
     const res = await fetch(`/api/church/${regionToDelete}/`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
     if (res.ok) {
-      queryClient.refetchQueries(["churches"]);
-      alert("Successfully deleted church");
+      await queryClient.refetchQueries(['churches']);
+      alert('Successfully deleted church');
     }
     // Reset the selection
-    setRegionToDelete("");
+    setRegionToDelete('');
   };
 
   return (
@@ -599,11 +585,7 @@ export function DeleteChurchModal() {
           </div>
         </div>
         <DialogFooter>
-          <button
-            className={buttonStyle}
-            onClick={handleDeleteChurch}
-            disabled={!regionToDelete}
-          >
+          <button className={buttonStyle} onClick={handleDeleteChurch} disabled={!regionToDelete}>
             Delete Church
           </button>
         </DialogFooter>
@@ -613,17 +595,17 @@ export function DeleteChurchModal() {
 }
 
 export function ChangePasswordModal() {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleChangePassword = () => {
     // Add logic to handle changing the password
-    console.log("Changing password");
+    console.log('Changing password');
     // Reset the inputs
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
   };
 
   return (
@@ -633,9 +615,7 @@ export function ChangePasswordModal() {
       </DialogTrigger>
       <DialogContent className="bg-white border-4 border-[#FCC346]">
         <DialogHeader>
-          <DialogTitle className="font-bold text-lg">
-            Change Password
-          </DialogTitle>
+          <DialogTitle className="font-bold text-lg">Change Password</DialogTitle>
           <DialogDescription className="text-[#B7B7B7] font-light text-sm">
             Enter your current password and a new password.
           </DialogDescription>
@@ -689,14 +669,14 @@ export function ChangePasswordModal() {
 }
 
 export function AddNewAdminModal() {
-  const [adminName, setAdminName] = useState("");
-  const [adminEmail, setAdminEmail] = useState("");
-  const [adminPassword, setAdminPassword] = useState("");
+  const [adminName, setAdminName] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
 
   const handleAddAdmin = async () => {
     // Add logic to handle adding a new admin
-    const res = await fetch("/api/cms/add-admin", {
-      method: "POST",
+    const res = await fetch('/api/cms/add-admin', {
+      method: 'POST',
       body: JSON.stringify({
         username: adminName,
         email: adminEmail,
@@ -704,13 +684,13 @@ export function AddNewAdminModal() {
       }),
     });
     if (res.ok) {
-      alert("Successfully created admin");
+      alert('Successfully created admin');
     } else {
-      alert("Error while creating admin");
+      alert('Error while creating admin');
     }
-    setAdminName("");
-    setAdminEmail("");
-    setAdminPassword("");
+    setAdminName('');
+    setAdminEmail('');
+    setAdminPassword('');
   };
 
   return (

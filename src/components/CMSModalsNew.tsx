@@ -23,7 +23,7 @@ export function AddRegionModal({ isOpen, onClose }) {
         type: 'success',
         title: 'Region added successfully.',
       });
-      queryClient.refetchQueries(['regions']);
+      await queryClient.refetchQueries(['regions']);
       onClose();
     } else {
       alert('An error occurred: ' + res.statusText);
@@ -156,7 +156,7 @@ export function DeleteRegionModal({ isOpen, onClose }) {
       const res = await fetch(`/api/cms/region/${regionToDelete}/`, { method: 'DELETE' });
       if (!res.ok) throw new Error(res.statusText);
       showAlert({ type: 'success', title: 'Region deleted successfully.' });
-      queryClient.refetchQueries(['regions']);
+      await queryClient.refetchQueries(['regions']);
       setRegionToDelete('');
       onClose();
     } catch (err) {
@@ -278,12 +278,13 @@ export function AddSubregionModal({ isOpen, onClose }) {
       });
       if (!res.ok) throw new Error('Failed to fetch');
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       showAlert({
         type: 'success',
         title: 'Subregion added successfully.',
       });
-      queryClient.refetchQueries(['subregions']);
+      await queryClient.refetchQueries(['subregions']);
+      await queryClient.refetchQueries(['regions']);
       onClose();
     },
     onError: (data) => {
@@ -419,33 +420,64 @@ export function DeleteSubregionModal({ isOpen, onClose }) {
 
   const [selectedSubregion, setSelectedSubregion] = useState('');
 
-  const [selectedRegion, setSelectedRegion] = useState<keyof typeof regionsData | ''>('');
+  const [selectedRegion, setSelectedRegion] = useState('');
   const [subregions, setSubregions] = useState<string[]>([]);
 
-  const regionsData: { [key: string]: { name: string; subregions: string[] } } = {
-    '1': {
-      name: 'North America',
-      subregions: ['California', 'New York', 'Texas'],
+  const [regionsData, setRegionsData] = useState([]);
+  const regionsQuery = useQuery({
+    queryKey: ['regions'],
+    queryFn: async () => {
+      const res = await fetch('/api/cms/region', { method: 'GET' });
+      if (!res.ok) throw new Error(res.statusText);
+      return res.json();
     },
-    '2': { name: 'Europe', subregions: ['Paris', 'London', 'Berlin'] },
-    '3': { name: 'Asia', subregions: ['Tokyo', 'Shanghai', 'Mumbai'] },
-  };
+  });
+  // const regionsData: { [key: string]: { name: string; subregions: string[] } } = {
+  //   '1': {
+  //     name: 'North America',
+  //     subregions: ['California', 'New York', 'Texas'],
+  //   },
+  //   '2': { name: 'Europe', subregions: ['Paris', 'London', 'Berlin'] },
+  //   '3': { name: 'Asia', subregions: ['Tokyo', 'Shanghai', 'Mumbai'] },
+  // };
+
+  useEffect(() => {
+    if (regionsQuery.status === 'success') {
+      setRegionsData(regionsQuery.data);
+    } else if (regionsQuery.status === 'error') {
+      showAlert({ type: 'error', title: regionsQuery.error.message });
+    }
+  }, [regionsQuery.data, regionsQuery.status]);
 
   useEffect(() => {
     if (selectedRegion) {
-      setSubregions(selectedRegion ? regionsData[selectedRegion].subregions : []);
+      console.log('Selected region:', selectedRegion);
+      console.log('Regions data:', regionsData);
+      const selectedRegionData = regionsData.find((r) => r.id == selectedRegion);
+      setSubregions(selectedRegion ? selectedRegionData.subregions : []);
       setSelectedSubregion('');
     }
   }, [selectedRegion]);
 
-  const handleDeleteSubregion = () => {
-    // Add logic to handle deleting a subregion
-    console.log(
-      'Deleting subregion:',
-      selectedSubregion,
-      'from region:',
-      regionsData[selectedRegion]?.name
-    );
+  const handleDeleteSubregion = async () => {
+    try {
+      const res = await fetch(`/api/cms/subregion/${selectedSubregion}/`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error(res.statusText);
+      showAlert({
+        type: 'success',
+        title: 'Subregion deleted successfully.',
+      });
+      await queryClient.refetchQueries(['subregions']);
+      await queryClient.refetchQueries(['regions']);
+      onClose();
+    } catch (err) {
+      showAlert({
+        type: 'error',
+        title: 'Error deleting subregion:' + err,
+      });
+    }
     // Reset the selections
     setSelectedRegion('');
     setSelectedSubregion('');
@@ -517,7 +549,7 @@ export function DeleteSubregionModal({ isOpen, onClose }) {
               }}
             >
               <option value="">-- Select a Region --</option>
-              {regionsData.data?.map((r) => (
+              {regionsData.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name}
                 </option>
@@ -538,8 +570,8 @@ export function DeleteSubregionModal({ isOpen, onClose }) {
             >
               <option value="">-- Select a Subregion --</option>
               {subregions.map((subregion) => (
-                <option key={subregion} value={subregion}>
-                  {subregion}
+                <option key={subregion.id} value={subregion.id}>
+                  {subregion.name}
                 </option>
               ))}
             </select>
@@ -913,31 +945,35 @@ export function ChangePasswordModal({ isOpen, onClose }) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // const handleChangePassword = async () => {
-  //   if (!currentPassword || !newPassword || !confirmPassword) {
-  //     showAlert({ type: 'error', title: 'All fields are required.' });
-  //     return;
-  //   }
-  //   if (newPassword !== confirmPassword) {
-  //     showAlert({ type: 'error', title: 'New passwords do not match.' });
-  //     return;
-  //   }
-  //   try {
-  //     const res = await fetch('/api/cms/change-password', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ currentPassword, newPassword }),
-  //     });
-  //     if (!res.ok) throw new Error(res.statusText);
-  //     showAlert({ type: 'success', title: 'Password changed successfully.' });
-  //     setCurrentPassword('');
-  //     setNewPassword('');
-  //     setConfirmPassword('');
-  //     onClose();
-  //   } catch (err) {
-  //     showAlert({ type: 'error', title: `Error: ${err.message}` });
-  //   }
-  // };
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showAlert({ type: 'error', title: 'All fields are required.' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      showAlert({ type: 'error', title: 'New passwords do not match.' });
+      return;
+    }
+    try {
+      const res = await fetch('/api/cms/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          old_password: currentPassword,
+          new_password: newPassword,
+          confirm_password: confirmPassword,
+        }),
+      });
+      if (!res.ok) throw new Error(res.statusText);
+      showAlert({ type: 'success', title: 'Password changed successfully.' });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      onClose();
+    } catch (err) {
+      showAlert({ type: 'error', title: `Error: ${err.message}` });
+    }
+  };
 
   // ESC & scroll lock
   useEffect(() => {
