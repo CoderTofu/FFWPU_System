@@ -204,15 +204,14 @@ export default function Home() {
             <motion.div
               whileHover={{
                 scale: 1.05,
-                boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)',
                 transition: { duration: 0.3 },
               }}
               variants={fadeUpVariants}
-              className="border-[#EFC017] border-4 rounded shadow-lg"
+              className=""
             >
               <img
                 src="/images/about/about1.png"
-                className="w-full h-auto object-cover max-h-[376px]"
+                className="w-auto h-full object-cover max-h-[376px]"
                 alt=""
               />
             </motion.div>
@@ -226,15 +225,13 @@ export default function Home() {
             <motion.div
               whileHover={{
                 scale: 1.05,
-                boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)',
                 transition: { duration: 0.3 },
               }}
               variants={fadeUpVariants}
-              className="border-[#EFC017] border-4 rounded shadow-lg"
             >
               <img
                 src="/images/about/about2.png"
-                className="w-full h-auto object-cover max-h-[376px]"
+                className="w-auto h-full object-cover max-h-[376px]"
                 alt=""
               />
             </motion.div>
@@ -250,15 +247,13 @@ export default function Home() {
             <motion.div
               whileHover={{
                 scale: 1.05,
-                boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)',
                 transition: { duration: 0.3 },
               }}
               variants={fadeUpVariants}
-              className="border-[#EFC017] border-4 rounded shadow-lg"
             >
               <img
                 src="/images/about/about3.png"
-                className="w-full h-auto object-cover max-h-[376px]"
+                className="w-auto h-full object-cover max-h-[376px]"
                 alt=""
               />
             </motion.div>
