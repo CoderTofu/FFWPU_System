@@ -33,6 +33,7 @@ export default function ViewWorshipEvent() {
         console.log(data);
         setChurch(data?.Church.Name); // You might need to adjust this
         setImages(data?.Images || []); // Assume `Images` is array of URLs
+        console.log(data?.Images);
       } else {
         alert('Failed to fetch event information');
       }
@@ -91,18 +92,19 @@ export default function ViewWorshipEvent() {
 
           {/* Show uploaded images */}
           {images.length > 0 && (
-            <div className="mt-4 w-full overflow-x-auto">
-              <div className="flex space-x-2 p-2">
-                {images.map((image, index) => (
-                  <div key={index} className="relative w-24 h-24 flex-shrink-0">
+            <div className="mt-4 flex flex-col gap-4">
+              {images.map((image, idx) => {
+                const src = image.url ?? image.photoUrl ?? image.photo;
+                return (
+                  <div key={idx} className="w-fit h-auto">
                     <img
-                      src={image.photo}
-                      alt={`Uploaded ${index}`}
-                      className="w-full h-full object-cover rounded-lg border border-gray-300"
+                      src={src}
+                      alt={`Uploaded ${idx}`}
+                      className="w-fit h-auto object-cover rounded-lg border border-gray-300"
                     />
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
           )}
         </div>

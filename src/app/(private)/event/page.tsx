@@ -1,197 +1,186 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Table from '@/components/Table';
-import { Search, ChevronDown } from 'lucide-react';
-import Modal from '@/components/Modal';
-import { axiosInstance } from '@/app/axiosInstance';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-
-import Button from '@/components/Button';
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Table from "@/components/Table";
+import { Search } from "lucide-react";
+import Modal from "@/components/Modal";
+import FilterEventModal from "@/components/FilterEventModal";
+import Button from "@/components/Button";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function EventInfo() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    router.prefetch('/event/add-event');
-  }, []);
-
-  const [data, setData] = useState([]);
-
-  const eventQuery = useQuery({
-    queryKey: ['worships'],
+  // fetch data
+  const { data: raw, status } = useQuery({
+    queryKey: ["worships"],
     queryFn: async () => {
-      const res = await fetch('/api/worship', { method: 'GET' });
-      if (!res.ok) throw new Error('Failed to fetch');
+      const res = await fetch("/api/worship");
+      if (!res.ok) throw new Error("Failed to fetch");
       return res.json();
     },
   });
 
+  const [data, setData] = useState<any[]>([]);
   useEffect(() => {
-    if (eventQuery.status === 'success') {
-      const data = eventQuery.data.map((event) => ({
-        ...event,
-        Church: event.Church.Name,
-      }));
-      setData(data);
-      console.log(data);
-    } else if (eventQuery.status === 'error') {
-      alert('An error occurred while fetching data.');
+    if (status === "success") {
+      setData(
+        raw.map((e: any) => ({
+          ...e,
+          Church: e.Church.Name,
+        }))
+      );
     }
-  }, [eventQuery.data, eventQuery.status]);
+  }, [raw, status]);
 
-  const dataID = 'ID';
+  // filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    startDate: "",
+    endDate: "",
+    worshipType: "",
+  });
 
-  // Column configuration for responsive table
-  const columnConfig = {
-    lg: ['ID', 'Event Name', 'Date', 'Church', 'Worship Type'],
-    md: ['Event Name', 'Date', 'Church Name', 'Worship Type'],
-    sm: ['Event Name', 'Church Name'],
-  };
-  const queryClient = useQueryClient();
+  // apply filters
+  const filteredData = data.filter((ev) => {
+    // search by name
+    if (
+      !ev["Event Name"]
+        .toLowerCase()
+        .includes(searchQuery.trim().toLowerCase())
+    )
+      return false;
 
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState('');
-  const [selectedYear, setSelectedYear] = useState('');
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [rowToDelete, setRowToDelete] = useState(null);
+    // type filter
+    if (
+      filters.worshipType &&
+      ev["Worship Type"] !== filters.worshipType
+    )
+      return false;
 
-  const toggleDropdown = (dropdown: string) => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
-  };
+    // date range
+    if (filters.startDate && ev.Date < filters.startDate) return false;
+    if (filters.endDate && ev.Date > filters.endDate) return false;
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpenDropdown(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    return true;
+  });
 
-  const filteredData = data.filter(
-    (event) =>
-      Object.values(event).some((value) =>
-        value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-      ) &&
-      (selectedType ? event.Type === selectedType : true) &&
-      (selectedYear ? event.Date.startsWith(selectedYear) : true)
-  );
+  // table selection & delete modal
+  const [selectedRow, setSelectedRow] = useState<any>(null);
+  const [deleteModal, setDeleteModal] = useState(false);
 
-  const handleAddClick = () => {
-    router.push('/event/add-event');
-  };
-
-  const handleEditClick = () => {
-    if (selectedRow) {
-      window.location.href = `/event/edit-event/${selectedRow[dataID]}`;
-      router.push(`/event/edit-event/${selectedRow[dataID]}`);
-    }
-  };
-
-  const handleDeleteClick = () => {
-    if (selectedRow) {
-      setRowToDelete(selectedRow);
-      setShowDeleteModal(true);
-    }
-  };
-
-  const handleViewClick = () => {
-    if (selectedRow) {
-      window.location.href = `/event/${selectedRow[dataID]}`;
-    }
-  };
+  // handlers
+  const applyFilters = (f: typeof filters) => setFilters(f);
+  const resetFilters = () =>
+    setFilters({ startDate: "", endDate: "", worshipType: "" });
 
   return (
-    <div className="px-0 md:px-[150px] min-h-screen h-full bg-[#f8fafc] pt-8">
-      {/* Header */}
-      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#01438F] border-2 shadow-lg">
-        <p className="text-3xl font-bold uppercase">EVENTS INFORMATION</p>
+    <div className="px-0 md:px-[150px] min-h-screen bg-[#f8fafc] pt-8">
+      {/* HEADER */}
+      <div className="w-full p-4 bg-white rounded-md shadow-lg border-2 border-[#01438F] flex justify-center">
+        <p className="text-3xl font-bold uppercase">Events Information</p>
       </div>
-      {/* Search and Filters */}
+
+      {/* SEARCH + FILTER BTN */}
       <div className="flex flex-wrap items-center gap-4 mt-4 justify-between">
         <div className="relative w-full sm:max-w-md flex items-center">
-          <label htmlFor="">Search:</label>
-          <div className="ml-2 relative w-full">
-            <input
-              className="w-full h-9 pl-8 border border-[#01438F] rounded outline-none text-sm"
-              type="text"
-              placeholder="Search Event Name"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
-          </div>
+          <Search className="absolute left-2 text-[#01438F] w-4 h-5" />
+          <input
+            type="text"
+            className="w-full pl-8 h-9 border border-[#01438F] rounded text-sm"
+            placeholder="Search Event Name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-
         <Button
           type="primary"
-          // onClick={() => setFilterModalOpen(true)}
-          className={'text-lg !py-2 !px-12'}
-          disabled={true}
+          className="!py-2 !px-8"
+          onClick={() => setFilterModalOpen(true)}
         >
           Ⴤ Filters
         </Button>
       </div>
 
-      {/* Table */}
+      {/* TABLE */}
       <div className="overflow-hidden rounded-lg bg-white mt-6 border border-[#CBCBCB] shadow-lg">
         <Table
           data={filteredData}
-          columns={columnConfig}
+          columns={{
+            lg: ["ID", "Event Name", "Date", "Church", "Worship Type"],
+            md: ["Event Name", "Date", "Church", "Worship Type"],
+            sm: ["Event Name", "Church"],
+          }}
           rowDoubleClickPath="/event"
-          idName={dataID}
+          idName="ID"
           onRowSelect={setSelectedRow}
         />
       </div>
 
-      {/* Buttons */}
-
+      {/* ACTIONS */}
       <div className="flex flex-wrap justify-between items-center my-7 gap-4">
-        <div className="flex flex-wrap gap-3 sm:gap-5">
-          <Button type="primary" onClick={handleAddClick}>
+        <div className="flex flex-wrap gap-3">
+          <Button type="primary" onClick={() => router.push("/event/add-event")}>
             Add
           </Button>
-          <Button type="primary" onClick={handleEditClick} disabled={!selectedRow}>
+          <Button
+            type="primary"
+            onClick={() =>
+              selectedRow &&
+              router.push(`/event/edit-event/${selectedRow["ID"]}`)
+            }
+            disabled={!selectedRow}
+          >
             Edit
           </Button>
-          <Button type="primary" onClick={handleDeleteClick} disabled={!selectedRow}>
+          <Button
+            type="primary"
+            onClick={() => setDeleteModal(true)}
+            disabled={!selectedRow}
+          >
             Delete
           </Button>
         </div>
-
-        <Button type="outline" onClick={handleViewClick} disabled={!selectedRow}>
+        <Button
+          type="outline"
+          onClick={() =>
+            selectedRow && router.push(`/event/${selectedRow["ID"]}`)
+          }
+          disabled={!selectedRow}
+        >
           View
         </Button>
       </div>
 
-      {/* Modal */}
-      {showDeleteModal && (
+      {/* DELETE CONFIRM */}
+      {deleteModal && (
         <Modal
-          isOpen={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
+          isOpen
+          onClose={() => setDeleteModal(false)}
           onConfirm={async () => {
-            console.log('Deleting event...');
-            const resp = await fetch(`/api/worship/${rowToDelete['ID']}`, {
-              method: 'DELETE',
+            await fetch(`/api/worship/${selectedRow["ID"]}`, {
+              method: "DELETE",
             });
-            if (resp.ok) {
-              queryClient.refetchQueries(['worships']);
-            } else {
-              alert('An error occurred while deleting worship: ' + resp.statusText);
-            }
-            setShowDeleteModal(false);
+            queryClient.invalidateQueries(["worships"]);
+            setDeleteModal(false);
           }}
-          message="Are you sure you want to delete this worship event?"
+          message="Are you sure you want to delete this event?"
           confirmText="Delete"
           cancelText="Cancel"
         />
       )}
+
+      {/* EVENT FILTER MODAL */}
+      <FilterEventModal
+        isOpen={filterModalOpen}
+        onClose={() => setFilterModalOpen(false)}
+        filters={filters}
+        onApply={applyFilters}
+        onReset={resetFilters}
+      />
     </div>
   );
 }
