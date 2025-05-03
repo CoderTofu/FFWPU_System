@@ -59,8 +59,10 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
   }
 
   // Apply currency conversion if needed
-  const displayData =
-    currency === 'PHP' ? selectedData.map((value) => value.amount * usdToPhpRate) : selectedData;
+  const displayData = selectedData.map((value) =>
+    currency === 'PHP' ? value.amount * usdToPhpRate : value.amount
+  );
+  
 
   // Find maximum value for Y axis scaling
   const maxValue = Math.ceil(Math.max(...displayData) / 20000) * 20000;
