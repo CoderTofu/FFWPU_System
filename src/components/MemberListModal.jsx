@@ -168,6 +168,11 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
           )}
           <div className="mt-4 flex justify-between">
             <div>
+              <Button type="outline" onClick={onClose}>
+                Cancel
+              </Button>
+            </div>
+            <div>
               <Button
                 type="primary"
                 className={"mr-2"}
@@ -175,14 +180,6 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds }) => {
                 disabled={!selectedCustomer}
               >
                 Select
-              </Button>
-              {/* <Button type="primary" onClick={() => newCustomerModal(true)}>
-                New
-              </Button> */}
-            </div>
-            <div>
-              <Button type="outline" onClick={onClose}>
-                Cancel
               </Button>
             </div>
           </div>
