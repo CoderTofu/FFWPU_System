@@ -913,31 +913,31 @@ export function ChangePasswordModal({ isOpen, onClose }) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleChangePassword = async () => {
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      showAlert({ type: 'error', title: 'All fields are required.' });
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      showAlert({ type: 'error', title: 'New passwords do not match.' });
-      return;
-    }
-    try {
-      const res = await fetch('/api/cms/change-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword, newPassword }),
-      });
-      if (!res.ok) throw new Error(res.statusText);
-      showAlert({ type: 'success', title: 'Password changed successfully.' });
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      onClose();
-    } catch (err) {
-      showAlert({ type: 'error', title: `Error: ${err.message}` });
-    }
-  };
+  // const handleChangePassword = async () => {
+  //   if (!currentPassword || !newPassword || !confirmPassword) {
+  //     showAlert({ type: 'error', title: 'All fields are required.' });
+  //     return;
+  //   }
+  //   if (newPassword !== confirmPassword) {
+  //     showAlert({ type: 'error', title: 'New passwords do not match.' });
+  //     return;
+  //   }
+  //   try {
+  //     const res = await fetch('/api/cms/change-password', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ currentPassword, newPassword }),
+  //     });
+  //     if (!res.ok) throw new Error(res.statusText);
+  //     showAlert({ type: 'success', title: 'Password changed successfully.' });
+  //     setCurrentPassword('');
+  //     setNewPassword('');
+  //     setConfirmPassword('');
+  //     onClose();
+  //   } catch (err) {
+  //     showAlert({ type: 'error', title: `Error: ${err.message}` });
+  //   }
+  // };
 
   // ESC & scroll lock
   useEffect(() => {
