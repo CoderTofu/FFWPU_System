@@ -31,8 +31,8 @@ const TopMemberDonor: React.FC<TopMemberDonorProps> = ({ currency, topDonors }) 
       <div className="flex flex-col">
         {topDonors.map((donor, index) => (
           <div key={index} className="flex justify-between py-2">
-            <span className="font-medium">{donor.name}</span>
-            <span className="text-blue-800 font-bold ml-64" style={{ color: '#01438F' }}>
+            <p className="font-medium truncate">{donor.name}</p>
+            <span className="text-blue-800 font-bold " style={{ color: '#01438F' }}>
               {formatCurrency(donor.amount)}
             </span>
           </div>

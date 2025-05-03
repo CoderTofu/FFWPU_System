@@ -19,6 +19,7 @@ export default function Reporting() {
     setCurrency(newCurrency);
     setPeriod(newPeriod);
   };
+
   const statisticsQuery = useQuery({
     queryKey: ['statistics'],
     queryFn: async () => {
@@ -38,72 +39,65 @@ export default function Reporting() {
     }
   }, [statisticsQuery.data, statisticsQuery.status]);
 
-  useEffect(() => {
-    console.log(monthlyData);
-  }, [monthlyData]);
-
   return (
-    <div className="relative px-2 sm:px-4 md:px-6 lg:px-10">
-      <section className="relative">
-        <div className="bg-white p-3 rounded-xl h-[100px] flex flex-col justify-center items-center shadow-xl mt-7 mx-2 sm:mx-10">
-          <h1 className="font-bold text-center text-2xl sm:text-3xl">REPORTING</h1>
-        </div>
-      </section>
+    <div className="min-h-screen h-full px-4 py-8 lg:px-32 bg-gray-50">
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg mb-8">
+        <p className="text-3xl font-bold uppercase">DONATIONS REPORTING</p>
+      </div>
 
-      <div className="flex flex-col lg:flex-row justify-center items-center mx-2 sm:mx-14 gap-8 lg:mr-28 mt-14">
-        <div className="flex flex-col justify-center items-start gap-8 mx-4 sm:mx-2">
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-10 mt-[85px]">
-            {/*TOTAL DONATION*/}
-            <div className="bg-white p-3 h-[150px] sm:w-[270px] flex flex-col justify-center items-center shadow-2xl sm:mb-1">
-              <TotalDonations
-                currency={currency}
-                period={period}
-                monthlyData={monthlyData}
-                weeklyData={weeklyData}
-                yearlyData={yearlyData}
-              />
-              <h3 className="text-gray-500 text-1xl p-2 font-bold">TOTAL DONATION</h3>
-            </div>
-            {/*AVERAGE DONATION*/}
-            <div className="bg-white p-3 h-[150px] sm:w-[270px] flex flex-col justify-center items-center shadow-2xl">
-              <AverageDonations
-                currency={currency}
-                period={period}
-                monthlyData={monthlyData}
-                weeklyData={weeklyData}
-                yearlyData={yearlyData}
-              />
-              <h3 className="text-gray-500 text-1xl p-2 font-bold">AVERAGE DONATION</h3>
-            </div>
+      <div className="flex flex-col lg:flex-row gap-8 mb-10">
+        {/* Left Column: Metrics */}
+        <div className="flex-1 space-y-8">
+          {/* TOTAL DONATION */}
+          <div className="bg-white rounded-2xl shadow-xl py-8 flex flex-col items-center justify-center">
+            <TotalDonations
+              currency={currency}
+              period={period}
+              monthlyData={monthlyData}
+              weeklyData={weeklyData}
+              yearlyData={yearlyData}
+            />
+            <p className="text-gray-500 mt-4 font-semibold">Total Donation</p>
           </div>
-          {/*TOP MEMBER DONOR*/}
-          <div className="bg-white p-6 h-[320px] w-full sm:w-[580px] flex flex-col justify-center items-center shadow-2xl ml-0">
+
+          {/* AVERAGE DONATION */}
+          <div className="bg-white rounded-2xl shadow-xl py-8 flex flex-col items-center justify-center">
+            <AverageDonations
+              currency={currency}
+              period={period}
+              monthlyData={monthlyData}
+              weeklyData={weeklyData}
+              yearlyData={yearlyData}
+            />
+            <p className="text-gray-500 mt-4 font-semibold">Average Donation</p>
+          </div>
+
+          {/* TOP DONOR */}
+          <div className="bg-white rounded-2xl shadow-xl p-6">
+            <h2 className="text-[#BE9231] text-xl font-semibold mb-4 text-center">
+              Top Member Donors
+            </h2>
             <TopDonor currency={currency} period={period} topDonors={topDonors} />
-            <h3 className="text-gray-500 text-1xl p-4 font-bold mt-auto">TOP MEMBER DONOR</h3>
           </div>
         </div>
 
-        {/*MONTHLY DONATION */}
-        <div className="flex flex-col justify-center items-start mt-10 lg:mt-0">
-          <div className="flex justify-between w-full">
-            <h2 className="text-[#BE9231] text-2xl p-3 text-left mt-6">
+        {/* Right Column: Chart */}
+        <div className="flex-1 bg-white rounded-2xl shadow-xl p-6">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+            <h2 className="text-[#BE9231] text-2xl font-semibold">
               {period === 'week' ? 'Weekly' : period === 'month' ? 'Monthly' : 'Yearly'} Donation
             </h2>
-            {/* Filtering options moved here with vertical offset */}
-            <div className="flex justify-end">
-              <FilterOptions onFilterChange={handleFilterChange} />
-            </div>
+            <FilterOptions onFilterChange={handleFilterChange} />
           </div>
-          <div className="bg-white h-[503px] w-full sm:w-[600px] flex flex-col justify-center items-center shadow-2xl">
-            <div className="h-[500px] w-full sm:w-[500px] mt-20 mr-24 ml-16 justify-center relative">
-              <MonthlyDonation
-                currency={currency}
-                period={period}
-                monthlyData={monthlyData}
-                weeklyData={weeklyData}
-                yearlyData={yearlyData}
-              />
-            </div>
+
+          <div className="w-full overflow-x-auto">
+            <MonthlyDonation
+              currency={currency}
+              period={period}
+              monthlyData={monthlyData}
+              weeklyData={weeklyData}
+              yearlyData={yearlyData}
+            />
           </div>
         </div>
       </div>
