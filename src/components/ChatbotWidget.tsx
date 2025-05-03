@@ -112,7 +112,7 @@ export default function ChatbotWidget() {
                 <button
                   key={idx}
                   onClick={() => sendMessage(question)}
-                  className="bg-gray-100 border border-gray-300 text-xs text-gray-800 px-3 py-1 rounded-full hover:bg-gray-200 transition-all duration-300"
+                  className="bg-gray-100 border border-gray-300 text-xs text-gray-800 px-3 py-1 rounded-md hover:bg-gray-200 transition-all duration-300"
                 >
                   {question}
                 </button>

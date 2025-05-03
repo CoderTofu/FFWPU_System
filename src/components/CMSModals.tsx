@@ -84,7 +84,6 @@ export function AddRegionModal() {
 export function DeleteRegionModal() {
   const [regionToDelete, setRegionToDelete] = useState("");
 
-  // This is a placeholder. In a real application, you'd fetch this data from your backend.
   const [regions, setRegions] = useState([]);
 
   useEffect(() => {

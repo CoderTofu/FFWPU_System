@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 
 import Modal from '@/components/Modal';
 import Table from '@/components/Table';
 import DonationModal from '@/components/DonationModal';
 import MemberListModal from '@/components/MemberListModal';
+import FilterModalDonation from '@/components/FilterDonationModal';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAlert } from '@/components/context/AlertContext';
 
@@ -14,6 +15,7 @@ import Button from '@/components/Button';
 
 export default function Donation() {
   const { showAlert } = useAlert();
+  const queryClient = useQueryClient();
 
   const [selectedRow, setSelectedRow] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -27,6 +29,11 @@ export default function Donation() {
   const [toDelete, setToDelete] = useState('');
 
   const [churches, setChurches] = useState([]);
+
+  // --- NEW: filter & search state
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState({ startDate: '', endDate: '', currency: '' });
+  const [searchQuery, setSearchQuery] = useState('');
 
   const donationQuery = useQuery({
     queryKey: ['donations'],
@@ -58,6 +65,29 @@ export default function Donation() {
     sm: ['Full Name', 'Amount'],
   };
 
+  // derive unique currencies for filter dropdown
+  const currencies = useMemo(() => {
+    if (!donationQuery.data) return [];
+    return Array.from(new Set(donationQuery.data.map((d) => d.Currency)));
+  }, [donationQuery.data]);
+
+  // apply search + filter logic
+  const filteredDonations = useMemo(() => {
+    const raw = donationQuery.data || [];
+    return raw.filter((d) => {
+      // search by full name
+      if (!d.Member['Full Name'].toLowerCase().includes(searchQuery.trim().toLowerCase())) {
+        return false;
+      }
+      // date range
+      if (filters.startDate && d.Date < filters.startDate) return false;
+      if (filters.endDate && d.Date > filters.endDate) return false;
+      // currency
+      if (filters.currency && d.Currency !== filters.currency) return false;
+      return true;
+    });
+  }, [donationQuery.data, searchQuery, filters]);
+
   const handleAddDonation = async (formData) => {
     try {
       const res = await fetch('/api/donations', {
@@ -68,7 +98,6 @@ export default function Donation() {
       if (res.ok) {
         showAlert({ type: 'success', message: 'Donation added successfully!' });
         await donationQuery.refetch();
-
         setIsAddModalOpen(false);
       } else {
         const errorData = await res.text();
@@ -91,7 +120,6 @@ export default function Donation() {
       if (res.ok) {
         showAlert({ type: 'success', message: 'Donation updated successfully!' });
         await donationQuery.refetch();
-
         setIsEditModalOpen(false);
       } else {
         const errorData = await res.text();
@@ -111,8 +139,6 @@ export default function Donation() {
       });
       if (res.ok) {
         await donationQuery.refetch();
-        await donationQuery.refetch();
-
         showAlert({ type: 'success', message: 'Donation deleted successfully!' });
         setShowDeleteModal(false);
       } else {
@@ -135,6 +161,8 @@ export default function Donation() {
       <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg">
         <p className="text-3xl font-bold uppercase">DONATIONS INFORMATION</p>
       </div>
+
+      {/* Search & Filters */}
       <div className="flex flex-wrap items-center gap-4 mt-4 justify-between">
         <div className="relative w-full sm:max-w-md flex items-center">
           <label htmlFor="">Search:</label>
@@ -143,12 +171,18 @@ export default function Donation() {
               className="w-full h-9 pl-8 border border-[#01438F] rounded outline-none text-sm"
               type="text"
               placeholder="Search Full Name"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-[#01438F] w-4 h-5" />
           </div>
         </div>
 
-        <Button type="primary" className={'text-lg !py-2 !px-12'} disabled={true}>
+        <Button
+          type="primary"
+          className="text-lg !py-2 !px-12"
+          onClick={() => setFilterModalOpen(true)}
+        >
           Ⴤ Filters
         </Button>
       </div>
@@ -156,7 +190,7 @@ export default function Donation() {
       <div className="rounded-lg items-center justify-center mt-4">
         <div className="overflow-hidden rounded-lg bg-white mt-6 border border-[#CBCBCB] shadow-lg">
           <Table
-            data={(donationQuery.data || []).map((donation) => ({
+            data={filteredDonations.map((donation) => ({
               ...donation,
               'Member ID': donation.Member.ID,
               'Full Name': donation.Member['Full Name'],
@@ -231,6 +265,17 @@ export default function Donation() {
             cancelText="Cancel"
           />
         )}
+
+        {/* Donation Filters Modal */}
+        <FilterModalDonation
+          isOpen={filterModalOpen}
+          onClose={() => setFilterModalOpen(false)}
+          filters={filters}
+          churches={churches}
+          currencies={currencies}
+          onApply={(f) => setFilters(f)}
+          onReset={() => setFilters({ startDate: '', endDate: '', currency: '' })}
+        />
       </div>
     </div>
   );

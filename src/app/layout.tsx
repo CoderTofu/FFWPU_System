@@ -4,8 +4,11 @@ import Preloader from "@/components/Preloader";
 import LayoutWrapper from "@/components/LayoutWrapper";
 
 export const metadata: Metadata = {
-  title: "FFWPU-System",
-  description: "Created to help the FFWPU organization",
+  title: 'FFWPU-System',
+  description: 'Created to help the FFWPU organization',
+  icons: {
+    icon: '/icons/ffwpu_icon.svg',
+  },
 };
 
 import { AlertProvider } from "@/components/context/AlertContext";

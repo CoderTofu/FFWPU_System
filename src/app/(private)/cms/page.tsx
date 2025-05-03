@@ -1,174 +1,112 @@
 "use client";
 
 import { useState } from "react";
-import { Camera } from "lucide-react";
+import Button from '@/components/Button';
 import {
   AddRegionModal,
   DeleteRegionModal,
   AddSubregionModal,
   DeleteSubregionModal,
-  ChangePasswordModal,
-  AddNewAdminModal,
   AddChurchModal,
   DeleteChurchModal,
-} from "@/components/CMSModals";
+  AddNewAdminModal,
+  ChangePasswordModal,
+} from '@/components/CMSModalsNew';
 
 export default function CMS() {
-  const [siteName, setSiteName] = useState("");
+  const [isAddRegionOpen, setIsAddRegionOpen] = useState(false);
+  const [isDeleteRegionOpen, setIsDeleteRegionOpen] = useState(false);
+  const [isAddSubregionOpen, setIsAddSubregionOpen] = useState(false);
+  const [isDeleteSubregionOpen, setIsDeleteSubregionOpen] = useState(false);
+  const [isAddChurchOpen, setIsAddChurchOpen] = useState(false);
+  const [isDeleteChurchOpen, setIsDeleteChurchOpen] = useState(false);
+  const [isAddNewAdminOpen, setIsAddNewAdminOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
-  const handleSiteNameChange = () => {
-    // Add logic to update site name
-    console.log("Updating site name to:", siteName);
-  };
+  const cards = [
+    {
+      title: 'Regions',
+      subtitle: 'Add & delete regions',
+      icon: '/icons/location_icon.svg',
+      actions: [
+        { label: 'Add', onClick: () => setIsAddRegionOpen(true), type: 'primary' },
+        { label: 'Delete', onClick: () => setIsDeleteRegionOpen(true), type: 'outline' },
+      ],
+    },
+    {
+      title: 'Subregions',
+      subtitle: 'Add & delete subregions',
+      icon: '/icons/location_icon.svg',
+      actions: [
+        { label: 'Add', onClick: () => setIsAddSubregionOpen(true), type: 'primary' },
+        { label: 'Delete', onClick: () => setIsDeleteSubregionOpen(true), type: 'outline' },
+      ],
+    },
+    {
+      title: 'Churches',
+      subtitle: 'Add & delete churches',
+      icon: '/icons/location_icon.svg',
+      actions: [
+        { label: 'Add', onClick: () => setIsAddChurchOpen(true), type: 'primary' },
+        { label: 'Delete', onClick: () => setIsDeleteChurchOpen(true), type: 'outline' },
+      ],
+    },
+    {
+      title: 'Password',
+      subtitle: 'Change your password',
+      icon: '/icons/lock_icon.svg',
+      actions: [{ label: 'Update', onClick: () => setIsChangePasswordOpen(true), type: 'primary' }],
+    },
+    {
+      title: 'New Admin',
+      subtitle: 'Invite a new administrator',
+      icon: '/icons/add_acc_icon.svg',
+      actions: [{ label: 'Add', onClick: () => setIsAddNewAdminOpen(true), type: 'primary' }],
+    },
+  ];
 
   return (
-    <main>
-      {/* Icon and Site Name Section*/}
-      <section className="mx-4 sm:mx-16 pb-10 pt-20 flex flex-col md:flex-row justify-center gap-20 items-center border-b-2 border-[#01438F]">
-        {/* Icon Part */}
-        <div className="relative">
-          <img
-            src="/images/temp_icon.png"
-            className="w-[250px]"
-            alt="Site Icon"
-          />
-          <div className="absolute bottom-0 right-0 p-2 rounded-full hover:bg-gray-50 hover:bg-opacity-50 transition-all duration-500">
-            <label htmlFor="icon_upload" style={{ cursor: "pointer" }}>
-              <Camera className="w-[50px] h-[50px]" />
-            </label>
-            <input
-              id="icon_upload"
-              type="file"
-              accept=".svg,.png,.jpg,.jpeg"
-              style={{ display: "none" }}
-            />
-          </div>
-        </div>
+    <div className="px-0 md:px-[150px] min-h-screen h-full pt-8">
+      {/* Header */}
+      <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg">
+        <p className="text-3xl font-bold uppercase">CMS Dashboard</p>
+      </div>
 
-        {/* Site Name Part */}
-        <div className="w-full max-w-[1200px] flex flex-col md:flex-row gap-6 items-center justify-center">
-          <label
-            htmlFor="site_name_change"
-            className="md:w-[140px] font-bold text-base"
+      <section className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {cards.map(({ title, subtitle, icon, actions }) => (
+          <div
+            key={title}
+            className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-200 flex flex-col items-center p-6"
           >
-            Site Name:
-          </label>
-          <input
-            type="text"
-            id="site_name_change"
-            value={siteName}
-            onChange={(e) => setSiteName(e.target.value)}
-            placeholder="Enter new site name..."
-            className="w-full border-2 border-black rounded-sm px-1 py-1"
-          />
-          <button
-            className="px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg"
-            onClick={handleSiteNameChange}
-          >
-            Edit
-          </button>
-        </div>
+            <img src={icon} alt={`${title} icon`} className="h-10 w-10 mb-4" />
+            <h2 className="text-xl font-semibold text-[#01438F]">{title}</h2>
+            <p className="text-gray-500 text-sm mb-6 text-center">{subtitle}</p>
+            <div className="flex gap-2 flex-row-reverse">
+              {actions.map(({ label, onClick, type }) => (
+                <Button key={label} type={type} onClick={onClick}>
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ))}
       </section>
 
-      {/* Other changes */}
-      <section className="py-10 flex gap-8 justify-center flex-wrap">
-        {/* Region Change */}
-        <div className="w-[350px] h-[200px] rounded-xl flex flex-col justify-center bg-white py-4 shadow-[0px_0px_6.584px_0px_rgba(0,0,0,0.25)]">
-          <div className="flex mb-5 gap-4 justify-center">
-            <img
-              src="/icons/location_icon.svg"
-              className="w-8"
-              alt="location icon"
-            />
-            <div>
-              <h2 className="font-bold text-lg">ADD & DELETE REGION</h2>
-              <p className="text-[#B7B7B7] font-light text-sm">
-                Edit regions here
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2 justify-center px-8">
-            <AddRegionModal />
-            <DeleteRegionModal />
-          </div>
-        </div>
-
-        {/* Subregion Change */}
-        <div className="w-[350px] h-[200px] rounded-xl flex flex-col justify-center bg-white py-4 shadow-[0px_0px_6.584px_0px_rgba(0,0,0,0.25)]">
-          <div className="flex gap-4 mb-5 justify-center">
-            <img
-              src="/icons/location_icon.svg"
-              className="w-8"
-              alt="location icon"
-            />
-            <div>
-              <h2 className="font-bold text-lg">ADD & DELETE SUBREGION</h2>
-              <p className="text-[#B7B7B7] font-light text-sm">
-                Edit subregions here
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2 justify-center px-8">
-            <AddSubregionModal />
-            <DeleteSubregionModal />
-          </div>
-        </div>
-        <div className="w-[350px] h-[200px] rounded-xl flex flex-col justify-center bg-white py-4 shadow-[0px_0px_6.584px_0px_rgba(0,0,0,0.25)]">
-          <div className="flex gap-4 mb-5 justify-center">
-            <img
-              src="/icons/location_icon.svg"
-              className="w-8"
-              alt="location icon"
-            />
-            <div>
-              <h2 className="font-bold text-lg">ADD & DELETE CHURCH</h2>
-              <p className="text-[#B7B7B7] font-light text-sm">
-                Edit churches here
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2 justify-center px-8">
-            <AddChurchModal />
-            <DeleteChurchModal />
-          </div>
-        </div>
-
-        {/* Password Change */}
-        <div className="w-[350px] h-[200px] rounded-xl flex flex-col justify-center bg-white py-4 shadow-[0px_0px_6.584px_0px_rgba(0,0,0,0.25)]">
-          <div className="flex gap-6 mb-5 justify-center">
-            <img src="/icons/lock_icon.svg" className="w-6" alt="lock icon" />
-            <div>
-              <h2 className="font-bold text-lg">CHANGE PASSWORD</h2>
-              <p className="text-[#B7B7B7] font-light text-sm">
-                Change your password here
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2 justify-center px-8">
-            <ChangePasswordModal />
-          </div>
-        </div>
-
-        {/* New Admins */}
-        <div className="w-[350px] h-[200px] rounded-xl flex flex-col justify-center bg-white py-4 shadow-[0px_0px_6.584px_0px_rgba(0,0,0,0.25)]">
-          <div className="flex gap-4 mb-5 justify-center">
-            <img
-              src="/icons/add_acc_icon.svg"
-              className="w-8"
-              alt="add account icon"
-            />
-            <div>
-              <h2 className="font-bold text-lg">ADD NEW ADMIN</h2>
-              <p className="text-[#B7B7B7] font-light text-sm">
-                Add a new admin here
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2 justify-center px-8">
-            <AddNewAdminModal />
-          </div>
-        </div>
-      </section>
-    </main>
+      {/* Modals */}
+      <AddRegionModal isOpen={isAddRegionOpen} onClose={() => setIsAddRegionOpen(false)} />
+      <DeleteRegionModal isOpen={isDeleteRegionOpen} onClose={() => setIsDeleteRegionOpen(false)} />
+      <AddSubregionModal isOpen={isAddSubregionOpen} onClose={() => setIsAddSubregionOpen(false)} />
+      <DeleteSubregionModal
+        isOpen={isDeleteSubregionOpen}
+        onClose={() => setIsDeleteSubregionOpen(false)}
+      />
+      <AddChurchModal isOpen={isAddChurchOpen} onClose={() => setIsAddChurchOpen(false)} />
+      <DeleteChurchModal isOpen={isDeleteChurchOpen} onClose={() => setIsDeleteChurchOpen(false)} />
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+      />
+      <AddNewAdminModal isOpen={isAddNewAdminOpen} onClose={() => setIsAddNewAdminOpen(false)} />
+    </div>
   );
 }
