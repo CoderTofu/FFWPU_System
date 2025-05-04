@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 
 export default function Reporting() {
   const [currency, setCurrency] = useState<string>('USD');
-  const [period, setPeriod] = useState<string>('month');
+  const [period, setPeriod] = useState<string>('week');
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [yearlyData, setYearlyData] = useState<any[]>([]);
