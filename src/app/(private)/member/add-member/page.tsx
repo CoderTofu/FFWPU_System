@@ -87,7 +87,7 @@ export default function AddMemberForm() {
       if (!res.ok) throw new Error('Failed to fetch');
       return await res.json();
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       formData.missionHistory.forEach((mission) => {
         const missionData = {
           member: data['ID'],
@@ -99,7 +99,7 @@ export default function AddMemberForm() {
         };
         missionMutation.mutate(missionData);
       });
-      queryClient.refetchQueries(['members']);
+      await queryClient.refetchQueries(['members']);
       showAlert({
         type: 'success',
         title: 'Member Added!',

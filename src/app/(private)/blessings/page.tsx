@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import Table from "@/components/Table";
-import { useParams, useRouter } from "next/navigation";
-import Modal from "@/components/Modal";
-import { Search, ChevronDown } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useRef, useEffect } from 'react';
+import Table from '@/components/Table';
+import { useParams, useRouter } from 'next/navigation';
+import Modal from '@/components/Modal';
+import { Search, ChevronDown } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import Button from '@/components/Button';
 
@@ -88,7 +88,7 @@ export default function ViewBlessing() {
       method: 'DELETE',
     });
     if (res.ok) {
-      queryClient.refetchQueries(['blessings']);
+      await queryClient.refetchQueries(['blessings']);
     } else {
       alert('An error occurred while deleting blessing: ' + res.statusText);
     }

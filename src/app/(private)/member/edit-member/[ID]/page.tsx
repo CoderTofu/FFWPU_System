@@ -137,7 +137,7 @@ export default function AddMemberForm() {
       if (!res.ok) throw new Error('Failed to fetch');
       return await res.json();
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       formData.missionHistory.forEach((mission) => {
         if (!mission.id || mission.id === undefined) {
           const missionData = {
@@ -166,7 +166,7 @@ export default function AddMemberForm() {
           method: 'DELETE',
         });
       });
-      queryClient.refetchQueries(['members']);
+      await queryClient.refetchQueries(['members']);
       showAlert({
         type: 'success',
         title: 'Member updated!',
