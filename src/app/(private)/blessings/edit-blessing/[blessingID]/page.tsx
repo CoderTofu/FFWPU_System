@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Calendar, PlusCircle } from "lucide-react";
-import Table from "@/components/Table";
-import Modal from "@/components/Modal";
-import RegistrationModal from "@/components/RegistrationModal";
-import { useParams } from "next/navigation";
+import { useEffect, useState } from 'react';
+import { Calendar, PlusCircle } from 'lucide-react';
+import Table from '@/components/Table';
+import Modal from '@/components/Modal';
+import RegistrationModal from '@/components/RegistrationModal';
+import { useParams } from 'next/navigation';
 
 import Button from '@/components/Button';
 
@@ -255,7 +255,7 @@ export default function EditBlessing() {
         <Button
           type="primary"
           onClick={() => {
-            const trimmedBlessingName = formData.name_of_blessing();
+            const trimmedBlessingName = formData.name_of_blessing;
             const trimmedDate = formData.blessing_date.trim();
             const trimmedChaenbo = formData.chaenbo.trim();
 

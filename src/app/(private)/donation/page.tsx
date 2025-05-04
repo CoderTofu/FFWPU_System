@@ -60,11 +60,13 @@ export default function Donation() {
   }, [churchQuery.data]);
 
   const column = {
-    lg: ['ID', 'Member ID', 'Full Name', 'Date', 'Church', 'Amount', 'Currency'],
+    lg: ['ID', 'Member ID', 'Full Name', 'Date', 'Church Name', 'Amount', 'Currency'],
     md: ['ID', 'Full Name', 'Date', 'Amount'],
     sm: ['Full Name', 'Amount'],
   };
 
+  const [previousData, setPreviousData] = useState();
+  const [previousMember, setPreviousMember] = useState();
   // derive unique currencies for filter dropdown
   const currencies = useMemo(() => {
     if (!donationQuery.data) return [];
@@ -89,10 +91,10 @@ export default function Donation() {
   }, [donationQuery.data, searchQuery, filters]);
 
   const handleAddDonation = async (formData) => {
+    console.log(formData);
     try {
       const res = await fetch('/api/donations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
       if (res.ok) {
@@ -152,8 +154,14 @@ export default function Donation() {
   useEffect(() => {
     if (selectedMember) {
       setIsAddModalOpen(true);
+      setPreviousMember(selectedMember);
     }
   }, [selectedMember]);
+
+  useEffect(() => {
+    if (selectedRow === null) return;
+    setPreviousData(selectedRow);
+  }, [selectedRow]);
 
   return (
     <div className="px-0 md:px-[150px] min-h-screen h-full pt-8">
@@ -194,7 +202,7 @@ export default function Donation() {
               ...donation,
               'Member ID': donation.Member.ID,
               'Full Name': donation.Member['Full Name'],
-              Church: donation.Church?.Name || '-',
+              'Church Name': donation.Church?.Name || '-',
             }))}
             columns={column}
             onRowSelect={setSelectedRow}
@@ -238,7 +246,10 @@ export default function Donation() {
             onClose={() => setIsAddModalOpen(false)}
             onSubmit={handleAddDonation}
             churches={churches}
-            selectedMember={selectedMember}
+            selectedMember={previousMember}
+            setSelectedMember={setPreviousMember}
+            selectedDonation={previousData}
+            setSelectedDonation={setPreviousData}
           />
         )}
 
@@ -250,7 +261,10 @@ export default function Donation() {
             onClose={() => setIsEditModalOpen(false)}
             onSubmit={handleEditDonation}
             churches={churches}
-            selectedDonation={selectedRow}
+            selectedMember={previousMember}
+            setSelectedMember={setPreviousMember}
+            selectedDonation={previousData}
+            setSelectedDonation={setPreviousData}
           />
         )}
 

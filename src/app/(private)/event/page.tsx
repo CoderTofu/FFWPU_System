@@ -1,31 +1,35 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Table from "@/components/Table";
-import { Search } from "lucide-react";
-import Modal from "@/components/Modal";
-import FilterEventModal from "@/components/FilterEventModal";
-import Button from "@/components/Button";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Table from '@/components/Table';
+import { Search } from 'lucide-react';
+import Modal from '@/components/Modal';
+import FilterEventModal from '@/components/FilterEventModal';
+import Button from '@/components/Button';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function EventInfo() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
+  const [selectedRow, setSelectedRow] = useState<any>(null);
+  const [deleteModal, setDeleteModal] = useState(false);
+
   // fetch data
   const { data: raw, status } = useQuery({
-    queryKey: ["worships"],
+    queryKey: ['worships'],
     queryFn: async () => {
-      const res = await fetch("/api/worship");
-      if (!res.ok) throw new Error("Failed to fetch");
+      const res = await fetch('/api/worship');
+      if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },
   });
 
   const [data, setData] = useState<any[]>([]);
+  const [previousData, setPreviousData] = useState<any[]>();
   useEffect(() => {
-    if (status === "success") {
+    if (status === 'success') {
       setData(
         raw.map((e: any) => ({
           ...e,
@@ -34,32 +38,29 @@ export default function EventInfo() {
       );
     }
   }, [raw, status]);
+  useEffect(() => {
+    if (selectedRow === null) {
+      return;
+    }
+    setPreviousData(selectedRow);
+  }, [selectedRow]);
 
   // filter state
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [filters, setFilters] = useState({
-    startDate: "",
-    endDate: "",
-    worshipType: "",
+    startDate: '',
+    endDate: '',
+    worshipType: '',
   });
 
   // apply filters
   const filteredData = data.filter((ev) => {
     // search by name
-    if (
-      !ev["Event Name"]
-        .toLowerCase()
-        .includes(searchQuery.trim().toLowerCase())
-    )
-      return false;
+    if (!ev['Event Name'].toLowerCase().includes(searchQuery.trim().toLowerCase())) return false;
 
     // type filter
-    if (
-      filters.worshipType &&
-      ev["Worship Type"] !== filters.worshipType
-    )
-      return false;
+    if (filters.worshipType && ev['Worship Type'] !== filters.worshipType) return false;
 
     // date range
     if (filters.startDate && ev.Date < filters.startDate) return false;
@@ -69,13 +70,10 @@ export default function EventInfo() {
   });
 
   // table selection & delete modal
-  const [selectedRow, setSelectedRow] = useState<any>(null);
-  const [deleteModal, setDeleteModal] = useState(false);
 
   // handlers
   const applyFilters = (f: typeof filters) => setFilters(f);
-  const resetFilters = () =>
-    setFilters({ startDate: "", endDate: "", worshipType: "" });
+  const resetFilters = () => setFilters({ startDate: '', endDate: '', worshipType: '' });
 
   return (
     <div className="px-0 md:px-[150px] min-h-screen bg-[#f8fafc] pt-8">
@@ -96,11 +94,7 @@ export default function EventInfo() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button
-          type="primary"
-          className="!py-2 !px-8"
-          onClick={() => setFilterModalOpen(true)}
-        >
+        <Button type="primary" className="!py-2 !px-8" onClick={() => setFilterModalOpen(true)}>
           Ⴤ Filters
         </Button>
       </div>
@@ -110,9 +104,9 @@ export default function EventInfo() {
         <Table
           data={filteredData}
           columns={{
-            lg: ["ID", "Event Name", "Date", "Church", "Worship Type"],
-            md: ["Event Name", "Date", "Church", "Worship Type"],
-            sm: ["Event Name", "Church"],
+            lg: ['ID', 'Event Name', 'Date', 'Church', 'Worship Type'],
+            md: ['Event Name', 'Date', 'Church', 'Worship Type'],
+            sm: ['Event Name', 'Church'],
           }}
           rowDoubleClickPath="/event"
           idName="ID"
@@ -123,32 +117,23 @@ export default function EventInfo() {
       {/* ACTIONS */}
       <div className="flex flex-wrap justify-between items-center my-7 gap-4">
         <div className="flex flex-wrap gap-3">
-          <Button type="primary" onClick={() => router.push("/event/add-event")}>
+          <Button type="primary" onClick={() => router.push('/event/add-event')}>
             Add
           </Button>
           <Button
             type="primary"
-            onClick={() =>
-              selectedRow &&
-              router.push(`/event/edit-event/${selectedRow["ID"]}`)
-            }
+            onClick={() => selectedRow && router.push(`/event/edit-event/${selectedRow['ID']}`)}
             disabled={!selectedRow}
           >
             Edit
           </Button>
-          <Button
-            type="primary"
-            onClick={() => setDeleteModal(true)}
-            disabled={!selectedRow}
-          >
+          <Button type="primary" onClick={() => setDeleteModal(true)} disabled={!selectedRow}>
             Delete
           </Button>
         </div>
         <Button
           type="outline"
-          onClick={() =>
-            selectedRow && router.push(`/event/${selectedRow["ID"]}`)
-          }
+          onClick={() => selectedRow && router.push(`/event/${selectedRow['ID']}`)}
           disabled={!selectedRow}
         >
           View
@@ -161,11 +146,13 @@ export default function EventInfo() {
           isOpen
           onClose={() => setDeleteModal(false)}
           onConfirm={async () => {
-            await fetch(`/api/worship/${selectedRow["ID"]}`, {
-              method: "DELETE",
+            console.log(previousData);
+            await fetch(`/api/worship/${previousData['ID']}`, {
+              method: 'DELETE',
             });
-            queryClient.invalidateQueries(["worships"]);
+            await queryClient.refetchQueries(['worships']);
             setDeleteModal(false);
+            setPreviousData(null);
           }}
           message="Are you sure you want to delete this event?"
           confirmText="Delete"

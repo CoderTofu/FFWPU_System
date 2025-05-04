@@ -33,7 +33,9 @@ export default function AddDonationModal({
   onSubmit,
   churches,
   selectedMember,
+  setSelectedMember,
   selectedDonation,
+  setSelectedDonation,
 }: AddDonationModalProps) {
   const { showAlert } = useAlert();
   const modalRef = useRef(null);
@@ -47,6 +49,7 @@ export default function AddDonationModal({
   useEffect(() => {
     if (isOpen) {
       if (mode === 'edit' && selectedDonation) {
+        const churchId = churches.find((ch) => ch.ID === selectedDonation.Church?.ID);
         setChurch(selectedDonation.Church || null);
         setDate(selectedDonation.Date || '');
         setAmount(selectedDonation.Amount || '');
@@ -75,7 +78,7 @@ export default function AddDonationModal({
       showAlert({ type: 'error', message: 'Please fill in all required fields.' });
       return;
     }
-
+    console.log('selected donation', selectedDonation);
     if (mode === 'add') {
       onSubmit({
         member: selectedMember?.ID,
@@ -94,6 +97,8 @@ export default function AddDonationModal({
         currency,
       });
     }
+    setSelectedDonation(null);
+    setSelectedMember(null);
     onClose();
   };
 
