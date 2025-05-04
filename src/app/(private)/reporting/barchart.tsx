@@ -14,11 +14,11 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface MonthlyDonationProps {
-  currency: string;
-  period: string;
-  monthlyData: any[];
-  weeklyData: any[];
-  yearlyData: any[];
+  currency: 'USD' | 'PHP' | 'EUR' | 'JPY' | 'KRW' | 'CNY';
+  period: 'week' | 'month' | 'year';
+  monthlyData: { amount: number }[];
+  weeklyData: { amount: number }[];
+  yearlyData: { amount: number }[];
 }
 
 const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
@@ -28,12 +28,29 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
   weeklyData,
   yearlyData,
 }) => {
-  const usdToPhpRate = 55.6; // 1 USD = 0.018 PHP
+  // Static conversion rates per 1 USD
+  const conversionRates: Record<string, number> = {
+    USD: 1,
+    PHP: 55.6,
+    EUR: 0.93,
+    JPY: 145.3,
+    KRW: 1310.4,
+    CNY: 7.15,
+  };
 
-  // Choose the right dataset based on selected period
+  // Symbol map
+  const currencySymbols: Record<string, string> = {
+    USD: '$',
+    PHP: '₱',
+    EUR: '€',
+    JPY: '¥',
+    KRW: '₩',
+    CNY: '¥',
+  };
+
+  // Pick dataset & labels
   let selectedData;
-  let labels;
-  console.log(monthlyData, weeklyData, yearlyData);
+  let labels: string[];
   if (period === 'week') {
     selectedData = weeklyData;
     labels = ['Week 1', 'Week 2', 'Week 3'];
@@ -42,33 +59,18 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
     labels = ['2024', '2025', '2026', '2027'];
   } else {
     selectedData = monthlyData;
-    labels = [
-      'Jan',
-      'Feb',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'Aug',
-      'Sept',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   }
 
-  // Apply currency conversion if needed
-  const displayData = selectedData.map((value) =>
-    currency === 'PHP' ? value.amount * usdToPhpRate : value.amount
-  );
-  
+  // Convert amounts
+  const rate = conversionRates[currency] ?? 1;
+  const displayData = selectedData.map((d) => d.amount * rate);
 
-  // Find maximum value for Y axis scaling
-  const maxValue = Math.ceil(Math.max(...displayData) / 20000) * 20000;
+  // Y-axis max
+  const maxValue = Math.ceil(Math.max(...displayData) / 5) * 5;
 
   const data = {
-    labels: labels,
+    labels,
     datasets: [
       {
         data: displayData,
@@ -82,16 +84,11 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
   const options = {
     responsive: true,
     plugins: {
-      legend: {
-        display: false,
-      },
+      legend: { display: false },
     },
     scales: {
       x: {
-        grid: {
-          display: false,
-          drawOnChartArea: true,
-        },
+        grid: { display: false, drawOnChartArea: true },
       },
       y: {
         beginAtZero: true,
@@ -99,13 +96,19 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
           stepSize: maxValue / 5,
           min: 0,
           max: maxValue,
-          callback: function (value: any) {
-            return currency === 'USD' ? `$${value.toLocaleString()}` : `₱${value.toLocaleString()}`;
+          callback: (value: number) => {
+            const symbol = currencySymbols[currency] || '';
+            // no decimals for JPY/KRW
+            const formatted = ['JPY', 'KRW'].includes(currency)
+              ? Math.round(value).toLocaleString()
+              : value.toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                });
+            return `${symbol}${formatted}`;
           },
         },
-        grid: {
-          display: true,
-        },
+        grid: { display: true },
       },
     },
   };
@@ -114,7 +117,7 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
     <div className="relative w-full">
       <h3 className="mb-7 text-gray-500">SUM Amount ({currency})</h3>
       <Bar data={data} options={options} />
-      <h3 className="absolute bottom-[10px] right-[-25px] text-sm right-0 text-gray-500 rotate-90 ml-0">
+      <h3 className="absolute bottom-[10px] right-0 text-sm text-gray-500 rotate-90">
         {period === 'week' ? 'Week' : period === 'month' ? 'Month' : 'Year'}
       </h3>
     </div>
