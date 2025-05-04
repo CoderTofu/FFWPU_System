@@ -43,6 +43,8 @@ export default function EditBlessing() {
             'Full Name': attendee.Member['Full Name'],
           }))
         );
+        // setMemberIds(members.map((attendee) => attendee.Member.ID));
+
         setFormData({
           name_of_blessing: data['Name'],
           blessing_date: data['Date'],
@@ -68,6 +70,11 @@ export default function EditBlessing() {
   const [attendeesToDelete, setAttendeesToDelete] = useState([]);
 
   const handleMemberDelete = async () => {
+    console.log('here', selectedMember, memberIds);
+    // const test = memberIds.filter((member) => {
+    //   console.log('here', member);
+    //   return member !== selectedMember.ID;
+    // });
     setMemberIds(memberIds.filter((member) => member !== selectedMember.ID));
     setMembers(members.filter((member) => member !== selectedMember));
     setAttendeesToDelete((prev) => [...prev, selectedMember.attendee_id]);
@@ -86,15 +93,7 @@ export default function EditBlessing() {
         memberIds.map(async (id) => {
           try {
             const resp = await fetch(`/api/members/${id}`, { method: 'GET' });
-            if (resp.ok) {
-              return await resp.json();
-            } else {
-              showAlert({
-                type: 'error',
-                message: "Error while fetching member id: ' + id",
-              });
-              return null;
-            }
+            return await resp.json();
           } catch (error) {
             showAlert({
               type: 'error',
@@ -108,7 +107,12 @@ export default function EditBlessing() {
       );
 
       const validMembers = fetched.filter((member) => member !== null);
-      setMembers(validMembers); // ✅ Only freshly fetched members, no old ones
+      const merged = [...members, ...validMembers];
+
+      // Remove duplicates by ID
+      const unique = Array.from(new Map(merged.map((m) => [m.ID, m])).values());
+
+      setMembers(unique); // ✅ Only freshly fetched members, no old ones
     };
 
     fetchMembers();
@@ -377,7 +381,6 @@ export default function EditBlessing() {
           isOpen={isRegistrationModalOpen}
           onClose={() => setIsRegistrationModalOpen(false)}
           onSubmit={(formData) => {
-            console.log('Registered:', formData);
             if (registrationType === 'member') {
               const id = parseInt(formData.memberId);
               if (memberIds.includes(id)) {
