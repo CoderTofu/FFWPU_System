@@ -2,11 +2,11 @@
 import React from 'react';
 
 interface TotalDonationsProps {
-  currency: string;
-  period: string;
-  monthlyData: any[];
-  weeklyData: any[];
-  yearlyData: any[];
+  currency: 'USD' | 'PHP' | 'EUR' | 'JPY' | 'KRW' | 'CNY';
+  period: 'week' | 'month' | 'year';
+  monthlyData: { amount: number }[];
+  weeklyData: { amount: number }[];
+  yearlyData: { amount: number }[];
 }
 
 const TotalDonations: React.FC<TotalDonationsProps> = ({
@@ -16,38 +16,35 @@ const TotalDonations: React.FC<TotalDonationsProps> = ({
   weeklyData,
   yearlyData,
 }) => {
-  // Choose the right dataset based on selected period
-  let selectedData;
+  const dataSet = period === 'week' ? weeklyData : period === 'year' ? yearlyData : monthlyData;
 
-  if (period === 'week') {
-    selectedData = weeklyData;
-  } else if (period === 'year') {
-    selectedData = yearlyData;
-  } else {
-    selectedData = monthlyData;
-  }
+  // USD → target currency
+  const rates: Record<string, number> = {
+    USD: 1,
+    PHP: 55.6,
+    EUR: 0.93,
+    JPY: 145.3,
+    KRW: 1310.4,
+    CNY: 7.15,
+  };
+  const rate = rates[currency] || 1;
 
-  const usdToPhpRate = 55.6; // 1 USD = 55.6 PHP
+  // sum in USD, then convert once
+  const totalUSD = dataSet.reduce((sum, x) => sum + x.amount, 0);
+  const total = totalUSD * rate;
 
-  // Calculate the total donations
-  let totalDonation = selectedData ? selectedData.reduce((sum, value) => sum + value.amount, 0) : 0;
-
-  // Apply currency conversion if needed
-  if (currency === 'PHP') {
-    totalDonation = totalDonation * usdToPhpRate;
-  }
-
-  // Format the total as currency
-  const formattedTotal = new Intl.NumberFormat('en-US', {
+  // JPY/KRW: no decimals; else 2
+  const zeroDec = currency === 'JPY' || currency === 'KRW';
+  const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(totalDonation);
+    currency,
+    minimumFractionDigits: zeroDec ? 0 : 2,
+    maximumFractionDigits: zeroDec ? 0 : 2,
+  }).format(total);
 
   return (
     <div className="flex flex-col justify-center items-center h-full">
-      <p className="text-4xl font-bold text-[#01438F]">{formattedTotal}</p>
+      <p className="text-4xl font-bold text-[#01438F]">{formatted}</p>
     </div>
   );
 };
