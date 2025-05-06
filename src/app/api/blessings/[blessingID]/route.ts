@@ -1,7 +1,12 @@
 import { fetchWithAuth } from '@/lib/auth';
+type RouteContext = {
+  params: {
+    blessingID: string;
+  };
+};
 
-export async function GET(request: Request, { params }) {
-  const { blessingID } = await params;
+export async function GET(request: Request, context: RouteContext) {
+  const { blessingID } = context.params;
   const res = await fetchWithAuth(`/blessing/${blessingID}`, {
     method: 'GET',
   });
@@ -10,8 +15,8 @@ export async function GET(request: Request, { params }) {
   }
   return Response.json({});
 }
-export async function DELETE(request: Request, { params }) {
-  const { blessingID } = await params;
+export async function DELETE(request: Request, context: RouteContext) {
+  const { blessingID } = context.params;
   const res = await fetchWithAuth(`/blessing/${blessingID}/`, {
     method: 'DELETE',
   });
@@ -20,8 +25,8 @@ export async function DELETE(request: Request, { params }) {
   }
   return Response.json({});
 }
-export async function PATCH(request: Request, { params }) {
-  const { blessingID } = await params;
+export async function PATCH(request: Request, context: RouteContext) {
+  const { blessingID } = context.params;
   const body = await request.json();
   const res = await fetchWithAuth(`/blessing/${blessingID}/`, {
     method: 'PATCH',

@@ -1,9 +1,14 @@
 import { fetchWithAuth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
-export async function DELETE(request: Request, { params }) {
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+export async function DELETE(request: Request, context: RouteContext) {
   try {
-    const { id } = await params;
+    const { id } = context.params;
     const resp = await fetchWithAuth(`/worship-image/${id}/`, {
       method: 'DELETE',
     });

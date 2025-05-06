@@ -1,7 +1,12 @@
 import { fetchWithAuth } from '@/lib/auth';
 
-export async function GET(request: Request, { params }) {
-  const { donationID } = await params;
+type RouteContext = {
+  params: {
+    donationID: string;
+  };
+};
+export async function GET(request: Request, context: RouteContext) {
+  const { donationID } = context.params;
   const res = await fetchWithAuth(`/donation/${donationID}`, {
     method: 'GET',
   });
@@ -10,8 +15,8 @@ export async function GET(request: Request, { params }) {
   }
   return Response.json({});
 }
-export async function DELETE(request: Request, { params }) {
-  const { donationID } = await params;
+export async function DELETE(request: Request, context: RouteContext) {
+  const { donationID } = context.params;
   const res = await fetchWithAuth(`/donation/${donationID}/`, {
     method: 'DELETE',
   });
@@ -20,8 +25,8 @@ export async function DELETE(request: Request, { params }) {
   }
   return Response.json({});
 }
-export async function PATCH(request: Request, { params }) {
-  const { donationID } = await params;
+export async function PATCH(request: Request, context: RouteContext) {
+  const { donationID } = context.params;
   const body = await request.json();
   const res = await fetchWithAuth(`/donation/${donationID}/`, {
     method: 'PATCH',

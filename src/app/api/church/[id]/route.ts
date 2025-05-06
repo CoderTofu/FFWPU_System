@@ -1,18 +1,20 @@
-"use server";
+'use server';
 
-import { axiosInstance } from "@/app/axiosInstance";
-import { fetchWithAuth, getAccessToken, getRefreshToken } from "@/lib/auth";
-import { NextApiRequest } from "next";
-import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { axiosInstance } from '@/app/axiosInstance';
+import { fetchWithAuth, getAccessToken, getRefreshToken } from '@/lib/auth';
+import { NextApiRequest } from 'next';
+import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+export async function GET(request: Request, context: RouteContext) {
+  const { id } = context.params;
   const response = await fetchWithAuth(`/church/${id}`, {
-    method: "GET",
+    method: 'GET',
   });
   // const response = await axiosInstance.get(`/members/${memberID}`, {
   //   headers: { Authorization: `Bearer ${await getAccessToken()}` },
@@ -23,10 +25,10 @@ export async function GET(
   return NextResponse.json({});
 }
 
-export async function DELETE(request: Request, { params }) {
-  const { id } = await params;
+export async function DELETE(request: Request, context: RouteContext) {
+  const { id } = context.params;
   const res = await fetchWithAuth(`/church/${id}/`, {
-    method: "DELETE",
+    method: 'DELETE',
   });
   if (res.status >= 200 && res.status <= 299) {
     return Response.json(res.data);
@@ -34,14 +36,14 @@ export async function DELETE(request: Request, { params }) {
   return Response.json({});
 }
 
-export async function PATCH(request: Request, { params }) {
-  const { id } = await params;
+export async function PATCH(request: Request, context: RouteContext) {
+  const { id } = context.params;
   const body = await request.json();
   const res = await fetchWithAuth(`/church/${id}/`, {
-    method: "PATCH",
+    method: 'PATCH',
     body: JSON.stringify(body),
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   });
   if (res.status >= 200 && res.status <= 299) {

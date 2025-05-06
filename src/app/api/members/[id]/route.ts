@@ -6,8 +6,13 @@ import { NextApiRequest } from 'next';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const { id } = await params;
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+export async function GET(request: Request, context: RouteContext) {
+  const { id } = context.params;
   const response = await fetchWithAuth(`/member/${id}`, {
     method: 'GET',
   });
@@ -20,8 +25,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
   return NextResponse.json({});
 }
 
-export async function DELETE(request: Request, { params }) {
-  const { id } = await params;
+export async function DELETE(request: Request, context: RouteContext) {
+  const { id } = context.params;
   const res = await fetchWithAuth(`/member/${id}/`, {
     method: 'DELETE',
   });
@@ -31,9 +36,9 @@ export async function DELETE(request: Request, { params }) {
   return Response.json({});
 }
 
-export async function PATCH(request: Request, { params }) {
+export async function PATCH(request: Request, context: RouteContext) {
   try {
-    const { id } = await params;
+    const { id } = context.params;
     const formData = await request.formData();
     const resp = await fetchWithAuth(`/member/${id}/`, {
       method: 'PATCH',

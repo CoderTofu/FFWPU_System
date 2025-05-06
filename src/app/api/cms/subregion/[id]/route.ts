@@ -1,7 +1,11 @@
 import { fetchWithAuth } from '@/lib/auth';
-
-export async function DELETE(request: Request, { params }) {
-  const { id } = await params;
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+export async function DELETE(request: Request, context: RouteContext) {
+  const { id } = context.params;
   const res = await fetchWithAuth(`/subregion/${id}/`, {
     method: 'DELETE',
   });

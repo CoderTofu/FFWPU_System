@@ -6,8 +6,13 @@ import { headers } from 'next/headers';
 import { axiosInstance } from '@/app/axiosInstance';
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+export async function GET(request: Request, context: RouteContext) {
+  const { id } = context.params;
   const resp = await fetchWithAuth(`/blessing-recipient/${id}`, {
     method: 'GET',
   });
@@ -17,8 +22,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
   return NextResponse.json({});
 }
 
-export async function DELETE(request: NextApiRequest, { params }) {
-  const { id } = await params;
+export async function DELETE(request: NextApiRequest, context: RouteContext) {
+  const { id } = context.params;
   const resp = await fetchWithAuth(`/blessing-recipient/${id}/`, {
     method: 'DELETE',
   });
@@ -28,9 +33,9 @@ export async function DELETE(request: NextApiRequest, { params }) {
   return NextResponse.json({});
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, context: RouteContext) {
   const body = await request.json();
-  const { id } = await params;
+  const { id } = context.params;
   console.log(body);
   try {
     const resp = await fetchWithAuth(`/blessing-recipient/${id}/`, {
