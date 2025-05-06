@@ -62,7 +62,7 @@ export default function AddBlessing() {
 
       <div className="flex flex-col lg:flex-row py-4 w-full gap-6">
         <div className="lg:w-1/2 p-8 bg-white rounded-lg shadow-md flex flex-col relative">
-          <h2 className="text-lg font-semibold mb-3 flex justify-between">Member Attendees</h2>
+          <h2 className="text-lg font-semibold mb-3 flex justify-between">Members Blessed</h2>
           <div className="max-h-[250px] overflow-y-auto border border-[#CBCBCB] shadow-lg rounded-lg">
             <Table
               data={members}
@@ -73,7 +73,7 @@ export default function AddBlessing() {
               }}
             />
           </div>
-          <h2 className="text-lg font-semibold mt-4 mb-3 flex justify-between">Guest Attendees</h2>
+          <h2 className="text-lg font-semibold mt-4 mb-3 flex justify-between">Guests Blessed</h2>
           <div className="max-h-[250px] overflow-y-auto border border-[#CBCBCB] shadow-lg rounded-lg">
             <Table
               data={[...guests]}
@@ -97,7 +97,7 @@ export default function AddBlessing() {
           <label className="block font-medium mt-5">Date</label>
           <div className="relative w-full">
             <input
-              className="w-full border border-[#01438F] p-2 rounded mt-2 pr-10  pointer-events-none"
+              className="w-full border border-[#01438F] p-2 rounded mt-2 pointer-events-none"
               type="date"
               placeholder="MM/DD/YYYY"
               value={formData.blessing_date}

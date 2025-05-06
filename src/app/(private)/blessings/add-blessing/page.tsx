@@ -73,7 +73,7 @@ export default function AddBlessing() {
       <div className="flex flex-col lg:flex-row py-4 w-full gap-6">
         <div className="lg:w-1/2 p-8 bg-white rounded-lg shadow-md flex flex-col relative">
           <h2 className="text-lg font-semibold mb-3 flex justify-between">
-            Member Attendees
+            Members Blessed
             <div title="Register Member">
               <PlusCircle
                 className="text-[#01438F] cursor-pointer hover:text-[#FCC346]"
@@ -108,7 +108,7 @@ export default function AddBlessing() {
             Remove
           </button>
           <h2 className="text-lg font-semibold mt-4 mb-3 flex justify-between">
-            Guest Attendees
+            Guests Blessed
             <div title="Register Guest">
               <PlusCircle
                 className="text-[#01438F] cursor-pointer hover:text-[#FCC346]"
@@ -152,7 +152,7 @@ export default function AddBlessing() {
           <label className="block font-medium mt-5">Date</label>
           <div className="relative w-full">
             <input
-              className="w-full border border-[#01438F] p-2 rounded mt-2 pr-10"
+              className="w-full border border-[#01438F] p-2 rounded mt-2"
               type="date"
               placeholder="MM/DD/YYYY"
               value={date}
