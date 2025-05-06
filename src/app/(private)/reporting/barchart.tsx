@@ -117,9 +117,6 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
     <div className="relative w-full">
       <h3 className="mb-7 text-gray-500">SUM Amount ({currency})</h3>
       <Bar data={data} options={options} />
-      <h3 className="absolute bottom-[10px] right-0 text-sm text-gray-500 rotate-90">
-        {period === 'week' ? 'Week' : period === 'month' ? 'Month' : 'Year'}
-      </h3>
     </div>
   );
 };
