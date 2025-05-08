@@ -8,13 +8,10 @@ import { Search, ChevronDown } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import Button from '@/components/Button';
+import FilterBlessingsModal, { BlessingsFilter } from '@/components/FilterBlessingsModal';
 
 export default function ViewBlessing() {
   const router = useRouter();
-
-  useEffect(() => {
-    router.prefetch('/member/add-member');
-  }, []);
 
   const [selectedRow, setSelectedRow] = useState<{
     ID: number;
@@ -35,6 +32,15 @@ export default function ViewBlessing() {
       return await res.json();
     },
   });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filters, setFilters] = useState<BlessingsFilter>({ search: '', year: '' });
+  const availableYears = Array.from(
+    new Set(
+      blessings
+        .map((b) => (b.Date ? new Date(b.Date).getFullYear().toString() : ''))
+        .filter((y) => y)
+    )
+  );
 
   useEffect(() => {
     if (blessingQuery.status === 'success') {
@@ -63,9 +69,10 @@ export default function ViewBlessing() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredData = blessings.filter((item) =>
-    Object.values(item.Name).join(' ').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredData = blessings.filter((item) => {
+    if (!item['Name'].toLowerCase().includes(searchQuery.trim().toLowerCase())) return false;
+    return true;
+  });
 
   const handleEditClick = () => {
     if (selectedRow) {
@@ -76,14 +83,6 @@ export default function ViewBlessing() {
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const handleConfirm = async () => {
-    // if (selectedRow) {
-    //   setBlessings(
-    //     blessings.filter(
-    //       (item) => item["Blessing ID"] !== selectedRow["Blessing ID"]
-    //     )
-    //   );
-    // }
-
     const res = await fetch(`/api/blessings/${rowToDelete['ID']}`, {
       method: 'DELETE',
     });
@@ -135,7 +134,14 @@ export default function ViewBlessing() {
           </div>
         </div>
 
-        <Button type="primary" className={'text-lg !py-2 !px-12'} disabled={true}>
+        <Button
+          type="primary"
+          className={'text-lg !py-2 !px-12'}
+          onClick={() => {
+            console.log('test');
+            setIsFilterOpen(true);
+          }}
+        >
           Ⴤ Filters
         </Button>
       </div>
@@ -170,6 +176,13 @@ export default function ViewBlessing() {
         </Button>
       </div>
 
+      <FilterBlessingsModal
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onApply={setFilters}
+        initialFilters={filters}
+        availableYears={availableYears}
+      />
       {/* Modal */}
       <Modal
         isOpen={isOpen}
