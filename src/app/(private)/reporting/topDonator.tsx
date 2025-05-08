@@ -1,38 +1,49 @@
 'use client';
 import React from 'react';
 
-interface TopMemberDonorProps {
-  currency: string;
-  period: string;
-}
-
 interface Donor {
   name: string;
-  amount: number;
+  amount: number; // in USD
+}
+
+interface TopMemberDonorProps {
+  currency: 'USD' | 'PHP' | 'EUR' | 'JPY' | 'KRW' | 'CNY';
+  period: string;
+  topDonors: Donor[];
 }
 
 const TopMemberDonor: React.FC<TopMemberDonorProps> = ({ currency, topDonors }) => {
-  const usdToPhpRate = 55.6; // 1 USD = 55.6 PHP
+  // conversion rates per 1 USD
+  const conversionRates: Record<string, number> = {
+    USD: 1,
+    PHP: 55.6,
+    EUR: 0.93,
+    JPY: 145.3,
+    KRW: 1310.4,
+    CNY: 7.15,
+  };
+  const rate = conversionRates[currency] ?? 1;
 
-  // Format currency with proper type annotation for parameter
-  const formatCurrency = (donation: number): string => {
-    const amount = currency === 'PHP' ? donation * usdToPhpRate : donation;
+  // JPY/KRW: no decimals, others: 2 decimals
+  const zeroDecimals = currency === 'JPY' || currency === 'KRW';
 
+  const formatCurrency = (donationInUSD: number): string => {
+    const converted = donationInUSD * rate;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
+      currency,
+      minimumFractionDigits: zeroDecimals ? 0 : 2,
+      maximumFractionDigits: zeroDecimals ? 0 : 2,
+    }).format(converted);
   };
 
   return (
     <div className="w-full px-6 mb-4">
       <div className="flex flex-col">
-        {topDonors.map((donor, index) => (
-          <div key={index} className="flex justify-between py-2">
+        {topDonors.map((donor, idx) => (
+          <div key={idx} className="flex justify-between py-2">
             <p className="font-medium truncate">{donor.name}</p>
-            <span className="text-blue-800 font-bold " style={{ color: '#01438F' }}>
+            <span className="text-blue-800 font-bold" style={{ color: '#01438F' }}>
               {formatCurrency(donor.amount)}
             </span>
           </div>

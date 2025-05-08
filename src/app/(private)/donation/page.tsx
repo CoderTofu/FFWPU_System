@@ -26,13 +26,12 @@ export default function Donation() {
   const [isMemberListOpen, setIsMemberListOpen] = useState(false);
   const [memberIds, setMemberIds] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
-  const [toDelete, setToDelete] = useState('');
 
   const [churches, setChurches] = useState([]);
 
   // --- NEW: filter & search state
   const [filterModalOpen, setFilterModalOpen] = useState(false);
-  const [filters, setFilters] = useState({ startDate: '', endDate: '', currency: '' });
+  const [filters, setFilters] = useState({ startDate: '', endDate: '', currency: '', church: '' });
   const [searchQuery, setSearchQuery] = useState('');
 
   const donationQuery = useQuery({
@@ -86,6 +85,7 @@ export default function Donation() {
       if (filters.endDate && d.Date > filters.endDate) return false;
       // currency
       if (filters.currency && d.Currency !== filters.currency) return false;
+      if (filters.church && d.Church.Name !== filters.church) return false;
       return true;
     });
   }, [donationQuery.data, searchQuery, filters]);
