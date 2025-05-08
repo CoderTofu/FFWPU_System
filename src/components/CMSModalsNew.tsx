@@ -609,6 +609,8 @@ export function AddChurchModal({ isOpen, onClose }) {
   const [subregion, setSubregion] = useState('');
   const [country, setCountry] = useState('');
 
+  const nations = ['Philippines', 'USA', 'Korea', 'Japan', 'China', 'Other'];
+
   // Queries retain original logic
   const regionQuery = useQuery({
     queryKey: ['regions'],
@@ -746,6 +748,24 @@ export function AddChurchModal({ isOpen, onClose }) {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="country" className="font-bold">
+              Country
+            </label>
+            <select
+              id="country"
+              className="col-span-3 border border-gray-300 rounded-sm px-2 py-1 focus:outline-none focus:ring"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+            >
+              <option value="">-- Select Country --</option>
+              {nations.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
             <label htmlFor="region" className="font-bold">
               Region
             </label>
@@ -784,18 +804,6 @@ export function AddChurchModal({ isOpen, onClose }) {
                 </option>
               ))}
             </select>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="country" className="font-bold">
-              Country
-            </label>
-            <input
-              id="country"
-              type="text"
-              className="col-span-3 border border-gray-300 rounded-sm px-2 py-1 focus:outline-none focus:ring"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            />
           </div>
         </div>
         <div className="px-6 mt-6 flex justify-end space-x-4">

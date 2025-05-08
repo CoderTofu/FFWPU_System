@@ -11,7 +11,7 @@ export default function ContactInfoSection({ formData, setFormData }: Props) {
   const [allSubregions, setAllSubregions] = useState([]);
   const [filteredSubregions, setFilteredSubregions] = useState([]);
   
-  const nations = ["Philippines", "USA", "Korea", "Japan", "Other"];
+  const nations = ['Philippines', 'USA', 'Korea', 'Japan', 'China', 'Other'];
 
   const regionQuery = useQuery({
     queryKey: ["regions"],
