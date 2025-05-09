@@ -271,7 +271,7 @@ export default function AddBlessing() {
                   body: JSON.stringify({
                     blessing: addedID,
                     type: 'Guest',
-                    full_name: guest.Name,
+                    full_name: guest['Full Name'],
                     email: guest.Email,
                     invited_by: guest.invitedBy || null,
                   }),
