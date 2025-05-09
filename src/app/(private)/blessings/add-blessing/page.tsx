@@ -277,7 +277,7 @@ export default function AddBlessing() {
                   }),
                 });
                 if (!resp.ok) {
-                  alert('Error adding guest' + guest.Name);
+                  alert('Error adding guest' + guest['Full Name']);
                 }
               }),
             ]);
