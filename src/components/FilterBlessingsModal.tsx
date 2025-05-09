@@ -6,7 +6,7 @@ import Button from '@/components/Button';
 
 export interface BlessingsFilter {
   year: string;
-  orientation: 'vertical' | 'horizontal';
+  chaenbo: 'vertical' | 'horizontal' | '';
 }
 
 interface FilterBlessingsModalProps {
@@ -27,14 +27,13 @@ export default function FilterBlessingsModal({
   onReset,
   availableYears,
 }: FilterBlessingsModalProps) {
-  const defaultFilters: BlessingsFilter = { year: '', orientation: 'vertical' };
+  const defaultFilters: BlessingsFilter = { year: '', chaenbo: '' };
   const [local, setLocal] = useState<BlessingsFilter>(filters ?? defaultFilters);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // sync local state when modal opens or filters change
   useEffect(() => {
-    if (isOpen) {
-      setLocal(filters ?? defaultFilters);
+    if (isOpen && filters !== undefined) {
+      setLocal(filters);
     }
   }, [isOpen, filters]);
 
@@ -102,14 +101,14 @@ export default function FilterBlessingsModal({
             </select>
           </div>
 
-          {/* Orientation Dropdown */}
           <div>
             <label className="block text-sm font-medium mb-1">Chaenbo Orientation</label>
             <select
-              value={local.orientation}
-              onChange={(e) => handleChange('orientation', e.target.value)}
+              value={local.chaenbo}
+              onChange={(e) => handleChange('chaenbo', e.target.value)}
               className="mt-1 w-full border-2 border-[#01438F] rounded-md p-2 text-sm"
             >
+              <option value="">All Chaenbo</option>
               <option value="vertical">Vertical</option>
               <option value="horizontal">Horizontal</option>
             </select>

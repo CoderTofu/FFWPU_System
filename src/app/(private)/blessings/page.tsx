@@ -33,14 +33,8 @@ export default function ViewBlessing() {
     },
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState<BlessingsFilter>({ search: '', year: '' });
-  const availableYears = Array.from(
-    new Set(
-      blessings
-        .map((b) => (b.Date ? new Date(b.Date).getFullYear().toString() : ''))
-        .filter((y) => y)
-    )
-  );
+  const [filters, setFilters] = useState<BlessingsFilter>({ year: '', chaenbo: '' });
+  const [availableYears, setAvailableYears] = useState<string[]>([]);
 
   useEffect(() => {
     if (blessingQuery.status === 'success') {
@@ -50,13 +44,24 @@ export default function ViewBlessing() {
     }
   }, [blessingQuery.data, blessingQuery.status]);
 
+  useEffect(() => {
+    setAvailableYears(
+      Array.from(
+        new Set(
+          blessings
+            .map((b) => (b.Date ? new Date(b.Date).getFullYear().toString() : ''))
+            .filter((y) => y)
+        )
+      )
+    );
+  }, [blessings]);
+
   const columns = {
     lg: ['ID', 'Date', 'Name', 'Chaenbo'],
     md: ['ID', 'Date', 'Name'],
     sm: ['ID', 'Date'],
   };
 
-  // DATA ID
   const dataId = 'ID';
 
   useEffect(() => {
@@ -71,6 +76,13 @@ export default function ViewBlessing() {
 
   const filteredData = blessings.filter((item) => {
     if (!item['Name'].toLowerCase().includes(searchQuery.trim().toLowerCase())) return false;
+    if (filters.year && item['Date']) {
+      const year = new Date(item['Date']).getFullYear().toString();
+      if (year !== filters.year) return false;
+    }
+    if (filters.chaenbo && item['Chaenbo']?.toLowerCase() !== filters.chaenbo.toLowerCase())
+      return false;
+
     return true;
   });
 
@@ -138,7 +150,6 @@ export default function ViewBlessing() {
           type="primary"
           className={'text-lg !py-2 !px-12'}
           onClick={() => {
-            console.log('test');
             setIsFilterOpen(true);
           }}
         >
@@ -180,6 +191,9 @@ export default function ViewBlessing() {
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         onApply={setFilters}
+        onReset={() => {
+          setFilters({ year: '', chaenbo: '' }); // <- reset filters in parent state
+        }}
         initialFilters={filters}
         availableYears={availableYears}
       />
