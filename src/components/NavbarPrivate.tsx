@@ -1,37 +1,54 @@
 /* eslint-disable @next/next/no-img-element */
-"use client";
+'use client';
 
-import { useState, useEffect, MouseEvent } from "react";
-import { Menu, X, ArrowRight, CircleUserRound } from "lucide-react"; // Added more icons
-import { useRouter } from "next/navigation";
+import { useState, useEffect, MouseEvent } from 'react';
+import { Menu, X, ArrowRight, CircleUserRound } from 'lucide-react'; // Added more icons
+import { useRouter } from 'next/navigation';
+import { useAlert } from './context/AlertContext';
 export default function NavbarPrivate() {
+  const { showAlert } = useAlert();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [username, setUsername] = useState('Administrator');
   // Prevent scrolling when sidebar is open
   const router = useRouter();
   useEffect(() => {
     if (isSidebarOpen) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     }
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     };
   }, [isSidebarOpen]);
 
+  // Fetch username from the server
+  useEffect(() => {
+    const fetchUsername = async () => {
+      const response = await fetch('/api/username');
+      if (response.ok) {
+        const data = await response.json();
+        setUsername(data.username);
+      } else {
+        showAlert({ type: 'error', title: 'Failed to fetch username' });
+      }
+    };
+    fetchUsername();
+  }, []);
+
   const navItems = [
-    { name: "Members", href: "/member" },
-    { name: "Events", href: "/event" },
-    { name: "Blessings", href: "/blessings" },
-    { name: "Donations", href: "/donation" },
-    { name: "Reporting", href: "/reporting" },
-    { name: "CMS", href: "/cms" },
+    { name: 'Members', href: '/member' },
+    { name: 'Events', href: '/event' },
+    { name: 'Blessings', href: '/blessings' },
+    { name: 'Donations', href: '/donation' },
+    { name: 'Reporting', href: '/reporting' },
+    { name: 'CMS', href: '/cms' },
   ];
 
   const logout = async (e: MouseEvent) => {
-    const response = await fetch("/api/logout", { method: "POST" });
+    const response = await fetch('/api/logout', { method: 'POST' });
     if (response.ok) {
-      router.push("/");
+      router.push('/');
     }
   };
 
@@ -39,12 +56,8 @@ export default function NavbarPrivate() {
     <div className="bg-[#fff] border-b-4 shadow p-4 px-[100px] min-h-[100px] flex justify-between items-center">
       {/* Logo */}
       <div className="flex gap-4 items-center">
-        <a href={"/"}>
-          <img
-            src="/icons/ffwpu_icon.svg"
-            className="h-full w-auto"
-            alt="Site Icon"
-          />
+        <a href={'/'}>
+          <img src="/icons/ffwpu_icon.svg" className="h-full w-auto" alt="Site Icon" />
         </a>
         <div className="text-[#1C5CA8] averia-font italic">
           <h1 className="text-[21px] italic font-semibold">FFWPU</h1>
@@ -63,7 +76,7 @@ export default function NavbarPrivate() {
       {/* Sidebar (Mobile Navigation) */}
       <div
         className={`z-50 fixed top-0 right-0 w-64 h-full ${
-          isSidebarOpen ? "translate-x-0" : "translate-x-full"
+          isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
         } bg-[#01438F] shadow-xl p-6 flex flex-col gap-6 text-lg transition-all duration-300 border-yellow-400 border-l-8 text-white`}
       >
         <div className="flex justify-between items-center mb-8">
@@ -80,7 +93,7 @@ export default function NavbarPrivate() {
           <CircleUserRound className="w-28 h-28" />
           <h3 className="mt-1 text-xl font-light italic text-center">
             Welcome, <br />
-            Admin!
+            {username}!
           </h3>
         </div>
 
