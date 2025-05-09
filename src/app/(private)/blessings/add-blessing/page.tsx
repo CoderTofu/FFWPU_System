@@ -283,7 +283,6 @@ export default function AddBlessing() {
             ]);
 
             setShowModal(false);
-            alert('Successfully added blessing');
             router.push('/blessings');
           }}
           message="Are you sure you want to add this blessing?"
