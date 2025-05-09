@@ -57,9 +57,6 @@ export const TotalDonations: React.FC<TotalDonationsProps> = ({
     });
   }
 
-  // log for inspection
-  console.log('TotalDonations – filtered data for', period, filtered);
-
   // sum in USD
   const totalUSD = filtered.reduce((sum, { amount }) => sum + amount, 0);
 

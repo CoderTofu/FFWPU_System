@@ -73,9 +73,6 @@ export default function AverageDonations({
     }
   }
 
-  // log what went into the average
-  console.log('AverageDonations – filtered data for', period, filtered);
-
   // convert & format
   const rate = conversionRates[currency];
   const avg = avgUSD * rate;

@@ -39,9 +39,6 @@ export default function Reporting() {
     }
   }, [statisticsQuery.data, statisticsQuery.status]);
 
-  useEffect(() => {
-    console.log('Top Donors:', topDonors);
-  }, [topDonors]);
   return (
     <div className="min-h-screen h-full px-4 py-8 lg:px-32 bg-gray-50">
       <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg mb-8">

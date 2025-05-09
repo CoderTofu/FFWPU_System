@@ -38,6 +38,8 @@ const TopMemberDonor: React.FC<TopMemberDonorProps> = ({ currency, topDonors, pe
     }).format(converted);
   };
 
+  console.log('TopMemberDonor', topDonors);
+
   return (
     <div className="w-full px-6 mb-4">
       <div className="flex flex-col">
