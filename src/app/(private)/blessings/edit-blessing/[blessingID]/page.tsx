@@ -25,6 +25,10 @@ export default function EditBlessing() {
     blessing_date: '',
     chaenbo: '',
   });
+
+  // Compute today's date for max
+  const todayISO = new Date().toISOString().split('T')[0];
+
   const chaenboMap = { Vertical: 1, Horizontal: 2 };
   useEffect(() => {
     (async function () {
@@ -211,6 +215,7 @@ export default function EditBlessing() {
               className="w-full border border-[#01438F] p-2 rounded mt-2"
               type="date"
               placeholder="MM/DD/YYYY"
+              max={todayISO}
               value={formData.blessing_date}
               onChange={(e) => setFormData({ ...formData, blessing_date: e.target.value })}
             />

@@ -22,12 +22,15 @@ export default function AddWorshipEvent() {
   const router = useRouter();
   const [guests, setGuests] = useState([]);
 
+  // Compute today's date for max
+  const todayISO = new Date().toISOString().split('T')[0];
+
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const [eventName, setEventName] = useState<string>('');
-  const [date, setDate] = useState<string>('');
+  const [date, setDate] = useState<string>(todayISO);
   const dateInputRef = useRef<HTMLInputElement | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -210,6 +213,7 @@ export default function AddWorshipEvent() {
               ref={dateInputRef}
               type="date"
               value={date}
+              max={todayISO}
               onChange={(e) => setDate(e.target.value)}
               className="w-full border border-[#01438F] p-2 rounded mt-2 appearance-none"
             />

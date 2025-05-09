@@ -14,12 +14,8 @@ export default function PersonalInfoSection({ formData, setFormData }: Props) {
   return (
     <section className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-[#01438f] mb-2">
-          Personal Information
-        </h2>
-        <p className="text-sm text-gray-600 mb-6">
-          Fill out your personal details accurately.
-        </p>
+        <h2 className="text-2xl font-bold text-[#01438f] mb-2">Personal Information</h2>
+        <p className="text-sm text-gray-600 mb-6">Fill out your personal details accurately.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -96,6 +92,7 @@ export default function PersonalInfoSection({ formData, setFormData }: Props) {
             name="birthdate"
             type="date"
             value={formData.birthdate}
+            max={new Date().toISOString().split('T')[0]} // Prevent future dates
             onChange={handleChange}
             className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
@@ -113,7 +110,9 @@ export default function PersonalInfoSection({ formData, setFormData }: Props) {
             onChange={handleChange}
             className="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
-            <option value="" disabled hidden>Select marital status</option>
+            <option value="" disabled hidden>
+              Select marital status
+            </option>
             <option value="Single">Single</option>
             <option value="Married">Married</option>
           </select>

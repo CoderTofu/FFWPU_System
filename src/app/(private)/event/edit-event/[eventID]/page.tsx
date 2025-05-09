@@ -24,6 +24,9 @@ export default function EditWorshipEvent() {
 
   const params = useParams();
 
+  // Compute today's date for max
+  const todayISO = new Date().toISOString().split('T')[0];
+
   // This is the blessing ID from the URL
   const [worshipInfo, setWorshipInfo] = useState({});
   const [attendees, setAttendees] = useState([]);
@@ -290,6 +293,7 @@ export default function EditWorshipEvent() {
               ref={dateInputRef}
               type="date"
               value={date}
+              max={todayISO}
               onChange={(e) => setDate(e.target.value)}
               className="w-full border border-[#01438F] p-2 rounded mt-2 appearance-none"
             />

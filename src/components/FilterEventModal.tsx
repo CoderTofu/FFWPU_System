@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { useAlert } from '@/components/context/AlertContext';
 import Button from '@/components/Button';
 
-interface FilterEventModal {
+interface FilterEventModalProps {
   isOpen: boolean;
   onClose: () => void;
   filters: {
@@ -22,17 +23,24 @@ export default function FilterEventModal({
   filters,
   onApply,
   onReset,
-}: FilterEventModal) {
+}: FilterEventModalProps) {
+  const { showAlert } = useAlert();
   const [local, setLocal] = useState(filters);
+  const [errors, setErrors] = useState<{ startDate?: string; endDate?: string }>({});
   const modalRef = useRef<HTMLDivElement>(null);
 
+  // Today's date for max
+  const todayISO = new Date().toISOString().split('T')[0];
+
+  // Reset local state and errors when opened
   useEffect(() => {
     if (isOpen) {
       setLocal(filters);
+      setErrors({});
     }
   }, [isOpen, filters]);
 
-  // close when clicking outside
+  // Close on click outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -47,12 +55,34 @@ export default function FilterEventModal({
 
   const handleChange = (key: keyof typeof local, val: string) => {
     setLocal((prev) => ({ ...prev, [key]: val }));
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
+  };
+
+  const validate = () => {
+    const errs: { startDate?: string; endDate?: string } = {};
+    if (local.startDate && local.endDate && local.startDate > local.endDate) {
+      errs.startDate = 'Start date cannot be after end date.';
+      errs.endDate = 'End date cannot be before start date.';
+    }
+    if (local.startDate && local.startDate > todayISO) {
+      errs.startDate = 'Start date cannot be in the future.';
+    }
+    if (local.endDate && local.endDate > todayISO) {
+      errs.endDate = 'End date cannot be in the future.';
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
   const handleApply = () => {
+    if (!validate()) {
+      showAlert({ type: 'error', message: 'Please fix date errors before applying filters.' });
+      return;
+    }
     onApply(local);
     onClose();
   };
+
   const handleReset = () => {
     onReset();
     onClose();
@@ -85,9 +115,12 @@ export default function FilterEventModal({
               type="date"
               className="mt-1 w-full border-2 border-[#01438F] rounded-md p-2"
               value={local.startDate}
+              max={todayISO}
               onChange={(e) => handleChange('startDate', e.target.value)}
             />
+            {errors.startDate && <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>}
           </div>
+
           {/* End Date */}
           <div>
             <label className="block text-sm font-medium">End Date</label>
@@ -95,9 +128,13 @@ export default function FilterEventModal({
               type="date"
               className="mt-1 w-full border-2 border-[#01438F] rounded-md p-2"
               value={local.endDate}
+              min={local.startDate || undefined}
+              max={todayISO}
               onChange={(e) => handleChange('endDate', e.target.value)}
             />
+            {errors.endDate && <p className="text-red-500 text-xs mt-1">{errors.endDate}</p>}
           </div>
+
           {/* Worship Type */}
           <div>
             <label className="block text-sm font-medium">Worship Type</label>
@@ -113,7 +150,7 @@ export default function FilterEventModal({
           </div>
         </div>
 
-        {/* FOOTER BUTTONS */}
+        {/* FOOTER */}
         <div className="flex justify-between px-6 py-4 border-t">
           <Button type="outline" onClick={handleReset}>
             Reset

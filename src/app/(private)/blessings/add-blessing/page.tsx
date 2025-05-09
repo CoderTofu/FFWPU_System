@@ -21,6 +21,9 @@ export default function AddBlessing() {
   const [chaenbo, setChaenbo] = useState('');
   const [guests, setGuests] = useState([]);
 
+  // Compute today's date for max
+  const todayISO = new Date().toISOString().split('T')[0];
+
   const [selectedMember, setSelectedMember] = useState<{
     'Member ID': number;
   } | null>(null);
@@ -28,7 +31,7 @@ export default function AddBlessing() {
   const router = useRouter();
 
   const [showModal, setShowModal] = useState(false);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(todayISO);
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [registrationType, setRegistrationType] = useState<'member' | 'guest' | null>(null);
   const handleOpenRegistration = (type: 'member' | 'guest') => {
@@ -156,6 +159,7 @@ export default function AddBlessing() {
               type="date"
               placeholder="MM/DD/YYYY"
               value={date}
+              max={todayISO}
               onChange={(e) => setDate(e.target.value)}
             />
           </div>
