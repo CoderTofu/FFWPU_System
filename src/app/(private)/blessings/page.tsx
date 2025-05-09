@@ -9,10 +9,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import Button from '@/components/Button';
 import FilterBlessingsModal, { BlessingsFilter } from '@/components/FilterBlessingsModal';
+import { useAlert } from '@/components/context/AlertContext';
 
 export default function ViewBlessing() {
   const router = useRouter();
-
+  const { showAlert } = useAlert();
   const [selectedRow, setSelectedRow] = useState<{
     ID: number;
   } | null>(null);
@@ -40,7 +41,7 @@ export default function ViewBlessing() {
     if (blessingQuery.status === 'success') {
       setBlessings(blessingQuery.data);
     } else if (blessingQuery.status === 'error') {
-      alert(blessingQuery.error.message);
+      showAlert({ type: 'error', title: blessingQuery.error.message });
     }
   }, [blessingQuery.data, blessingQuery.status]);
 
@@ -101,7 +102,10 @@ export default function ViewBlessing() {
     if (res.ok) {
       await queryClient.refetchQueries(['blessings']);
     } else {
-      alert('An error occurred while deleting blessing: ' + res.statusText);
+      showAlert({
+        type: 'error',
+        title: 'An error occurred while deleting blessing: ' + res.statusText,
+      });
     }
     setIsOpen(false);
   };

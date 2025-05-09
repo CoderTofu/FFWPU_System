@@ -55,7 +55,7 @@ export default function AddBlessing() {
         memberIds.map(async (id) => {
           const res = await fetch(`/api/members/${id}`, { method: 'GET' });
           if (!res.ok) {
-            alert(`Member with ID ${id} does not exist`);
+            showAlert({ type: 'error', title: `Member with ID ${id} does not exist` });
           } else {
             return await res.json();
           }
@@ -262,7 +262,7 @@ export default function AddBlessing() {
                   }),
                 });
                 if (!resp.ok) {
-                  alert('Error adding member ' + id);
+                  showAlert({ type: 'error', title: 'Error adding member ' + id });
                 }
               }),
               ...guests.map(async (guest) => {
@@ -277,7 +277,7 @@ export default function AddBlessing() {
                   }),
                 });
                 if (!resp.ok) {
-                  alert('Error adding guest' + guest['Full Name']);
+                  showAlert({ type: 'error', title: 'Error adding guest' + guest['Full Name'] });
                 }
               }),
             ]);

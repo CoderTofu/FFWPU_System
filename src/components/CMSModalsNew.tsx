@@ -13,7 +13,6 @@ export function AddRegionModal({ isOpen, onClose }) {
   const queryClient = useQueryClient();
   const handleAddRegion = async () => {
     // Add logic to handle adding a region
-    console.log('Adding region:', regionName);
     const res = await fetch('/api/cms/region', {
       method: 'POST',
       body: JSON.stringify({ name: regionName }),
@@ -26,7 +25,7 @@ export function AddRegionModal({ isOpen, onClose }) {
       await queryClient.refetchQueries(['regions']);
       onClose();
     } else {
-      alert('An error occurred: ' + res.statusText);
+      showAlert({ type: 'error', title: 'An error occurred: ' + res.statusText });
     }
     // Reset the input
     setRegionName('');
@@ -288,12 +287,11 @@ export function AddSubregionModal({ isOpen, onClose }) {
       onClose();
     },
     onError: (data) => {
-      alert('Error while adding');
+      showAlert({ type: 'error', title: 'An error occurred while adding subregion.' });
     },
   });
   const handleAddSubregion = () => {
     // Add logic to handle adding a subregion
-    console.log('Adding subregion:', subRegion, 'to region:', selectedRegion);
     subregionMutation.mutate({ region: selectedRegion, name: subRegion });
     // Reset the inputs
     setSelectedRegion('');
@@ -304,7 +302,7 @@ export function AddSubregionModal({ isOpen, onClose }) {
     if (regionQuery.status === 'success') {
       setRegions(regionQuery.data);
     } else if (regionQuery.status === 'error') {
-      alert('An error occurred while fetching data');
+      showAlert({ type: 'error', title: 'An error occurred while fetching data' });
     }
   }, [regionQuery.data, regionQuery.status]);
 

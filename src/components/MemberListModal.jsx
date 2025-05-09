@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 
-import ListTable from "@/components/ListTable";
-import Button from "./Button";
+import ListTable from '@/components/ListTable';
+import Button from './Button';
 
-import { useAlert } from "@/components/context/AlertContext.jsx";
+import { useAlert } from '@/components/context/AlertContext.jsx';
 
-import loading from "@/components/assets/kinetiq-loading.gif";
+import loading from '@/components/assets/kinetiq-loading.gif';
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { type } from "os";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { type } from 'os';
 
 // forUnique is used to determine if the modal is for the member list or not
 // If it is for the member list, it should only allow unique members to be selected
@@ -51,7 +51,7 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds, forUnique =
       });
       return;
     }
-  
+
     if (!forUnique) {
       // For Donation — you want to pass the FULL MEMBER
       setMemberIds(selectedCustomer); // ← pass full object (Member)
@@ -72,7 +72,6 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds, forUnique =
     }
     onClose();
   };
-  
 
   useEffect(() => {
     console.log(data);
@@ -94,7 +93,7 @@ const MemberListModal = ({ isOpen, onClose, memberIds, setMemberIds, forUnique =
       setFilteredData(res);
       setIsLoading(false);
     } else if (memberQuery.status === 'error') {
-      alert('An error occurred while fetching data.');
+      showAlert({ type: 'error', title: 'An error occurred while fetching data.' });
     }
   }, [memberQuery.data, memberQuery.status]);
 

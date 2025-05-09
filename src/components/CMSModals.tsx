@@ -21,12 +21,14 @@ import {
 
 import { axiosInstance } from '@/app/axiosInstance';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAlert } from './context/AlertContext';
 
 // Helper function for button styles
 const buttonStyle =
   'px-6 py-2 rounded bg-[#01438F] text-[#FCC346] font-bold transition duration-300 ease-in-out hover:bg-[#FCC346] hover:text-[#01438F] hover:shadow-lg';
 
 export function AddRegionModal() {
+  const { showAlert } = useAlert();
   const [regionName, setRegionName] = useState('');
   const queryClient = useQueryClient();
   const handleAddRegion = async () => {
@@ -37,10 +39,10 @@ export function AddRegionModal() {
       body: JSON.stringify({ name: regionName }),
     });
     if (res.ok) {
-      alert('successfully added region');
+      showAlert({ type: 'success', title: 'Successfully added region' });
       await queryClient.refetchQueries(['regions']);
     } else {
-      alert('An error occurred: ' + res.statusText);
+      showAlert({ type: 'error', title: 'An error occurred: ' + res.statusText });
     }
     // Reset the input
     setRegionName('');
@@ -82,6 +84,7 @@ export function AddRegionModal() {
 }
 
 export function DeleteRegionModal() {
+  const { showAlert } = useAlert();
   const [regionToDelete, setRegionToDelete] = useState('');
 
   const [regions, setRegions] = useState([]);
@@ -93,7 +96,7 @@ export function DeleteRegionModal() {
         const data = await res.json();
         setRegions(data);
       } else {
-        alert('An error occurred while fetching regions');
+        showAlert({ type: 'error', title: 'An error occurred while fetching regions' });
       }
     };
     fetchRegions();
@@ -151,6 +154,7 @@ export function DeleteRegionModal() {
 }
 
 export function AddSubregionModal() {
+  const { showAlert } = useAlert();
   const [selectedRegion, setSelectedRegion] = useState('');
   const [subRegion, setSubRegion] = useState('');
 
@@ -175,16 +179,15 @@ export function AddSubregionModal() {
       if (!res.ok) throw new Error('Failed to fetch');
     },
     onSuccess: async (data) => {
-      alert('Successfully added');
+      showAlert({ type: 'success', title: 'Successfully added subregion' });
       await queryClient.refetchQueries(['subregions']);
     },
     onError: (data) => {
-      alert('Error while adding');
+      showAlert({ type: 'error', title: 'Error while adding subregion' });
     },
   });
   const handleAddSubregion = () => {
     // Add logic to handle adding a subregion
-    console.log('Adding subregion:', subRegion, 'to region:', selectedRegion);
     subregionMutation.mutate({ region: selectedRegion, name: subRegion });
     // Reset the inputs
     setSelectedRegion('');
@@ -195,7 +198,7 @@ export function AddSubregionModal() {
     if (regionQuery.status === 'success') {
       setRegions(regionQuery.data);
     } else if (regionQuery.status === 'error') {
-      alert('An error occurred while fetching data');
+      showAlert({ type: 'error', title: 'An error occurred while fetching data' });
     }
   }, [regionQuery.data, regionQuery.status]);
 
@@ -364,6 +367,7 @@ export function AddChurchModal() {
   const [region, setRegion] = useState('');
   const [subregion, setSubregion] = useState('');
   const [country, setCountry] = useState('');
+  const { showAlert } = useAlert();
 
   const queryClient = useQueryClient();
 
@@ -397,9 +401,9 @@ export function AddChurchModal() {
     if (res.ok) {
       await queryClient.invalidateQueries(['churches']);
       await queryClient.refetchQueries(['churches']);
-      alert('successfully added church');
+      showAlert({ type: 'success', title: 'Successfully added church' });
     } else {
-      alert('An error occurred: ' + res.statusText);
+      showAlert({ type: 'error', title: 'An error occurred: ' + res.statusText });
     }
     // // Reset the input
     setChurchName('');
@@ -412,7 +416,7 @@ export function AddChurchModal() {
     if (regionQuery.status === 'success') {
       setRegions(regionQuery.data);
     } else if (regionQuery.status === 'error') {
-      alert(regionQuery.error.message);
+      showAlert({ type: 'error', title: regionQuery.error.message });
     }
   }, [regionQuery.data, regionQuery.status]);
 
@@ -420,7 +424,7 @@ export function AddChurchModal() {
     if (subregionQuery.status === 'success') {
       setSubregions(subregionQuery.data);
     } else if (subregionQuery.status === 'error') {
-      alert(subregionQuery.error.message);
+      showAlert({ type: 'error', title: subregionQuery.error.message });
     }
   }, [subregionQuery.data, subregionQuery.status]);
 
@@ -518,6 +522,7 @@ export function AddChurchModal() {
 
 export function DeleteChurchModal() {
   const [regionToDelete, setRegionToDelete] = useState('');
+  const { showAlert } = useAlert();
   const [churches, setChurches] = useState([]);
   const queryClient = useQueryClient();
   const churchQuery = useQuery({
@@ -534,7 +539,7 @@ export function DeleteChurchModal() {
     if (churchQuery.status === 'success') {
       setChurches(churchQuery.data);
     } else if (churchQuery.status === 'error') {
-      alert(churchQuery.error.message);
+      showAlert({ type: 'error', title: churchQuery.error.message });
     }
   }, [churchQuery.data, churchQuery.status]);
 
@@ -547,7 +552,7 @@ export function DeleteChurchModal() {
     });
     if (res.ok) {
       await queryClient.refetchQueries(['churches']);
-      alert('Successfully deleted church');
+      showAlert({ type: 'error', title: 'Successfully deleted church' });
     }
     // Reset the selection
     setRegionToDelete('');
@@ -672,7 +677,7 @@ export function AddNewAdminModal() {
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
-
+  const { showAlert } = useAlert();
   const handleAddAdmin = async () => {
     // Add logic to handle adding a new admin
     const res = await fetch('/api/cms/add-admin', {
@@ -684,9 +689,9 @@ export function AddNewAdminModal() {
       }),
     });
     if (res.ok) {
-      alert('Successfully created admin');
+      showAlert({ type: 'success', title: 'Successfully created admin' });
     } else {
-      alert('Error while creating admin');
+      showAlert({ type: 'error', title: 'Error while creating admin' });
     }
     setAdminName('');
     setAdminEmail('');

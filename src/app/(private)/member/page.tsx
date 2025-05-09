@@ -95,7 +95,10 @@ export default function Member() {
       await queryClient.refetchQueries(['members']);
       showAlert({ type: 'success', message: 'Deleted successfully' });
     } else {
-      alert('An error occurred while deleting member: ' + response.statusText);
+      showAlert({
+        type: 'error',
+        title: 'An error occurred while deleting member: ' + response.statusText,
+      });
     }
     setIsOpen(false);
   };
@@ -133,7 +136,7 @@ export default function Member() {
       }));
       setData(data);
     } else if (memberQuery.status === 'error') {
-      alert('An error occurred while fetching data.');
+      showAlert({ type: 'error', title: 'An error occurred while fetching data.' });
     }
   }, [memberQuery.data, memberQuery.status]);
 

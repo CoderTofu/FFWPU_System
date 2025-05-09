@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Table from '@/components/Table';
+import { useAlert } from '@/components/context/AlertContext';
 
 export default function ViewWorshipEvent() {
+  const { showAlert } = useAlert();
   const params = useParams();
 
   const [attendees, setAttendees] = useState([]);
@@ -30,12 +32,11 @@ export default function ViewWorshipEvent() {
           );
         }
         setWorshipInfo(data);
-        console.log(data);
         setChurch(data?.Church.Name); // You might need to adjust this
         setImages(data?.Images || []); // Assume `Images` is array of URLs
         console.log(data?.Images);
       } else {
-        alert('Failed to fetch event information');
+        showAlert({ type: 'error', title: 'Failed to fetch event information' });
       }
     })();
   }, []);

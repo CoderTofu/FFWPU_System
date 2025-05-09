@@ -91,7 +91,7 @@ export default function AddMemberForm() {
         setFormData(data);
         //   setIsLoading(false);
       } else {
-        alert('An error occurred');
+        showAlert({ type: 'error', title: 'An error occurred' });
       }
     };
     fetchData();
