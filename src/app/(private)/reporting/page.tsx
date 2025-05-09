@@ -13,7 +13,7 @@ export default function Reporting() {
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [yearlyData, setYearlyData] = useState<any[]>([]);
-  const [topDonors, setTopDonors] = useState<any[]>([]);
+  const [topDonors, setTopDonors] = useState<any[]>({ monthly: [], weekly: [], yearly: [] });
 
   const handleFilterChange = (newCurrency: string, newPeriod: string) => {
     setCurrency(newCurrency);
@@ -39,6 +39,9 @@ export default function Reporting() {
     }
   }, [statisticsQuery.data, statisticsQuery.status]);
 
+  useEffect(() => {
+    console.log('Top Donors:', topDonors);
+  }, [topDonors]);
   return (
     <div className="min-h-screen h-full px-4 py-8 lg:px-32 bg-gray-50">
       <div className="w-full p-4 mx-auto bg-white rounded-md drop-shadow-lg flex items-center justify-center border-[#1C5CA8] border-2 shadow-lg mb-8">
@@ -74,9 +77,7 @@ export default function Reporting() {
 
           {/* TOP DONOR */}
           <div className="bg-white rounded-2xl shadow-xl p-6">
-            <h2 className="text-[#BE9231] text-xl font-semibold mb-4 text-center">
-              All Time Top Donors
-            </h2>
+            <h2 className="text-[#BE9231] text-xl font-semibold mb-4 text-center">Top Donors</h2>
             <TopDonor currency={currency} period={period} topDonors={topDonors} />
           </div>
         </div>

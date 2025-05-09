@@ -12,8 +12,9 @@ interface TopMemberDonorProps {
   topDonors: Donor[];
 }
 
-const TopMemberDonor: React.FC<TopMemberDonorProps> = ({ currency, topDonors }) => {
+const TopMemberDonor: React.FC<TopMemberDonorProps> = ({ currency, topDonors, period }) => {
   // conversion rates per 1 USD
+  console.log('TopMemberDonor', topDonors);
   const conversionRates: Record<string, number> = {
     USD: 1,
     PHP: 55.6,
@@ -40,14 +41,33 @@ const TopMemberDonor: React.FC<TopMemberDonorProps> = ({ currency, topDonors }) 
   return (
     <div className="w-full px-6 mb-4">
       <div className="flex flex-col">
-        {topDonors.map((donor, idx) => (
-          <div key={idx} className="flex justify-between py-2">
-            <p className="font-medium truncate">{donor.name}</p>
-            <span className="text-blue-800 font-bold" style={{ color: '#01438F' }}>
-              {formatCurrency(donor.amount)}
-            </span>
-          </div>
-        ))}
+        {period === 'year' &&
+          topDonors.yearly.map((donor, idx) => (
+            <div key={idx} className="flex justify-between py-2">
+              <p className="font-medium truncate">{donor.name}</p>
+              <span className="text-blue-800 font-bold" style={{ color: '#01438F' }}>
+                {formatCurrency(donor.amount)}
+              </span>
+            </div>
+          ))}
+        {period === 'month' &&
+          topDonors.monthly.map((donor, idx) => (
+            <div key={idx} className="flex justify-between py-2">
+              <p className="font-medium truncate">{donor.name}</p>
+              <span className="text-blue-800 font-bold" style={{ color: '#01438F' }}>
+                {formatCurrency(donor.amount)}
+              </span>
+            </div>
+          ))}
+        {period === 'week' &&
+          topDonors.weekly.map((donor, idx) => (
+            <div key={idx} className="flex justify-between py-2">
+              <p className="font-medium truncate">{donor.name}</p>
+              <span className="text-blue-800 font-bold" style={{ color: '#01438F' }}>
+                {formatCurrency(donor.amount)}
+              </span>
+            </div>
+          ))}
       </div>
     </div>
   );
