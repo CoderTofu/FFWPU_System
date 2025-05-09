@@ -125,7 +125,7 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({ onFilterChange }) => {
 
         {/* Period Dropdown */}
         <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Range</label>
           <div className="relative">
             <div
               className={`bg-white shadow-md rounded-md p-2 w-[110px] border-solid border-[1px] border-[#01438F] ${
