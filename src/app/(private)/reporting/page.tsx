@@ -75,7 +75,7 @@ export default function Reporting() {
           {/* TOP DONOR */}
           <div className="bg-white rounded-2xl shadow-xl p-6">
             <h2 className="text-[#BE9231] text-xl font-semibold mb-4 text-center">
-              Top Member Donors
+              All Time Top Donors
             </h2>
             <TopDonor currency={currency} period={period} topDonors={topDonors} />
           </div>
