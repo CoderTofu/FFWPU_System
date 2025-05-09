@@ -7,7 +7,7 @@ interface FilterOptionsProps {
 
 const FilterOptions: React.FC<FilterOptionsProps> = ({ onFilterChange }) => {
   const [currency, setCurrency] = useState<string>("USD");
-  const [period, setPeriod] = useState<string>('week');
+  const [period, setPeriod] = useState<string>('month');
   const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState<boolean>(false);
   const [periodDropdownOpen, setPeriodDropdownOpen] = useState<boolean>(false);
 
