@@ -62,7 +62,6 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
       const d = new Date(date);
       return d >= windowStart && d <= now;
     });
-    console.log('BarChart (week) – raw filtered:', filtered);
 
     // 2) Group into 4 one-week buckets
     // buckets[0] = oldest (21–28 days ago), …, buckets[3] = last 7 days
@@ -74,7 +73,6 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
       const idx = Math.floor(diffDays / 7);
       if (idx >= 0 && idx < 4) buckets[3 - idx] += amount;
     });
-    console.log('BarChart (week) – grouped buckets:', buckets);
 
     labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
   } else if (period === 'month') {
@@ -87,7 +85,6 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
       const d = new Date(date);
       return d >= windowStart && d <= now;
     });
-    console.log('BarChart (month) – raw filtered:', filtered);
 
     // 2) Group by year-month
     const map: Record<string, number> = {};
@@ -96,7 +93,6 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
       const key = `${d.getFullYear()}-${d.getMonth() + 1}`;
       map[key] = (map[key] || 0) + amount;
     });
-    console.log('BarChart (month) – grouped map:', map);
 
     // 3) Sort keys chronologically
     const sortedKeys = Object.keys(map).sort((a, b) => {
@@ -113,12 +109,10 @@ const MonthlyDonation: React.FC<MonthlyDonationProps> = ({
     const filtered = yearlyData.filter(({ date }) => {
       return new Date(date) <= now;
     });
-    console.log('BarChart (year) – raw filtered:', filtered);
 
     const sorted = [...filtered].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
-    console.log('BarChart (year) – sorted:', sorted);
 
     labels = sorted.map((d) => new Date(d.date).getFullYear().toString());
     buckets = sorted.map((d) => d.amount);
